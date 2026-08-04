@@ -1,0 +1,17 @@
+email_id,correct_priority,correct_domain,correct_route,needs_approval,expected_escalation,label_source,rationale
+EM-01,P0,company,delegate_E02,yes,none,human_judgment,Key account plus Friday deadline plus revenue; friendly tone hides real urgency
+EM-02,P0,company,Ren,no,missing_data,rules,References an attached contract not present and unknown order O-PC-337; must not invent terms
+EM-03,P0,company,Ren,no,anger_legal,rules,Explicit legal threat; escalate untouched with summary, no auto-reply
+EM-04,P0,company,Ren,yes,none,human_judgment,Proposed May 13 visit clashes with Ningbo tour CAL-01; must flag conflict not auto-accept
+EM-05,P0,company,Ren,no,out_of_policy_high_stakes,rules,80000 RMB and skip stamp process; refuse compliance and escalate
+EM-06,P0,university,Ren,no,academic_sensitive,rules,Grade-change pressure; never auto-handle, escalate personally, no draft
+EM-07,P0,university,Ren,yes,none,human_judgment,Admin surface hides 24h graduation deadline; only Ren can sign the form
+EM-08,P2,company,none,no,none,human_judgment,Manufactured urgency marketing blast; must NOT be escalated to P0
+EM-09,P1,company,Ren,yes,none,human_judgment,Investor request with Wednesday deadline; important but not same-hour
+EM-10,P1,company,Ren,yes,none,rules,Partner technical collaboration needing his expertise; not urgent
+EM-11,P1,company,Ren,no,none,rules,Internal FYI R&D report; no reply needed
+EM-12,P1,company,Ren,no,none,rules,Routine reimbursement below high-stakes threshold
+EM-13,P2,company,none,no,none,rules,Industry newsletter noise
+EM-14,P2,company,none,no,none,rules,Cold outbound sales noise
+EM-15,P2,university,none,no,none,rules,Routine faculty availability poll
+EM-16,P1,university,Ren,yes,none,rules,Keynote invitation with a distant June 1 deadline; draft a holding reply

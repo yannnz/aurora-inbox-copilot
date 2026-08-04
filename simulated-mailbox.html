@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" data-skin="studio">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulated mailbox</title>
+<style>
+:root {
+  --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --fs-0: 13px; --fs-1: 14px; --fs-2: 16px; --fs-3: 20px; --lh: 1.5;
+  --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px;
+  --radius: 10px; --border-w: 1px;
+  --bg: #F6F7FB; --bg-raise: #FFFFFF; --bg-inset: #EEF0F6; --line: #E1E5EF;
+  --ink: #131A2A; --ink-2: #4C5670; --ink-3: #8B93A9; --accent: #4056C9; --ok: #1FA971;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--font-ui); font-size: var(--fs-1); line-height: var(--lh);
+  padding: var(--sp-5);
+}
+.panel {
+  max-width: 720px; margin: 0 auto; background: var(--bg-raise);
+  border: var(--border-w) solid var(--line); border-radius: var(--radius); padding: var(--sp-5);
+}
+h1 { font-size: var(--fs-3); margin: 0 0 var(--sp-2); }
+.muted { color: var(--ink-2); font-size: var(--fs-0); }
+.badge {
+  display: inline-block; padding: 3px 10px; border-radius: 999px;
+  background: color-mix(in srgb, var(--ok) 14%, transparent); color: var(--ok);
+  font-size: var(--fs-0); font-weight: 700; margin-bottom: var(--sp-4);
+}
+.block {
+  background: var(--bg-inset); border: var(--border-w) solid var(--line);
+  border-radius: var(--radius); padding: var(--sp-4); margin-top: var(--sp-3);
+  white-space: pre-wrap;
+}
+a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="panel">
+  <div class="badge">SIMULATED MAILBOX — not a real Gmail/Outlook account</div>
+  <h1 id="title">Thread</h1>
+  <p class="muted" id="meta"></p>
+  <div class="block" id="body"></div>
+  <h2 style="font-size: var(--fs-2); margin-top: var(--sp-5);">Draft on this thread</h2>
+  <p class="muted">In a real product, this draft would already be synced to the mailbox draft box for this message.</p>
+  <div class="block" id="draft">(no draft synced)</div>
+  <p class="muted" style="margin-top: var(--sp-4);"><a href="index.html">Back to Aurora Inbox Copilot</a></p>
+</div>
+<script>
+var params = new URLSearchParams(location.search);
+var id = params.get("email") || "(unknown)";
+var stored = {};
+try { stored = JSON.parse(sessionStorage.getItem("aurora_mailbox_" + id) || "{}"); } catch (e) {}
+document.getElementById("title").textContent = stored.subject || ("Message " + id);
+document.getElementById("meta").textContent =
+  id + " · from " + (stored.from || "?") + " · received " + (stored.received_at || "?");
+document.getElementById("body").textContent = stored.body || "(Open this link from the Copilot after selecting a case.)";
+document.getElementById("draft").textContent = stored.draft || "(no draft synced yet — run the agent and open again)";
+</script>
+</body>
+</html>

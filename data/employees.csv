@@ -1,0 +1,5 @@
+employee_id,name,role,handles_categories,can_draft_reply,notes
+E01,Lin Hao,Operations Manager,"supplier, logistics, reimbursement, admin",yes,Handles vendor and operations matters
+E02,Zhao Rui,Sales Lead,"customer, quote, order",yes,Owns key accounts; drafts customer replies
+E03,Mei Zhou,Lab Coordinator,"internal_lab, sample_request",yes,Not investor-facing
+E04,Guo Ping,Finance Admin,"reimbursement, expense_processing",no,Prepares payments but cannot approve them

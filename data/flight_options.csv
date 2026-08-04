@@ -1,0 +1,4 @@
+flight_id,route,date,depart_time,arrive_time,airline,price_rmb,notes
+FL-01,Shanghai PVG to Chengdu TFU,2026-05-20,08:15,11:05,China Eastern,1180,Nonstop morning
+FL-02,Shanghai PVG to Chengdu TFU,2026-05-20,13:40,16:35,Air China,990,Nonstop afternoon
+FL-03,Shanghai PVG to Chengdu TFU,2026-05-20,19:20,22:10,Sichuan Airlines,860,Nonstop late evening

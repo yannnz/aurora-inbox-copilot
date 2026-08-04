@@ -1,0 +1,16 @@
+sender_id,name,org,relationship,domain,last_handled_by,notes
+S-01,Zhao Ming,Acme Battery Corp,key_customer,company,E02,Top-3 account by revenue; usually polite tone
+S-02,Lena Ortiz,PowerCell Ltd,customer,company,E02,Ongoing order dispute on pricing
+S-03,GreenVolt Supply Team,GreenVolt Supply,supplier,company,E01,Vendor; sends frequent promotional blasts
+S-04,Fang Li,Summit Ventures,investor_board,company,,Lead investor and board member
+S-05,Dr. Ken Park,Helios Materials,partner,company,,Potential technical collaboration partner
+S-06,Mei Zhou,Aurora Materials (Lab),internal,company,,Lab coordinator; sends daily R&D reports
+S-07,Chengdu Aero Co,Chengdu Aero Co,partner,company,,Aerospace partner; site located in Chengdu
+S-08,BatteryWeekly,BatteryWeekly Newsletter,noise,company,,Industry newsletter subscription
+S-09,Vertex CRM Sales,Vertex CRM,noise,company,,Cold outbound sales
+S-10,Guo Ping,Aurora Materials (Finance),internal,company,,Finance and admin coordinator
+S-11,Marcus Reed,Volt Dynamics,customer,company,E02,Received a shipment that failed QA
+S-20,Wang Tao,State University,grad_student,university,,PhD candidate; Ren's advisee
+S-21,Priya Nair,State University,grad_student,university,,Master's student; Ren's advisee
+S-22,Dean's Office,State University,university_admin,university,,Faculty administration
+S-23,ICSSB Committee,ICSSB 2026 Conference,university,university,,Conference organizing committee

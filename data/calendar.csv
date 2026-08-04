@@ -1,0 +1,6 @@
+event_id,type,title,start_date,end_date,location,notes
+CAL-01,trip,Production line tour - Ningbo plant,2026-05-13,2026-05-14,Ningbo,Confirmed
+CAL-02,trip,Chengdu Aero technical exchange,2026-05-20,2026-05-21,Chengdu,Tentative
+CAL-03,meeting,Board sync with Summit Ventures,2026-05-15,2026-05-15,Video call,Confirmed
+CAL-04,in_office,In-office week,2026-05-25,2026-05-29,Office,-
+CAL-05,meeting,Grad student weekly advising,2026-05-12,2026-05-12,Campus,Confirmed
