@@ -1,4 +1,5 @@
 node_modules/
+.cursor/
 npm-debug.log*
 .DS_Store
 *.local

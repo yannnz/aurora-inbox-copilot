@@ -14,7 +14,7 @@
   --fs-0: 13px; --fs-1: 14px; --fs-2: 16px; --fs-3: 20px; --fs-4: 28px; --lh: 1.5;
   --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px; --sp-6: 32px;
   --radius: 10px; --radius-sm: 6px; --border-w: 1px;
-  --ok: #1FA971; --warn: #D98E04; --danger: #D64545; --info: #3B82F6;
+  --ok: #059669; --warn: #D97706; --danger: #DC2626; --info: #2563EB;
 }
 :root, [data-skin="ops"] {
   --bg: #0F1420; --bg-raise: #171E2E; --bg-inset: #0B0F18; --line: #263049;
@@ -22,13 +22,29 @@
   --accent: #6C8CFF; --accent-ink: #FFFFFF; --chip: #1E2740;
   --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 32px -12px rgba(0,0,0,.55);
   --font-body: var(--font-ui);
+  --accent-soft: color-mix(in srgb, var(--accent) 18%, var(--bg-raise));
+  --accent-deep: color-mix(in srgb, var(--accent) 72%, var(--ink));
+  --cta: var(--warn);
 }
 [data-skin="studio"] {
-  --bg: #F6F7FB; --bg-raise: #FFFFFF; --bg-inset: #EEF0F6; --line: #E1E5EF;
-  --ink: #131A2A; --ink-2: #4C5670; --ink-3: #8B93A9;
-  --accent: #4056C9; --accent-ink: #FFFFFF; --chip: #EDF0FA;
-  --shadow: 0 1px 2px rgba(19,26,42,.06), 0 12px 28px -14px rgba(19,26,42,.18);
+  /* Soft UI Evolution × SaaS trust blue (UUPM) */
+  --bg: #F1F5FB;
+  --bg-raise: #FFFFFF;
+  --bg-inset: #E7EEF8;
+  --line: #D5E0F0;
+  --ink: #0F172A;
+  --ink-2: #475569;
+  --ink-3: #64748B;
+  --accent: #2563EB;
+  --accent-ink: #FFFFFF;
+  --chip: #E0EAFF;
+  --shadow: 0 1px 2px rgba(15, 23, 42, .05), 0 14px 32px -16px rgba(37, 99, 235, .18);
   --font-body: var(--font-ui);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --accent-soft: #DBEAFE;
+  --accent-deep: #1D4ED8;
+  --cta: #EA580C;
 }
 [data-skin="term"] {
   --bg: #0C0F0C; --bg-raise: #121712; --bg-inset: #080B08; --line: #223122;
@@ -36,6 +52,9 @@
   --accent: #35D07F; --accent-ink: #06130A; --chip: #16301E;
   --shadow: 0 0 0 1px rgba(53,208,127,.08), 0 12px 32px -14px rgba(0,0,0,.7);
   --font-body: var(--font-mono);
+  --accent-soft: color-mix(in srgb, var(--accent) 16%, var(--bg-raise));
+  --accent-deep: color-mix(in srgb, var(--accent) 70%, var(--ink));
+  --cta: var(--warn);
 }
 * { box-sizing: border-box; }
 body {
@@ -433,9 +452,24 @@ body {
 .log .row .action-approve  { color: var(--ok); }
 .log .row .action-edit     { color: var(--warn); }
 .log .row .action-escalate { color: var(--danger); }
-.thinking { display: inline-flex; align-items: center; gap: var(--sp-2); color: var(--info); font-weight: 600; }
-.thinking::before { content: ""; width: 12px; height: 12px; border: 2px solid var(--info); border-top-color: transparent; border-radius: 50%; animation: spin .8s linear infinite; }
+.thinking { display: inline-flex; align-items: center; gap: var(--sp-3); color: var(--info); font-weight: 600; }
+.thinking::before {
+  content: "";
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--info);
+  box-shadow: 14px 0 0 var(--info), 28px 0 0 var(--info);
+  animation: think-pulse 1s ease-in-out infinite;
+  margin-right: 28px;
+}
+@keyframes think-pulse {
+  0%, 80%, 100% { opacity: .35; }
+  40% { opacity: 1; }
+}
 @keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .thinking::before { animation: none; opacity: 1; }
+  .btn, .chip, .case-card, .panel, .field-input { transition: none !important; }
+}
 .empty { padding: var(--sp-6); text-align: center; color: var(--ink-2); }
 .empty .headline { font-size: var(--fs-3); font-weight: 700; color: var(--ink); margin-bottom: var(--sp-2); }
 .error-note {
@@ -526,6 +560,291 @@ body {
 }
 .bubble-meta { font-size: var(--fs-0); color: var(--ink-3); margin-bottom: var(--sp-2); }
 .bubble-subject { font-weight: 700; font-size: var(--fs-2); margin-bottom: var(--sp-2); }
+
+.email-chat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+.email-chat-thread {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  max-height: 22rem;
+  overflow: auto;
+  padding: var(--sp-3);
+  border: var(--border-w) solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--bg-inset);
+}
+.email-chat-thread:empty::before {
+  content: "Ask anything about this email — sender, ask, deadlines, related morning mail, or what triage would consider. Chat does not send mail.";
+  display: block;
+  color: var(--ink-3);
+  font-size: var(--fs-0);
+  line-height: var(--lh);
+}
+.chat-bubble {
+  max-width: 92%;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--radius);
+  border: var(--border-w) solid var(--line);
+  white-space: pre-wrap;
+  font-size: var(--fs-1);
+  line-height: var(--lh);
+}
+.chat-bubble.user {
+  align-self: flex-end;
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 28%, var(--line));
+  color: var(--ink);
+}
+.chat-bubble.assistant {
+  align-self: flex-start;
+  background: var(--bg-raise);
+  color: var(--ink);
+}
+.chat-bubble.error {
+  align-self: stretch;
+  border-color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 8%, var(--bg-raise));
+  color: var(--danger);
+}
+.email-chat-compose {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.email-chat-compose .row-actions {
+  justify-content: flex-end;
+}
+
+/* Sticky messenger widget — Intercom / Crisp pattern */
+.chat-launcher {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 50;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-ink);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--accent) 45%, transparent);
+  transition: transform .15s ease, box-shadow .2s ease, background .15s ease;
+}
+.chat-launcher:hover {
+  background: var(--accent-deep);
+  transform: scale(1.06);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--accent) 50%, transparent);
+}
+.chat-launcher:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.chat-launcher-icon {
+  width: 26px;
+  height: 26px;
+  display: block;
+}
+.chat-launcher[aria-expanded="true"] {
+  background: var(--ink);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--ink) 28%, transparent);
+}
+.chat-launcher[aria-expanded="true"] .chat-launcher-icon-open { display: none; }
+.chat-launcher[aria-expanded="true"] .chat-launcher-icon-close { display: block; }
+.chat-launcher-icon-close { display: none; }
+
+.global-chat {
+  position: fixed;
+  right: 20px;
+  bottom: 88px;
+  z-index: 51;
+  width: min(380px, calc(100vw - 2rem));
+  height: min(560px, calc(100vh - 120px));
+  max-height: calc(100vh - 120px);
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+  border: var(--border-w) solid var(--line);
+  border-radius: 16px;
+  background: var(--bg-raise);
+  box-shadow: 0 5px 40px color-mix(in srgb, var(--ink) 18%, transparent);
+}
+.global-chat[hidden] { display: none !important; }
+.global-chat-head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: 16px 18px;
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.global-chat-title-row {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+}
+.global-chat-title {
+  font-size: var(--fs-2);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--accent-ink);
+}
+.global-chat-head .info-tip-btn {
+  background: color-mix(in srgb, var(--accent-ink) 16%, transparent);
+  border-color: color-mix(in srgb, var(--accent-ink) 35%, transparent);
+  color: var(--accent-ink);
+}
+.global-chat-head .info-tip-btn:hover,
+.global-chat-head .info-tip-btn:focus-visible {
+  background: color-mix(in srgb, var(--accent-ink) 28%, transparent);
+  color: var(--accent-ink);
+}
+.global-chat-sub {
+  font-size: var(--fs-0);
+  margin-top: 4px;
+  color: color-mix(in srgb, var(--accent-ink) 80%, transparent);
+}
+.global-chat-close {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent-ink) 14%, transparent);
+  color: var(--accent-ink);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  line-height: 1;
+}
+.global-chat-close:hover {
+  background: color-mix(in srgb, var(--accent-ink) 24%, transparent);
+}
+.global-chat-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: color-mix(in srgb, var(--bg-inset) 65%, var(--bg-raise));
+}
+.global-chat-toolbar {
+  flex: none;
+  padding: 10px 12px 0;
+}
+.global-chat #global-chat-focus {
+  margin: 0;
+  font-size: var(--fs-0);
+  background: var(--bg-raise);
+}
+.global-chat .email-chat-thread {
+  flex: 1;
+  min-height: 0;
+  max-height: none;
+  margin: 10px 12px;
+  border: 0;
+  background: transparent;
+  padding: 4px 2px;
+}
+.global-chat .email-chat-thread:empty::before {
+  content: "Hi — ask about any morning email or inbox policy. Pick a focus above, or leave Whole inbox.";
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--bg-raise);
+  border: var(--border-w) solid var(--line);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 5%, transparent);
+}
+.global-chat .chat-bubble {
+  max-width: 85%;
+  border-radius: 14px;
+  padding: 10px 12px;
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 5%, transparent);
+}
+.global-chat .chat-bubble.user {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+.global-chat .chat-bubble.assistant {
+  background: var(--bg-raise);
+  border-color: var(--line);
+}
+.global-chat .email-chat-compose {
+  flex: none;
+  padding: 10px 12px 12px;
+  border-top: var(--border-w) solid var(--line);
+  background: var(--bg-raise);
+  gap: var(--sp-2);
+}
+.global-chat-compose-row {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: flex-end;
+}
+.global-chat-compose-row .field-input {
+  flex: 1;
+  min-height: 44px;
+  max-height: 96px;
+  resize: none;
+  border-radius: 12px;
+}
+.global-chat-send {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  border: 0;
+  background: var(--accent);
+  color: var(--accent-ink);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  box-shadow: 0 4px 10px -4px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+.global-chat-send:hover:not(:disabled) { background: var(--accent-deep); }
+.global-chat-send:disabled { opacity: .45; cursor: not-allowed; }
+.global-chat-send svg { width: 18px; height: 18px; display: block; }
+.global-chat-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.global-chat-foot .btn {
+  padding: 4px 10px;
+  font-size: var(--fs-0);
+}
+.global-chat-note {
+  margin: 0;
+  font-size: 11px;
+  color: var(--ink-3);
+  line-height: 1.35;
+}
+@media (max-width: 1100px) {
+  .chat-launcher { right: 16px; bottom: 16px; }
+  .global-chat {
+    right: 12px;
+    bottom: 80px;
+    width: calc(100vw - 24px);
+    height: min(70vh, 560px);
+  }
+}
 .draft-pane {
   border: var(--border-w) solid var(--accent); border-radius: var(--radius);
   background: var(--bg-inset); padding: var(--sp-3) var(--sp-4);
@@ -553,9 +872,7 @@ body {
 #first-run-banner.visible { display: block; }
 #settings-block.needs-key {
   outline: 2px solid var(--warn);
-  outline-offset: 4px;
-  border-radius: var(--radius-sm);
-  padding: var(--sp-2);
+  outline-offset: 2px;
 }
 .thinking-wrap {
   padding: var(--sp-4);
@@ -728,9 +1045,28 @@ body {
   font-size: var(--fs-1);
 }
 .trace-item:hover { background: color-mix(in srgb, var(--accent) 8%, transparent); }
-.trace-item.active { background: color-mix(in srgb, var(--accent) 14%, transparent); }
-.trace-item.parent { border-left: 3px solid var(--accent); }
-.trace-item.child { padding-left: calc(var(--sp-3) + 0.85rem); background: color-mix(in srgb, var(--bg) 70%, var(--bg-inset)); }
+.trace-item.parent { border-left: 3px solid color-mix(in srgb, var(--accent) 35%, var(--line)); }
+.trace-item.child {
+  padding-left: calc(var(--sp-3) + 0.85rem);
+  background: color-mix(in srgb, var(--bg) 70%, var(--bg-inset));
+  border-left: 3px solid transparent;
+}
+.trace-item.context-parent {
+  background: color-mix(in srgb, var(--accent) 7%, var(--bg-inset));
+  border-left-color: color-mix(in srgb, var(--accent) 55%, var(--line));
+}
+.trace-item.parent.active {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  border-left-color: var(--accent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 28%, transparent);
+}
+.trace-item.child.active {
+  background: color-mix(in srgb, var(--accent) 18%, var(--bg-raise));
+  border-left-color: transparent;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--accent) 40%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--accent) 12%, transparent);
+}
 .trace-item .t-meta { color: var(--ink-3); font-size: var(--fs-0); margin-top: 2px; }
 .trace-detail {
   border: var(--border-w) solid var(--line);
@@ -890,21 +1226,544 @@ body {
 }
 .limits-panel li { margin-bottom: var(--sp-2); }
 .limits-panel li:last-child { margin-bottom: 0; }
+.badge[hidden],
+.badge:empty,
+.prio[hidden],
+.prio:empty {
+  display: none !important;
+}
+.mail-status-row:empty { display: none; }
+
+/* Hover / focus info tips — first-run help without clutter */
+.section-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-3);
+  flex-wrap: wrap;
+}
+.section-title-row .panel-head {
+  margin: 0;
+  padding-left: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink-2);
+}
+.section-title-row .panel-head::after { display: none; }
+.label-with-tip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+}
+.info-tip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+.info-tip-btn {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border-radius: 50%;
+  border: var(--border-w) solid color-mix(in srgb, var(--accent) 35%, var(--line));
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  cursor: help;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+.info-tip-btn:hover,
+.info-tip-btn:focus-visible {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  outline: none;
+}
+.info-tip-pop {
+  display: none;
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 16rem;
+  max-width: min(22rem, 70vw);
+  padding: var(--sp-3);
+  border-radius: var(--radius-sm);
+  border: var(--border-w) solid var(--line);
+  background: var(--bg-raise);
+  color: var(--ink);
+  font-size: var(--fs-0);
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  line-height: var(--lh);
+  box-shadow: var(--shadow);
+  white-space: normal;
+}
+.info-tip-pop::before {
+  content: "";
+  position: absolute;
+  top: -5px; left: 10px;
+  width: 8px; height: 8px;
+  background: var(--bg-raise);
+  border-left: var(--border-w) solid var(--line);
+  border-top: var(--border-w) solid var(--line);
+  transform: rotate(45deg);
+}
+.info-tip:hover .info-tip-pop,
+.info-tip:focus-within .info-tip-pop,
+.info-tip.open .info-tip-pop {
+  display: block;
+}
+.info-tip-pop.align-end {
+  left: auto;
+  right: 0;
+}
+.info-tip-pop.align-end::before {
+  left: auto;
+  right: 10px;
+}
+
+/* Expandable secondary cards (Evals) */
+.fold-card {
+  margin-top: var(--sp-4);
+  border: var(--border-w) solid color-mix(in srgb, var(--accent) 16%, var(--line));
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, var(--accent-soft), var(--bg-inset));
+  box-shadow: 0 8px 20px -16px color-mix(in srgb, var(--ink) 20%, transparent);
+}
+.fold-card > summary {
+  cursor: pointer;
+  list-style: none;
+  padding: var(--sp-3) var(--sp-4);
+  font-size: var(--fs-2);
+  font-weight: 700;
+  color: var(--ink);
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.fold-card > summary::-webkit-details-marker { display: none; }
+.fold-card > summary::before {
+  content: "▸";
+  color: var(--accent);
+  font-size: var(--fs-1);
+  width: 1rem;
+  flex: none;
+}
+.fold-card[open] > summary::before { content: "▾"; }
+.fold-card-body {
+  padding: 0 var(--sp-4) var(--sp-4);
+  border-top: var(--border-w) solid color-mix(in srgb, var(--line) 80%, transparent);
+  padding-top: var(--sp-3);
+}
+.fold-card .imp-row { margin-bottom: var(--sp-3); }
+.fold-card .imp-row:last-child { margin-bottom: 0; }
+.fold-card .imp-k {
+  font-size: var(--fs-0);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: var(--sp-1);
+}
+.fold-card .imp-v {
+  font-size: var(--fs-1);
+  color: var(--ink);
+  line-height: var(--lh);
+  white-space: pre-wrap;
+}
+.fold-card .limits-intro {
+  margin: 0 0 var(--sp-3);
+  font-size: var(--fs-0);
+  color: var(--ink-3);
+}
+.fold-card ol {
+  margin: 0;
+  padding-left: var(--sp-5);
+  color: var(--ink);
+  font-size: var(--fs-1);
+  line-height: var(--lh);
+}
+.fold-card li { margin-bottom: var(--sp-2); }
+.fold-card li:last-child { margin-bottom: 0; }
 .console.hidden { display: none; }
+
+/* ═══ Soft UI Evolution + AI-Native (UUPM) — Studio token colors only ═══ */
+html { color-scheme: light; }
+body {
+  background:
+    radial-gradient(1100px 520px at 8% -8%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 58%),
+    radial-gradient(900px 480px at 92% 4%, color-mix(in srgb, var(--info) 10%, transparent), transparent 52%),
+    linear-gradient(180deg, color-mix(in srgb, var(--chip) 55%, var(--bg)) 0%, var(--bg) 42%);
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.005em;
+}
+.console {
+  padding: var(--sp-4) var(--sp-5) var(--sp-5);
+  gap: var(--sp-4);
+}
+.topbar {
+  position: sticky; top: 0; z-index: 20;
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  background: color-mix(in srgb, var(--bg-raise) 78%, transparent);
+  padding: var(--sp-4) var(--sp-5);
+  gap: var(--sp-4);
+  border-bottom: var(--border-w) solid color-mix(in srgb, var(--line) 70%, transparent);
+  box-shadow: 0 8px 28px -20px color-mix(in srgb, var(--ink) 28%, transparent);
+}
+.topbar::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 2px;
+  background: linear-gradient(90deg,
+    var(--accent) 0%,
+    color-mix(in srgb, var(--info) 70%, var(--accent)) 42%,
+    var(--cta) 78%,
+    transparent 100%);
+  opacity: .85;
+}
+.topbar .product {
+  font-size: var(--fs-3);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  display: inline-flex;
+  align-items: center;
+}
+.topbar .product-mark {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; margin-right: var(--sp-3);
+  border-radius: 9px;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--accent) 88%, var(--bg-raise)), var(--accent));
+  color: var(--accent-ink);
+  font-size: var(--fs-0); font-weight: 800; letter-spacing: 0;
+  box-shadow: 0 6px 14px -6px color-mix(in srgb, var(--accent) 70%, transparent);
+}
+.topbar .meta { color: var(--ink-3); max-width: 42rem; text-align: right; line-height: 1.35; }
+.topbar #top-status { margin-left: var(--sp-1); }
+.view-tabs {
+  display: flex;
+  padding: var(--sp-3) var(--sp-5);
+  gap: var(--sp-3);
+  align-items: center;
+  position: sticky; top: 64px; z-index: 19;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: color-mix(in srgb, var(--bg) 55%, transparent);
+  border-bottom: var(--border-w) solid color-mix(in srgb, var(--line) 65%, transparent);
+}
+.view-tabs-rail {
+  display: inline-flex;
+  gap: var(--sp-1);
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--bg-raise);
+  border: var(--border-w) solid var(--line);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 5%, transparent),
+              inset 0 1px 0 color-mix(in srgb, var(--bg-raise) 90%, transparent);
+}
+.view-tabs .chip {
+  padding: 8px 16px;
+  border-radius: 999px;
+  border-color: transparent;
+  background: transparent;
+  color: var(--ink-2);
+  transition: background .2s ease, color .2s ease, box-shadow .2s ease, transform .15s ease;
+}
+.view-tabs .chip:hover {
+  color: var(--ink);
+  background: color-mix(in srgb, var(--accent) 8%, var(--chip));
+  border-color: transparent;
+}
+.view-tabs .chip.active {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: var(--accent);
+  box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+.panel {
+  border-color: color-mix(in srgb, var(--line) 85%, transparent);
+  box-shadow:
+    0 1px 2px color-mix(in srgb, var(--ink) 4%, transparent),
+    0 16px 40px -24px color-mix(in srgb, var(--accent) 14%, transparent);
+  transition: box-shadow .25s ease, border-color .25s ease, transform .2s ease;
+  overflow: hidden;
+}
+.panel-head {
+  position: relative;
+  background: linear-gradient(180deg, var(--accent-soft), var(--bg-raise) 70%);
+  letter-spacing: .1em;
+  color: var(--accent-deep);
+}
+.panel-head::after {
+  content: "";
+  position: absolute;
+  left: var(--sp-4); right: var(--sp-4); bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--accent), transparent 85%);
+  opacity: .35;
+}
+.inbox-pane .panel-head,
+.reading-pane .panel-head,
+.session-pane .panel-head {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3);
+}
+.case-card {
+  transition: background .2s ease, box-shadow .2s ease, padding .15s ease;
+}
+.case-card:hover {
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
+}
+.case-card.active {
+  background: color-mix(in srgb, var(--accent) 11%, transparent);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+.case-card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.btn {
+  border-radius: 9px;
+  transition: background .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease, transform .15s ease;
+}
+.btn:hover:not(:disabled) {
+  box-shadow: 0 6px 16px -10px color-mix(in srgb, var(--ink) 35%, transparent);
+}
+.btn:active:not(:disabled) { transform: translateY(1px); }
+.btn.primary {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 88%, var(--bg-raise)), var(--accent-deep));
+  border-color: var(--accent-deep);
+  box-shadow: 0 8px 18px -10px color-mix(in srgb, var(--accent) 70%, transparent);
+}
+.btn.primary:hover:not(:disabled) {
+  background: var(--accent-deep);
+  border-color: var(--accent-deep);
+}
+.btn.approve {
+  box-shadow: 0 8px 18px -10px color-mix(in srgb, var(--ok) 65%, transparent);
+}
+.btn.approve:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--ok) 88%, var(--ink));
+  border-color: color-mix(in srgb, var(--ok) 88%, var(--ink));
+}
+.btn:focus-visible,
+.chip:focus-visible,
+.session-toggle:focus-visible,
+.field-input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.field-input {
+  border-radius: 9px;
+  transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+.field-input:focus {
+  border-color: var(--accent);
+  background: var(--bg-raise);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 16%, transparent);
+  outline: none;
+}
+.mail-read {
+  position: relative;
+  background:
+    linear-gradient(180deg, var(--accent-soft) 0%, var(--bg-raise) 48px);
+  border-radius: var(--radius);
+  border: var(--border-w) solid color-mix(in srgb, var(--line) 80%, transparent);
+  box-shadow:
+    0 1px 2px color-mix(in srgb, var(--ink) 4%, transparent),
+    0 12px 28px -18px color-mix(in srgb, var(--accent) 18%, transparent);
+  padding: var(--sp-5);
+  overflow: hidden;
+}
+.mail-read::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--info), var(--cta));
+}
+.mail-read .mail-subject {
+  letter-spacing: -0.02em;
+  font-size: var(--fs-3);
+  color: var(--ink);
+}
+.stage {
+  margin: 0 0 var(--sp-3);
+  padding: 0;
+  color: var(--accent-deep);
+}
+.stage::before {
+  background: linear-gradient(145deg, var(--accent), var(--accent-deep));
+  box-shadow: 0 4px 10px -4px color-mix(in srgb, var(--accent) 70%, transparent);
+}
+.stage-block {
+  position: relative;
+  margin-top: var(--sp-4);
+  padding: var(--sp-4) var(--sp-5);
+  border: var(--border-w) solid color-mix(in srgb, var(--line) 85%, transparent);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--accent-soft) 55%, var(--bg-raise)), var(--bg-raise) 42%);
+  box-shadow:
+    0 1px 2px color-mix(in srgb, var(--ink) 4%, transparent),
+    0 10px 28px -20px color-mix(in srgb, var(--accent) 16%, transparent);
+  overflow: hidden;
+}
+.stage-block::before {
+  content: "";
+  position: absolute;
+  top: var(--sp-4); bottom: var(--sp-4); left: 0;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--cta) 55%, var(--accent)));
+}
+.stage-block:first-child { margin-top: 0; }
+.draft-pane {
+  border-radius: var(--radius);
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+  background: linear-gradient(180deg, var(--accent-soft), var(--bg-inset));
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent),
+    0 10px 24px -16px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+.thinking-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  border-radius: var(--radius);
+  border: var(--border-w) solid color-mix(in srgb, var(--info) 28%, var(--line));
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--info) 8%, var(--bg-raise)), var(--bg-inset));
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--bg-raise) 80%, transparent);
+}
+#human-gate {
+  margin-top: var(--sp-3);
+  padding: var(--sp-4) var(--sp-5);
+  border: var(--border-w) solid color-mix(in srgb, var(--accent) 28%, var(--line));
+  border-radius: var(--radius);
+  background:
+    linear-gradient(165deg, var(--accent-soft) 0%, var(--bg-raise) 55%);
+  box-shadow:
+    0 1px 2px color-mix(in srgb, var(--ink) 5%, transparent),
+    0 14px 32px -18px color-mix(in srgb, var(--accent) 28%, transparent);
+}
+#human-gate .row-actions { gap: var(--sp-3); }
+#human-gate .btn.approve {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--ok) 85%, var(--bg-raise)), var(--ok));
+}
+.demo-chips .chip,
+.slot-chips .chip {
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 22%, var(--line));
+  color: var(--accent-deep);
+}
+.demo-chips .chip:hover,
+.slot-chips .chip:hover {
+  background: color-mix(in srgb, var(--accent) 18%, var(--accent-soft));
+  border-color: var(--accent);
+  color: var(--accent-deep);
+}
+.stat {
+  background: linear-gradient(180deg, var(--accent-soft), var(--bg-inset));
+  border-color: color-mix(in srgb, var(--accent) 18%, var(--line));
+}
+.stat.ok { background: linear-gradient(180deg, color-mix(in srgb, var(--ok) 14%, var(--bg-raise)), var(--bg-inset)); }
+.stat.warn { background: linear-gradient(180deg, color-mix(in srgb, var(--warn) 14%, var(--bg-raise)), var(--bg-inset)); }
+.stat.danger { background: linear-gradient(180deg, color-mix(in srgb, var(--danger) 12%, var(--bg-raise)), var(--bg-inset)); }
+.demo-chips-fold,
+.side-fold {
+  background: linear-gradient(180deg, var(--accent-soft), var(--bg-inset));
+  border-color: color-mix(in srgb, var(--accent) 16%, var(--line));
+}
+.settings-fold {
+  margin: var(--sp-4) var(--sp-4) 0;
+  border: var(--border-w) solid var(--line);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--bg-raise) 80%, var(--bg-inset));
+  box-shadow: 0 8px 20px -16px color-mix(in srgb, var(--ink) 20%, transparent);
+}
+.settings-fold > summary {
+  cursor: pointer;
+  list-style: none;
+  padding: var(--sp-3) var(--sp-4);
+  font-size: var(--fs-0);
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  user-select: none;
+}
+.settings-fold > summary::-webkit-details-marker { display: none; }
+.settings-fold > summary::before { content: "▸ "; color: var(--accent); }
+.settings-fold[open] > summary::before { content: "▾ "; }
+.settings-fold .settings-body { padding: 0 var(--sp-4) var(--sp-4); }
+.inbox-toolbar { padding-top: var(--sp-1); }
+.inbox-toolbar .btn.primary { min-width: 7.5rem; justify-content: center; }
+.session-toggle {
+  border-radius: var(--radius);
+  transition: border-color .2s ease, color .2s ease, background .2s ease, box-shadow .2s ease;
+  box-shadow: 0 10px 24px -18px color-mix(in srgb, var(--ink) 30%, transparent);
+}
+.session-toggle:hover {
+  box-shadow: 0 12px 28px -16px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+.decision-badges .badge {
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 18%, transparent);
+}
+.badge { border-radius: 999px; }
+.refusal-card {
+  box-shadow:
+    0 1px 2px color-mix(in srgb, var(--danger) 10%, transparent),
+    0 14px 28px -16px color-mix(in srgb, var(--danger) 35%, transparent);
+}
+.reviewer-panel {
+  border-radius: var(--radius);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--bg-raise) 75%, transparent);
+}
+.empty {
+  border: var(--border-w) dashed color-mix(in srgb, var(--line) 90%, var(--ink-3));
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--bg-inset) 75%, transparent);
+}
+.evals-view {
+  border-radius: calc(var(--radius) + 2px);
+  box-shadow:
+    0 1px 2px color-mix(in srgb, var(--ink) 4%, transparent),
+    0 18px 40px -24px color-mix(in srgb, var(--ink) 18%, transparent);
+}
+@media (max-width: 1100px) {
+  .topbar .meta { display: none; }
+  .view-tabs { top: 56px; padding-left: var(--sp-4); padding-right: var(--sp-4); }
+  .console { padding: var(--sp-3); }
+}
 </style>
 </head>
 <body>
 <header class="topbar">
-  <div class="product">Aurora Inbox Copilot</div>
+  <div class="product"><span class="product-mark" aria-hidden="true">A</span>Aurora Inbox Copilot</div>
   <span id="top-status" class="badge info">Ready</span>
-  <div class="meta" id="top-meta">Morning triage for Ren · scenario clock 11 May 2026 · Studio skin</div>
+  <div class="meta" id="top-meta">Morning triage for Ren · scenario clock 11 May 2026 · Soft Studio theme</div>
 </header>
 
 <nav class="view-tabs" aria-label="Main views">
-  <button type="button" class="chip active" id="tab-work" data-view="work">Work</button>
-  <button type="button" class="chip" id="tab-evals" data-view="evals">Evals</button>
-  <button type="button" class="chip" id="tab-traces" data-view="traces">Trace</button>
-  <button type="button" class="chip" id="tab-matrix" data-view="matrix">Priority matrix</button>
+  <div class="view-tabs-rail" role="presentation">
+    <button type="button" class="chip active" id="tab-work" data-view="work">Work</button>
+    <button type="button" class="chip" id="tab-evals" data-view="evals">Evals</button>
+    <button type="button" class="chip" id="tab-traces" data-view="traces">Trace</button>
+    <button type="button" class="chip" id="tab-matrix" data-view="matrix">Priority matrix</button>
+  </div>
 </nav>
 
 <div id="first-run-banner" role="status"></div>
@@ -914,10 +1773,20 @@ body {
 <div class="console" id="work-view" data-layout="list">
   <!-- Inbox list (full-width until an email is opened) -->
   <aside class="panel left-scroll inbox-pane">
-    <div class="panel-head">Inbox</div>
+    <div class="panel-head">
+      <span>Inbox</span>
+      <span class="info-tip">
+        <button type="button" class="info-tip-btn" aria-label="About inbox">i</button>
+        <span class="info-tip-pop align-end" role="tooltip">Click an email to open Reading · Triage. Run All walks every message in order. Demo chips jump to a known story. Settings (API keys, Google) are folded at the bottom.</span>
+      </span>
+    </div>
     <div class="panel-body inbox-body">
       <div class="inbox-toolbar">
         <button id="run-all-btn" class="btn primary">Run All</button>
+        <span class="info-tip">
+          <button type="button" class="info-tip-btn" aria-label="About Run All">i</button>
+          <span class="info-tip-pop" role="tooltip">Runs the worker (then reviewer) on each inbox email in order. Progress shows above the list. You can open other messages while a run continues.</span>
+        </span>
       </div>
       <p class="muted" id="run-all-progress" style="padding: 0 var(--sp-4);"></p>
       <p class="muted" id="run-all-summary" style="padding: 0 var(--sp-4);"></p>
@@ -926,32 +1795,55 @@ body {
         <div id="demo-chips" class="demo-chips"></div>
       </details>
       <div id="case-list" aria-label="Email list"></div>
-      <div id="settings-block" style="margin-top: var(--sp-4); padding: 0 var(--sp-4);">
-        <div class="panel-head" style="padding-left:0; border:0;">Settings</div>
-        <label class="muted" for="api-key">Worker API key — Kimi (localStorage only)</label>
+      <details class="settings-fold" id="settings-block">
+        <summary>Settings · API keys &amp; Google</summary>
+        <div class="settings-body">
+        <label class="muted label-with-tip" for="api-key">
+          Worker API key — Kimi (localStorage only)
+          <span class="info-tip">
+            <button type="button" class="info-tip-btn" aria-label="About worker key">i</button>
+            <span class="info-tip-pop" role="tooltip">Worker uses Kimi. Open the app at http://localhost:8787/ (not file://). Keys stay in this browser only.</span>
+          </span>
+        </label>
         <input class="field-input" type="password" id="api-key" placeholder="Paste Kimi key">
         <div class="row-actions" style="margin-top: var(--sp-2);">
           <button id="save-key" class="btn">Save key</button>
           <button id="clear-key" class="btn">Clear</button>
           <span id="key-status" class="badge neutral">no key</span>
         </div>
-        <label class="muted" for="openai-key" style="display:block; margin-top: var(--sp-4);">Reviewer API key — OpenAI (localStorage only)</label>
+        <label class="muted label-with-tip" for="openai-key" style="display:flex; margin-top: var(--sp-4);">
+          Reviewer API key — OpenAI (localStorage only)
+          <span class="info-tip">
+            <button type="button" class="info-tip-btn" aria-label="About reviewer key">i</button>
+            <span class="info-tip-pop" role="tooltip">Reviewer uses OpenAI (gpt-4o) as an independent check before you Approve / Edit / Escalate.</span>
+          </span>
+        </label>
         <input class="field-input" type="password" id="openai-key" placeholder="Paste OpenAI key">
         <div class="row-actions" style="margin-top: var(--sp-2);">
           <button id="save-openai-key" class="btn">Save OpenAI key</button>
           <button id="clear-openai-key" class="btn">Clear</button>
           <span id="openai-key-status" class="badge neutral">no key</span>
         </div>
-        <p class="muted" style="margin-top: var(--sp-2);">Worker uses Kimi; reviewer uses OpenAI (<code>gpt-4o</code>). Open the app at <code>http://localhost:8787/</code> (not file://). Keys stay in this browser only.</p>
-        <label class="muted" for="lmnr-key" style="display:block; margin-top: var(--sp-4);">Laminar project API key (optional tracing)</label>
+        <label class="muted label-with-tip" for="lmnr-key" style="display:flex; margin-top: var(--sp-4);">
+          Laminar project API key (optional tracing)
+          <span class="info-tip">
+            <button type="button" class="info-tip-btn" aria-label="About Laminar">i</button>
+            <span class="info-tip-pop" role="tooltip">Sends worker/reviewer runs to your local Laminar (via the Aurora proxy). Create a project in Laminar, copy the project API key, Save here. Keep Docker Laminar running while you triage.</span>
+          </span>
+        </label>
         <input class="field-input" type="password" id="lmnr-key" placeholder="Paste Laminar project API key">
         <div class="row-actions" style="margin-top: var(--sp-2);">
           <button id="save-lmnr-key" class="btn">Save Laminar key</button>
           <button id="clear-lmnr-key" class="btn">Clear</button>
           <span id="lmnr-key-status" class="badge neutral">off</span>
         </div>
-        <p class="muted" style="margin-top: var(--sp-2);">Sends worker/reviewer runs to your <a href="http://localhost:5667/" target="_blank" rel="noopener">local Laminar</a> (via the Aurora proxy). In Laminar: create a project → copy the project API key → Save here. Keep Docker Laminar running while you triage.</p>
-        <label class="muted" for="google-client-id" style="display:block; margin-top: var(--sp-4);">Google OAuth Client ID (Calendar)</label>
+        <label class="muted label-with-tip" for="google-client-id" style="display:flex; margin-top: var(--sp-4);">
+          Google OAuth Client ID (Calendar)
+          <span class="info-tip">
+            <button type="button" class="info-tip-btn" aria-label="About Google Calendar">i</button>
+            <span class="info-tip-pop align-end" role="tooltip">After Approve, optional real Calendar event. In Google Cloud OAuth client (Web), add Authorized JavaScript origins and redirect URIs as http://localhost:8787 and http://127.0.0.1:8787 — no trailing slash. Invite only test emails.</span>
+          </span>
+        </label>
         <input class="field-input" type="text" id="google-client-id" placeholder="xxxx.apps.googleusercontent.com">
         <div class="row-actions" style="margin-top: var(--sp-2);">
           <button id="save-google-client" class="btn">Save Client ID</button>
@@ -959,8 +1851,8 @@ body {
           <button id="google-disconnect-btn" class="btn">Disconnect</button>
           <span id="google-status" class="badge neutral">not connected</span>
         </div>
-        <p class="muted" style="margin-top: var(--sp-2);">After Approve, optional real Calendar event. Google Cloud → OAuth client (Web): add <strong>Authorized JavaScript origins</strong> and <strong>Authorized redirect URIs</strong> as <code>http://localhost:8787</code> and <code>http://127.0.0.1:8787</code> — <em>no trailing slash</em>. Connect Google leaves this page briefly and returns with a token. Invite only test emails.</p>
-      </div>
+        </div>
+      </details>
     </div>
   </aside>
 
@@ -975,12 +1867,17 @@ body {
 
   <!-- Session drawer (hidden by default; open from rail) -->
   <aside class="panel right-scroll session-pane" id="session-pane" hidden>
-    <div class="panel-head">Session</div>
+    <div class="panel-head">
+      <span>Session</span>
+      <span class="info-tip">
+        <button type="button" class="info-tip-btn" aria-label="About session">i</button>
+        <span class="info-tip-pop align-end" role="tooltip">Session only. Nothing is complete until Approve, Edit, or Escalate.</span>
+      </span>
+    </div>
     <div class="panel-body" style="padding-top: var(--sp-3);">
       <details class="side-fold" open>
         <summary>Run log</summary>
         <div class="fold-body">
-          <p class="muted">Session only. Nothing is complete until Approve, Edit, or Escalate.</p>
           <div class="log" id="run-log"></div>
         </div>
       </details>
@@ -1001,26 +1898,22 @@ body {
 </div>
 
 <section class="evals-view" id="evals-view" aria-label="Evals">
-  <div class="panel-head" style="padding-left:0; border:0; margin-bottom: var(--sp-3);">Evals · case runner</div>
-  <p class="muted" style="margin-bottom: var(--sp-4);">
-    Expected text is from your Design PRD. Run a row to fill Actual with what the agent really returned.
-    You judge the verdict — the agent does not grade itself.
-  </p>
+  <div class="section-title-row">
+    <div class="panel-head">Evals · case runner</div>
+    <span class="info-tip">
+      <button type="button" class="info-tip-btn" aria-label="About evals">i</button>
+      <span class="info-tip-pop" role="tooltip">Expected text is from your Design PRD. Run a row to fill Actual with what the agent really returned. You judge the verdict — the agent does not grade itself.</span>
+    </span>
+  </div>
   <div class="scoreboard" id="evals-scoreboard" aria-label="Eval scoreboard"></div>
-  <div class="improvement-card" id="improvement-card" aria-label="Improvement record"></div>
   <div class="eval-run-meta">
-    <div>
-      <label for="eval-run-label">Label for next Run (optional)</label>
-      <input class="field-input" id="eval-run-label" type="text"
-        placeholder="e.g. after calendar-conflict fix">
-    </div>
-    <div>
-      <label>&nbsp;</label>
+    <div class="row-actions" style="align-items: center;">
       <button type="button" class="btn" id="evals-reset-btn">Reset eval history</button>
+      <span class="info-tip">
+        <button type="button" class="info-tip-btn" aria-label="About scoreboard">i</button>
+        <span class="info-tip-pop" role="tooltip">Latest run stays on top. Open History to see older runs. Scoreboard uses the latest version only. Older versions are read-only under History.</span>
+      </span>
     </div>
-    <p class="muted" style="margin: 0; max-width: 28rem;">
-      Latest run stays on top. Open History to see older runs. Actual is only the live agent summary; Verdict/Note belong to that version.
-    </p>
   </div>
   <div style="overflow-x: auto;">
     <table class="evals-table" id="evals-table">
@@ -1038,29 +1931,33 @@ body {
       <tbody id="evals-tbody"></tbody>
     </table>
   </div>
-  <p class="muted" id="evals-persist-hint" style="margin-top: var(--sp-3);">
-    Scoreboard uses the latest version only. Older versions are read-only under History.
-  </p>
-  <aside class="limits-panel" id="known-limits" aria-label="Known limitations">
-    <h3>Known limitations</h3>
-    <p class="limits-intro">Scope decisions for this prototype — not a full product claim.</p>
-    <ol>
-      <li>Handles only Ren’s <strong>morning email triage</strong> for fictional Aurora Materials (company + university). No login, CRM, dashboards, or live mailbox sync.</li>
-      <li>English synthetic emails in this project’s exact CSV/record shape. Real Gmail/Outlook threads, Chinese WeChat, or messy free-text inboxes are out of scope.</li>
-      <li>The agent triages <strong>one email at a time</strong>, with same-sender morning emails included only as context for duplicate/related detection. Run All is sequential demos, not parallel production throughput.</li>
-      <li>Urgency uses a frozen <strong>scenario clock (11 May 2026 morning)</strong>, not the viewer’s real date. Calendar/flight rows are synthetic context only — nothing is booked or sent.</li>
-      <li>Needs a browser API key (and the local Kimi proxy when using Moonshot). Drafts stay suggestions until a human clicks Approve, Edit, or Escalate — the prototype never auto-sends.</li>
-    </ol>
-  </aside>
+  <details class="fold-card" id="improvement-fold">
+    <summary id="improvement-summary">Improvement · E-04</summary>
+    <div class="fold-card-body" id="improvement-card" aria-label="Improvement record"></div>
+  </details>
+  <details class="fold-card" id="known-limits">
+    <summary>Known limitations</summary>
+    <div class="fold-card-body">
+      <p class="limits-intro">Scope decisions for this prototype — not a full product claim.</p>
+      <ol>
+        <li>Handles only Ren’s <strong>morning email triage</strong> for fictional Aurora Materials (company + university). No login, CRM, dashboards, or live mailbox sync.</li>
+        <li>English synthetic emails in this project’s exact CSV/record shape. Real Gmail/Outlook threads, Chinese WeChat, or messy free-text inboxes are out of scope.</li>
+        <li>The agent triages <strong>one email at a time</strong>, with same-sender morning emails included only as context for duplicate/related detection. Run All is sequential demos, not parallel production throughput.</li>
+        <li>Urgency uses a frozen <strong>scenario clock (11 May 2026 morning)</strong>, not the viewer’s real date. Calendar/flight rows are synthetic context only — nothing is booked or sent.</li>
+        <li>Needs a browser API key (and the local Kimi proxy when using Moonshot). Drafts stay suggestions until a human clicks Approve, Edit, or Escalate — the prototype never auto-sends.</li>
+      </ol>
+    </div>
+  </details>
 </section>
 
 <section class="evals-view" id="traces-view" aria-label="Agent traces">
-  <div class="panel-head" style="padding-left:0; border:0; margin-bottom: var(--sp-3);">Trace · agent runs</div>
-  <p class="muted" style="margin-bottom: var(--sp-3);">
-    Local LangSmith-style log of every worker and reviewer API call in this browser.
-    Open a run to inspect system prompt, context, and output — then write review notes in the box at the top.
-    Notes and traces stay in this browser; Export JSON includes them. Nothing is sent to an external tracing service.
-  </p>
+  <div class="section-title-row">
+    <div class="panel-head">Trace · agent runs</div>
+    <span class="info-tip">
+      <button type="button" class="info-tip-btn" aria-label="About traces">i</button>
+      <span class="info-tip-pop" role="tooltip">Local LangSmith-style log of every worker and reviewer API call in this browser. Open a run to inspect system prompt, context, and output — then write review notes. Notes and traces stay in this browser; Export JSON includes them. Nothing is sent to an external tracing service.</span>
+    </span>
+  </div>
   <div class="row-actions" style="margin-bottom: var(--sp-3);">
     <button type="button" class="btn" id="traces-refresh-btn">Refresh</button>
     <button type="button" class="btn" id="traces-export-btn">Export JSON</button>
@@ -1076,12 +1973,13 @@ body {
 </section>
 
 <section class="evals-view" id="matrix-view" aria-label="Priority matrix">
-  <div class="panel-head" style="padding-left:0; border:0; margin-bottom: var(--sp-3);">Priority matrix · 16 emails</div>
-  <p class="muted" style="margin-bottom: var(--sp-2);">
-    <strong>Actual</strong> priorities sync from Work runs in this browser.
-    Expected comes from the evaluator answer key (never sent to the agent).
-    Collision rows are Discovery judgment cases. When all 16 Actuals are present, the matrix computes itself.
-  </p>
+  <div class="section-title-row">
+    <div class="panel-head">Priority matrix · 16 emails</div>
+    <span class="info-tip">
+      <button type="button" class="info-tip-btn" aria-label="About priority matrix">i</button>
+      <span class="info-tip-pop" role="tooltip"><strong>Actual</strong> priorities sync from Work runs in this browser. Expected comes from the evaluator answer key (never sent to the agent). Collision rows are Discovery judgment cases. When all 16 Actuals are present, the matrix computes itself.</span>
+    </span>
+  </div>
   <p class="muted" id="matrix-sync-status" style="margin-top:0;"></p>
 
   <div class="matrix-card">
@@ -1108,14 +2006,66 @@ body {
   </div>
 
   <div class="matrix-card" id="matrix-results" hidden>
-    <h3 style="margin:0 0 var(--sp-2); font-size: var(--fs-2);">Confusion matrix</h3>
-    <p class="muted" style="margin-top:0;">Rows = expected (answer key). Columns = agent actual.</p>
+    <div class="section-title-row" style="margin-bottom: var(--sp-2);">
+      <h3 style="margin:0; font-size: var(--fs-2);">Confusion matrix</h3>
+      <span class="info-tip">
+        <button type="button" class="info-tip-btn" aria-label="About confusion matrix">i</button>
+        <span class="info-tip-pop" role="tooltip">Rows = expected (answer key). Columns = agent actual.</span>
+      </span>
+    </div>
     <table class="matrix-table confusion" id="matrix-grid"></table>
     <div class="matrix-stats" id="matrix-stats"></div>
     <h3 style="margin: var(--sp-4) 0 var(--sp-2); font-size: var(--fs-2);">Paste-ready for teacher / PRD</h3>
     <pre class="matrix-paste" id="matrix-paste"></pre>
   </div>
 </section>
+
+<!-- Global sticky messenger — Intercom-style widget on every tab -->
+<button type="button" class="chat-launcher" id="chat-launcher" aria-expanded="false" aria-controls="global-chat" aria-label="Open ask assistant" title="Ask assistant">
+  <svg class="chat-launcher-icon chat-launcher-icon-open" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 12a8.5 8.5 0 0 1-8.5 8.5H7l-4 3V12A8.5 8.5 0 1 1 21 12z"/>
+  </svg>
+  <svg class="chat-launcher-icon chat-launcher-icon-close" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+    <path d="M6 6l12 12M18 6L6 18"/>
+  </svg>
+</button>
+<aside class="global-chat" id="global-chat" hidden aria-label="Ask assistant about inbox emails">
+  <div class="global-chat-head">
+    <div>
+      <div class="global-chat-title-row">
+        <div class="global-chat-title">Ask assistant</div>
+        <span class="info-tip">
+          <button type="button" class="info-tip-btn" aria-label="About ask assistant">i</button>
+          <span class="info-tip-pop" role="tooltip">Ask questions about synthetic morning emails and policies. Stays on every tab. Does not send mail or replace Run agent + Human review.</span>
+        </span>
+      </div>
+      <div class="global-chat-sub" id="global-chat-focus-label">Focus: whole morning inbox</div>
+    </div>
+    <button type="button" class="global-chat-close" id="global-chat-close" aria-label="Close chat">×</button>
+  </div>
+  <div class="global-chat-body">
+    <div class="global-chat-toolbar">
+      <label class="muted" for="global-chat-focus" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">Focus email</label>
+      <select class="field-input" id="global-chat-focus" aria-label="Chat focus email"></select>
+    </div>
+    <div class="email-chat-thread" id="global-chat-thread" aria-live="polite"></div>
+    <div class="email-chat-compose">
+      <div class="global-chat-compose-row">
+        <textarea class="field-input" id="global-chat-input" rows="2" placeholder="Ask a question…"></textarea>
+        <button type="button" class="global-chat-send" id="global-chat-send" aria-label="Send">
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 2L11 13"/>
+            <path d="M22 2L15 22l-4-9-9-4 20-7z"/>
+          </svg>
+        </button>
+      </div>
+      <div class="global-chat-foot">
+        <p class="global-chat-note">Does not send email · triage still needs Approve</p>
+        <button type="button" class="btn" id="global-chat-clear">Clear</button>
+      </div>
+    </div>
+  </div>
+</aside>
 
 <script>
 // =====================================================================
@@ -1343,6 +2293,22 @@ ESCALATION - when a trigger fires, state the reason and do NOT prepare calendar/
 4. Out-of-policy request - asks to approve a payment/seal outside limits or to bypass a required process. Flag REFUSED-ESCALATE; Draft reply: "none - escalated"; refuse to draft compliance.
 5. High stakes - an Aurora investor/board decision, a binding partnership/contract commitment, or a money commitment with an EXPLICITLY STATED amount of 50,000 RMB or more. Do not estimate amounts. Flag REFUSED-ESCALATE; Draft reply: "none - escalated" (summary only).
 6. Academic-sensitive - student matter touching grades, misconduct, disputes, or recommendation letters. Flag REFUSED-ESCALATE; Draft reply: "none - escalated".`;
+
+// Q&A chat (global sticky dock — does not triage and does not send).
+const CHAT_SYSTEM_PROMPT = `ROLE
+You are Ren's inbox Q&A assistant for Aurora Inbox Copilot (fictional Aurora Materials). Ren is CEO + professor. The user can ask about morning inbox emails and policies from any screen in the prototype.
+
+SCENARIO CLOCK
+"Today" / "now" = Monday, 11 May 2026 (morning). Ignore the real-world calendar.
+
+GROUNDING
+Use ONLY the context block provided with each turn (focused email and/or inbox index, sender records, same-sender morning emails, employee directory, calendar, flights, policy files). Never invent facts, amounts, attachments, or record IDs. If something is not in context, say it is not in the provided records.
+
+BOUNDARIES
+- You do NOT send email, book travel, approve payments, or execute actions.
+- You do NOT replace the triage loop. For a full labeled triage decision, tell the user to open the email on Work, click Run agent, then use Human review (Approve / Edit / Escalate).
+- Keep answers concise and practical. Cite email_id / policy / calendar IDs when relevant.
+- Plain helpful prose — not the labeled triage field format unless the user asks for a field-by-field walkthrough.`;
 
 // Path B4 — independent reviewer (runs after worker, before human gate).
 const REVIEWER_SYSTEM_PROMPT = `ROLE
@@ -1676,7 +2642,11 @@ function refreshKeyStatus() {
     lst.className = "badge " + (hasLmnr ? "ok" : "neutral");
   }
   var settings = document.getElementById("settings-block");
-  if (settings) settings.classList.toggle("needs-key", !has);
+  if (settings) {
+    var needsSettings = !has || !hasOai;
+    settings.classList.toggle("needs-key", needsSettings);
+    if (needsSettings) settings.open = true;
+  }
 
   var banner = document.getElementById("first-run-banner");
   if (banner) {
@@ -1822,6 +2792,29 @@ function initSessionToggle() {
   setWorkLayout("list");
 }
 
+/** Hover shows tips; click toggles for touch / sticky read. */
+function initInfoTips() {
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest && e.target.closest(".info-tip-btn");
+    if (btn) {
+      e.preventDefault();
+      e.stopPropagation();
+      var tip = btn.closest(".info-tip");
+      var wasOpen = tip && tip.classList.contains("open");
+      document.querySelectorAll(".info-tip.open").forEach(function (el) {
+        el.classList.remove("open");
+      });
+      if (tip && !wasOpen) tip.classList.add("open");
+      return;
+    }
+    if (!(e.target.closest && e.target.closest(".info-tip"))) {
+      document.querySelectorAll(".info-tip.open").forEach(function (el) {
+        el.classList.remove("open");
+      });
+    }
+  });
+}
+
 function paintWelcome() {
   selectedView = null;
   CASE_VIEWS.forEach(function (v) {
@@ -1830,6 +2823,7 @@ function paintWelcome() {
   setWorkLayout("list");
   var area = document.getElementById("work-area");
   if (area) area.innerHTML = "";
+  updateGlobalChatFocusLabel();
 }
 
 // ---- Parse + render the agent's labeled output ----
@@ -2423,10 +3417,11 @@ function loadImprovementRecord() {
 
 function renderImprovementCard() {
   var el = document.getElementById("improvement-card");
+  var summary = document.getElementById("improvement-summary");
   if (!el) return;
   var r = IMPROVEMENT_RECORD;
+  if (summary) summary.textContent = "Improvement · " + (r.case_id || "E-04");
   el.innerHTML =
-    "<h3>Improvement · " + escapeHtml(r.case_id) + "</h3>" +
     "<div class='imp-row'><div class='imp-k'>Before</div><div class='imp-v'>" +
     escapeHtml(r.before) + "</div></div>" +
     "<div class='imp-row'><div class='imp-k'>Change</div><div class='imp-v'>" +
@@ -2480,9 +3475,7 @@ var PROMPT17_JUDGMENTS = {
 var EVAL_LAST_RUN_AT = "";
 
 function peekNextRunLabel() {
-  var input = document.getElementById("eval-run-label");
-  var v = input && input.value ? input.value.trim() : "";
-  return v || "";
+  return "";
 }
 
 function cloneEvalEntry(h) {
@@ -3347,6 +4340,269 @@ function buildUserMessage(em) {
   );
 }
 
+function buildChatContextBlock(focusEmailId) {
+  var policyText = Object.keys(POLICIES).map(function (name) {
+    return "--- " + name + " ---\n" + POLICIES[name];
+  }).join("\n\n");
+
+  var inboxIndex = EMAILS.map(function (e) {
+    var s = senderById(e.sender_id) || {};
+    return {
+      email_id: e.email_id,
+      received_at: e.received_at,
+      subject: e.subject,
+      sender: s.name || "?",
+      org: s.org || "?",
+      attachments: e.attachments || "(none)"
+    };
+  });
+
+  var parts = [
+    "SCENARIO CLOCK (authoritative):",
+    "today / now / this morning = " + SCENARIO_NOW_LABEL,
+    "scenario_date = " + SCENARIO_NOW,
+    "",
+    "MORNING INBOX INDEX:",
+    JSON.stringify(inboxIndex, null, 2)
+  ];
+
+  var em = focusEmailId
+    ? EMAILS.find(function (e) { return e.email_id === focusEmailId; })
+    : null;
+
+  if (em) {
+    var s = senderById(em.sender_id) || {};
+    var sameSenderOthers = EMAILS.filter(function (other) {
+      return other.sender_id === em.sender_id && other.email_id !== em.email_id;
+    }).map(function (other) {
+      return {
+        email_id: other.email_id,
+        received_at: other.received_at,
+        subject: other.subject,
+        attachments: other.attachments || "(none)",
+        body: other.body
+      };
+    });
+    parts.push(
+      "",
+      "FOCUSED EMAIL (primary subject of this chat):",
+      "email_id: " + em.email_id,
+      "received_at: " + em.received_at,
+      "subject: " + em.subject,
+      "attachments present: " + (em.attachments ? em.attachments : "(none)"),
+      "body:",
+      em.body,
+      "",
+      "OTHER MORNING EMAILS FROM THE SAME SENDER:",
+      sameSenderOthers.length ? JSON.stringify(sameSenderOthers, null, 2) : "(none)",
+      "",
+      "LINKED SENDER RECORD:",
+      JSON.stringify(s, null, 2)
+    );
+  } else {
+    parts.push(
+      "",
+      "FOCUSED EMAIL: (none — answer using the inbox index; if the user names an email_id, use that row's subject/sender from the index and say body details need that email focused or opened)."
+    );
+  }
+
+  parts.push(
+    "",
+    "EMPLOYEE DIRECTORY:",
+    JSON.stringify(EMPLOYEES, null, 2),
+    "",
+    "REN'S CALENDAR:",
+    JSON.stringify(CALENDAR, null, 2),
+    "",
+    "FLIGHT OPTIONS:",
+    JSON.stringify(FLIGHTS, null, 2),
+    "",
+    "POLICY AND REFERENCE FILES:",
+    policyText
+  );
+  return parts.join("\n");
+}
+
+var GLOBAL_CHAT = {
+  open: false,
+  busy: false,
+  focusId: "",
+  messages: []
+};
+
+function syncGlobalChatFocusOptions() {
+  var sel = document.getElementById("global-chat-focus");
+  if (!sel) return;
+  var prev = GLOBAL_CHAT.focusId || (selectedView && selectedView.em && selectedView.em.email_id) || "";
+  sel.innerHTML = "<option value=''>Whole morning inbox</option>";
+  EMAILS.forEach(function (em) {
+    var s = senderById(em.sender_id) || {};
+    var opt = document.createElement("option");
+    opt.value = em.email_id;
+    opt.textContent = em.email_id + " · " + (s.name || "?") + " — " + String(em.subject || "").slice(0, 42);
+    sel.appendChild(opt);
+  });
+  if (prev && EMAILS.some(function (e) { return e.email_id === prev; })) {
+    sel.value = prev;
+    GLOBAL_CHAT.focusId = prev;
+  } else {
+    sel.value = "";
+    GLOBAL_CHAT.focusId = "";
+  }
+  updateGlobalChatFocusLabel();
+}
+
+function updateGlobalChatFocusLabel() {
+  var label = document.getElementById("global-chat-focus-label");
+  if (!label) return;
+  if (GLOBAL_CHAT.focusId) {
+    var em = EMAILS.find(function (e) { return e.email_id === GLOBAL_CHAT.focusId; });
+    label.textContent = em
+      ? ("Focus: " + em.email_id + " — " + String(em.subject || "").slice(0, 48))
+      : ("Focus: " + GLOBAL_CHAT.focusId);
+  } else {
+    label.textContent = "Focus: whole morning inbox";
+  }
+}
+
+function renderGlobalChatThread() {
+  var thread = document.getElementById("global-chat-thread");
+  if (!thread) return;
+  thread.innerHTML = "";
+  GLOBAL_CHAT.messages.forEach(function (m) {
+    var bub = document.createElement("div");
+    bub.className = "chat-bubble " + (m.role === "user" ? "user" : (m.role === "error" ? "error" : "assistant"));
+    bub.textContent = m.content || "";
+    thread.appendChild(bub);
+  });
+  thread.scrollTop = thread.scrollHeight;
+}
+
+function setGlobalChatOpen(open) {
+  GLOBAL_CHAT.open = !!open;
+  var panel = document.getElementById("global-chat");
+  var launcher = document.getElementById("chat-launcher");
+  if (panel) panel.hidden = !GLOBAL_CHAT.open;
+  if (launcher) {
+    launcher.setAttribute("aria-expanded", GLOBAL_CHAT.open ? "true" : "false");
+    launcher.setAttribute("aria-label", GLOBAL_CHAT.open ? "Close ask assistant" : "Open ask assistant");
+    launcher.title = GLOBAL_CHAT.open ? "Close" : "Ask assistant";
+  }
+  if (GLOBAL_CHAT.open) {
+    syncGlobalChatFocusOptions();
+    renderGlobalChatThread();
+    var input = document.getElementById("global-chat-input");
+    if (input) input.focus();
+  }
+}
+
+function setChatFocusFromSelection() {
+  if (selectedView && selectedView.em) {
+    GLOBAL_CHAT.focusId = selectedView.em.email_id;
+  }
+  var sel = document.getElementById("global-chat-focus");
+  if (sel && GLOBAL_CHAT.focusId) {
+    sel.value = GLOBAL_CHAT.focusId;
+  }
+  updateGlobalChatFocusLabel();
+}
+
+async function sendGlobalChatMessage() {
+  if (GLOBAL_CHAT.busy) return;
+  var input = document.getElementById("global-chat-input");
+  var sendBtn = document.getElementById("global-chat-send");
+  var text = input && input.value ? input.value.trim() : "";
+  if (!text) return;
+  if (!getApiKey()) {
+    GLOBAL_CHAT.messages.push({
+      role: "error",
+      content: "Save a Kimi worker key in Settings first, then try again."
+    });
+    renderGlobalChatThread();
+    setGlobalChatOpen(true);
+    return;
+  }
+
+  GLOBAL_CHAT.messages.push({ role: "user", content: text });
+  if (input) input.value = "";
+  GLOBAL_CHAT.busy = true;
+  if (sendBtn) {
+    sendBtn.disabled = true;
+    sendBtn.setAttribute("aria-busy", "true");
+  }
+  renderGlobalChatThread();
+
+  var context = buildChatContextBlock(GLOBAL_CHAT.focusId);
+  var system = CHAT_SYSTEM_PROMPT + "\n\nCONTEXT BLOCK:\n" + context;
+  var apiMessages = GLOBAL_CHAT.messages
+    .filter(function (m) { return m.role === "user" || m.role === "assistant"; })
+    .map(function (m) { return { role: m.role, content: m.content }; });
+
+  var api = await callMessagesApi(system, text, 1024, {
+    role: "chat",
+    emailId: GLOBAL_CHAT.focusId || "inbox",
+    chatMessages: apiMessages
+  });
+
+  GLOBAL_CHAT.busy = false;
+  if (sendBtn) {
+    sendBtn.disabled = false;
+    sendBtn.removeAttribute("aria-busy");
+  }
+
+  if (!api.ok) {
+    var errText = stripHtmlToText(api.errorHtml || "Chat request failed.");
+    GLOBAL_CHAT.messages.push({ role: "error", content: errText });
+  } else {
+    GLOBAL_CHAT.messages.push({ role: "assistant", content: api.text || "(empty reply)" });
+  }
+  renderGlobalChatThread();
+  setTopStatus(api.ok ? "ok" : "warn", api.ok ? "Chat answered" : "Chat error");
+}
+
+function initGlobalChat() {
+  var launcher = document.getElementById("chat-launcher");
+  var closeBtn = document.getElementById("global-chat-close");
+  var sendBtn = document.getElementById("global-chat-send");
+  var clearBtn = document.getElementById("global-chat-clear");
+  var input = document.getElementById("global-chat-input");
+  var focusSel = document.getElementById("global-chat-focus");
+
+  if (launcher) {
+    launcher.addEventListener("click", function () {
+      setGlobalChatOpen(!GLOBAL_CHAT.open);
+    });
+  }
+  if (closeBtn) {
+    closeBtn.addEventListener("click", function () {
+      setGlobalChatOpen(false);
+    });
+  }
+  if (sendBtn) sendBtn.addEventListener("click", function () { sendGlobalChatMessage(); });
+  if (clearBtn) {
+    clearBtn.addEventListener("click", function () {
+      GLOBAL_CHAT.messages = [];
+      renderGlobalChatThread();
+    });
+  }
+  if (input) {
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendGlobalChatMessage();
+      }
+    });
+  }
+  if (focusSel) {
+    focusSel.addEventListener("change", function () {
+      GLOBAL_CHAT.focusId = focusSel.value || "";
+      updateGlobalChatFocusLabel();
+    });
+  }
+  syncGlobalChatFocusOptions();
+  setGlobalChatOpen(false);
+}
+
 // ---- Call the Anthropic Messages API directly from the browser ----
 function setTopStatus(kind, label) {
   var top = document.getElementById("top-status");
@@ -3619,16 +4875,24 @@ function renderTracesView() {
   if (!selectedTraceId || !traces.some(function (t) { return t.id === selectedTraceId; })) {
     selectedTraceId = rows[0] ? rows[0].trace.id : traces[0].id;
   }
+  var selectedForList = traces.find(function (t) { return t.id === selectedTraceId; });
+  var contextParentId = selectedForList && selectedForList.parent_id
+    ? selectedForList.parent_id
+    : "";
   rows.forEach(function (row) {
     var t = row.trace;
     var btn = document.createElement("button");
     btn.type = "button";
     var isParent = t.role === "triage" || t.span_type === "parent";
+    var isActive = t.id === selectedTraceId;
+    var isContextParent = !!(contextParentId && t.id === contextParentId);
     btn.className =
       "trace-item" +
-      (t.id === selectedTraceId ? " active" : "") +
+      (isActive ? " active" : "") +
+      (isContextParent ? " context-parent" : "") +
       (isParent ? " parent" : "") +
       (row.depth > 0 ? " child" : "");
+    btn.setAttribute("aria-current", isActive ? "true" : "false");
     var status = t.ok ? "ok" : "error";
     var ms = t.latency_ms != null ? (t.latency_ms + " ms") : "—";
     var noteMark = (t.note && String(t.note).trim()) ? " · note" : "";
@@ -3647,7 +4911,7 @@ function renderTracesView() {
     });
     listEl.appendChild(btn);
   });
-  var selected = traces.find(function (t) { return t.id === selectedTraceId; });
+  var selected = selectedForList;
   if (!selected) return;
 
   detailEl.innerHTML = "";
@@ -3848,8 +5112,20 @@ async function callMessagesApi(systemPrompt, userContent, maxTokens, opts) {
         max_tokens: maxTokens || 2048,
         system: systemPrompt,
         thinking: { type: "disabled" },
-        messages: [{ role: "user", content: userContent }]
+        messages: (Array.isArray(opts.chatMessages) && opts.chatMessages.length)
+          ? opts.chatMessages
+          : [{ role: "user", content: userContent }]
       };
+  if (!forReviewer && Array.isArray(opts.chatMessages) && opts.chatMessages.length) {
+    var lastUser = "";
+    for (var mi = opts.chatMessages.length - 1; mi >= 0; mi--) {
+      if (opts.chatMessages[mi].role === "user") {
+        lastUser = opts.chatMessages[mi].content || "";
+        break;
+      }
+    }
+    traceMeta.userContent = lastUser || ("(chat · " + opts.chatMessages.length + " messages)");
+  }
 
   var resp;
   try {
@@ -4050,6 +5326,7 @@ function updateCaseCardBadge(view) {
   if (view.readStateEl) {
     view.readStateEl.className = "badge " + (view.read ? "neutral" : "info") + " read-state";
     view.readStateEl.textContent = view.read ? "Read" : "Unread";
+    view.readStateEl.hidden = false;
   }
 
   if (!view.badgeEl) return;
@@ -4079,6 +5356,7 @@ function updateCaseCardBadge(view) {
     view.badgeEl.textContent = "Awaiting review";
     view.badgeEl.hidden = false;
   } else {
+    view.badgeEl.className = "badge";
     view.badgeEl.textContent = "";
     view.badgeEl.hidden = true;
   }
@@ -4093,6 +5371,7 @@ function selectCase(view) {
   updateCaseCardBadge(view);
   setWorkLayout("reading");
   paintWorkArea(view);
+  setChatFocusFromSelection();
 }
 
 function paintWorkArea(view) {
@@ -4481,8 +5760,9 @@ function render() {
     readStateEl.className = "badge info read-state";
     readStateEl.textContent = "Unread";
     var badgeEl = document.createElement("span");
-    badgeEl.className = "badge neutral";
+    badgeEl.className = "badge";
     badgeEl.hidden = true;
+    badgeEl.textContent = "";
     statusRow.appendChild(prioEl);
     // move prio into status row for list alignment; clone reference already set
     statusRow.appendChild(readStateEl);
@@ -4539,6 +5819,8 @@ initEvalsResetButton();
 initTracesControls();
 initMatrixControls();
 initSessionToggle();
+initInfoTips();
+initGlobalChat();
 renderRunLog();
 render();
 loadEvalResults();
