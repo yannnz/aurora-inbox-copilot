@@ -444,6 +444,70 @@ body {
   background: color-mix(in srgb, var(--danger) 8%, transparent);
   color: var(--danger); font-size: var(--fs-1); white-space: pre-wrap;
 }
+.refusal-card {
+  border: var(--border-w) solid var(--danger);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--danger) 10%, var(--bg-raise));
+  padding: var(--sp-4);
+  margin-bottom: var(--sp-4);
+}
+.refusal-card .refusal-kicker {
+  font-size: var(--fs-0);
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--danger);
+  margin-bottom: var(--sp-2);
+}
+.refusal-card .refusal-title {
+  font-size: var(--fs-2);
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: var(--sp-2);
+}
+.refusal-card .refusal-body {
+  color: var(--ink);
+  font-size: var(--fs-1);
+  line-height: var(--lh);
+  margin-bottom: var(--sp-3);
+}
+.refusal-card .refusal-next {
+  border-top: var(--border-w) solid color-mix(in srgb, var(--danger) 35%, var(--line));
+  padding-top: var(--sp-3);
+  color: var(--ink-2);
+  font-size: var(--fs-1);
+}
+.refusal-card .refusal-next strong { color: var(--ink); }
+.refusal-details {
+  margin-top: var(--sp-3);
+  border: var(--border-w) solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--bg-inset);
+  padding: var(--sp-2) var(--sp-3);
+}
+.refusal-details > summary {
+  cursor: pointer;
+  color: var(--ink-2);
+  font-size: var(--fs-0);
+  font-weight: 600;
+  list-style: none;
+}
+.refusal-details > summary::-webkit-details-marker { display: none; }
+.refusal-details[open] > summary { margin-bottom: var(--sp-2); color: var(--ink); }
+.draft-pane.refused {
+  border-color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 6%, var(--bg-inset));
+}
+.draft-pane.refused .draft-label { color: var(--danger); }
+.gate-hint-refuse {
+  margin: 0 0 var(--sp-3);
+  padding: var(--sp-3);
+  border-radius: var(--radius-sm);
+  border: var(--border-w) solid color-mix(in srgb, var(--danger) 40%, var(--line));
+  background: color-mix(in srgb, var(--danger) 8%, transparent);
+  color: var(--ink);
+  font-size: var(--fs-1);
+}
 .field-input {
   width: 100%; background: var(--bg-inset); color: var(--ink);
   border: var(--border-w) solid var(--line); border-radius: var(--radius-sm);
@@ -2123,6 +2187,46 @@ function buildReviewerUserMessage(em, workerResult) {
   );
 }
 
+function refusalTriggerLabel(escalation, flag) {
+  var blob = String(escalation || flag || "").toLowerCase();
+  if (/anger|legal|hostile|threat|breach/.test(blob)) return "Anger / legal language";
+  if (/academic|grade|misconduct|recommendation/.test(blob)) return "Academic-sensitive";
+  if (/out-of-policy|out of policy|bypass|payment|seal/.test(blob)) return "Out-of-policy request";
+  if (/high.?stakes|50,?000|binding|investor|board/.test(blob)) return "High-stakes commitment";
+  if (/low confidence|ambiguous/.test(blob)) return "Low confidence";
+  if (/calendar conflict/.test(blob)) return "Calendar conflict";
+  if (/missing.?data/.test(blob)) return "Missing data";
+  return "Policy boundary";
+}
+
+function buildRefusalCardHtml(fields, status) {
+  var summary = getField(fields, "Summary") || "This message needs Ren personally.";
+  var escalation = getField(fields, "Escalation") || status.reason || "";
+  var flag = getField(fields, "Flag") || status.label;
+  var priority = getField(fields, "Priority") || "";
+  var route = getField(fields, "Recommended route") || "Ren";
+  var trigger = refusalTriggerLabel(escalation, flag);
+  return (
+    "<div class='refusal-card' role='status'>" +
+    "<div class='refusal-kicker'>Handed to Ren — not auto-handled</div>" +
+    "<div class='refusal-title'>Agent refused to draft a reply</div>" +
+    "<div class='refusal-body'>" +
+    "<strong>Why:</strong> " + escapeHtml(trigger) +
+    (escalation ? (" — " + escapeHtml(escalation)) : "") +
+    "</div>" +
+    "<div class='refusal-body'><strong>What this email is about:</strong> " +
+    escapeHtml(summary) + "</div>" +
+    "<div class='refusal-next'>" +
+    "<strong>What you should do:</strong> Open Human review below. Confirm with " +
+    "<em>Take personally</em> (or Escalate). No draft was written on purpose — " +
+    "the agent will not soft-reply to this boundary case." +
+    (priority ? (" Priority stays <strong>" + escapeHtml(priority) + "</strong>.") : "") +
+    (route ? (" Route: <strong>" + escapeHtml(route) + "</strong>.") : "") +
+    "</div>" +
+    "</div>"
+  );
+}
+
 function buildAgentOutput(text) {
   var fields = parseAgentOutput(text);
   if (fields.length === 0) {
@@ -2136,11 +2240,22 @@ function buildAgentOutput(text) {
 
   var status = computeStatus(fields);
   var badgeClass = status.refused ? "danger" : "ok";
-  var html =
-    "<div class='decision-badges'>" +
-    "<span class='badge " + badgeClass + "'>Worker: " + escapeHtml(status.label) + "</span>" +
-    (status.reason ? " <span class='muted'>" + escapeHtml(status.reason) + "</span>" : "") +
-    "</div>";
+  var html = "";
+
+  if (status.refused) {
+    html += buildRefusalCardHtml(fields, status);
+    html +=
+      "<div class='decision-badges'>" +
+      "<span class='badge danger'>Worker: " + escapeHtml(status.label) + "</span>" +
+      "</div>";
+    html += "<details class='refusal-details'><summary>Show full triage fields</summary>";
+  } else {
+    html +=
+      "<div class='decision-badges'>" +
+      "<span class='badge " + badgeClass + "'>Worker: " + escapeHtml(status.label) + "</span>" +
+      (status.reason ? " <span class='muted'>" + escapeHtml(status.reason) + "</span>" : "") +
+      "</div>";
+  }
 
   DECISION_FIELDS.forEach(function (label) {
     var val = getField(fields, label);
@@ -2150,6 +2265,8 @@ function buildAgentOutput(text) {
       "<div class='field'><div class='k'>" + escapeHtml(label) + "</div>" +
       "<div class='v" + whyClass + "'>" + escapeHtml(val) + "</div></div>";
   });
+
+  if (status.refused) html += "</details>";
 
   return { result: { fields: fields, status: status, text: text }, html: html };
 }
@@ -2863,7 +2980,9 @@ function attachHumanGate(em, draftBox, result, gateHost) {
   var state = document.createElement("p");
   state.className = "muted";
   state.style.fontWeight = "700";
-  state.textContent = "Human review required — Approve, Edit, or Escalate. Nothing sends or books without your click.";
+  state.textContent = result.status.refused
+    ? "Refusal confirmed by policy — take this personally. Nothing was drafted to send."
+    : "Human review required — Approve, Edit, or Escalate. Nothing sends or books without your click.";
 
   var meetingPanel = null;
   var createCheck = null;
@@ -2959,18 +3078,31 @@ function attachHumanGate(em, draftBox, result, gateHost) {
   btnRow.className = "row-actions";
 
   var approveBtn = document.createElement("button");
-  approveBtn.className = "btn primary";
-  approveBtn.textContent = showMeeting ? "Approve" : "Approve";
+  approveBtn.className = result.status.refused ? "btn" : "btn primary";
+      approveBtn.textContent = result.status.refused
+    ? "Acknowledge — I'll handle personally"
+    : "Approve";
   var editBtn = document.createElement("button");
   editBtn.className = "btn";
   editBtn.textContent = "Edit";
   var escalateBtn = document.createElement("button");
-  escalateBtn.className = "btn danger";
-  escalateBtn.textContent = "Escalate";
+  escalateBtn.className = result.status.refused ? "btn primary" : "btn danger";
+  escalateBtn.textContent = result.status.refused ? "Take personally (confirm)" : "Escalate";
   var saveBtn = document.createElement("button");
   saveBtn.className = "btn";
   saveBtn.textContent = "Save edit";
   saveBtn.style.display = "none";
+
+  if (result.status.refused) {
+    editBtn.style.display = "none";
+    var refuseHint = document.createElement("p");
+    refuseHint.className = "gate-hint-refuse";
+    refuseHint.innerHTML =
+      "<strong>Refusal path:</strong> There is no draft to send. Confirm you are taking this " +
+      "yourself, or press <em>Take personally</em>. The agent correctly refused to auto-reply.";
+    // inserted before buttons below via gateHost order
+    gateHost._refuseHint = refuseHint;
+  }
 
   var linkRow = document.createElement("div");
   linkRow.className = "row-actions";
@@ -3029,6 +3161,10 @@ function attachHumanGate(em, draftBox, result, gateHost) {
   }
 
   approveBtn.addEventListener("click", async function () {
+    if (result.status.refused) {
+      complete("Acknowledged — Ren handling personally (agent refused draft)");
+      return;
+    }
     var wantCreate = createCheck && createCheck.checked;
     if (!wantCreate) {
       complete("Approved (draft ready to send — simulated, not sent)");
@@ -3128,14 +3264,30 @@ function attachHumanGate(em, draftBox, result, gateHost) {
     complete("Edited (saved draft)");
   });
   escalateBtn.addEventListener("click", function () {
-    var reason = prompt("One-line reason for escalating to Ren:");
+    var defaultReason = "";
+    if (result.status.refused) {
+      defaultReason =
+        getField(result.fields, "Escalation") ||
+        getField(result.fields, "Summary") ||
+        "Agent REFUSED-ESCALATE — Ren taking personally";
+    }
+    var reason = prompt(
+      result.status.refused
+        ? "Confirm why this stays with Ren (edit if needed):"
+        : "One-line reason for escalating to Ren:",
+      defaultReason
+    );
     if (reason === null) return;
     reason = reason.trim();
     if (!reason) {
       alert("A reason is required to escalate.");
       return;
     }
-    complete("Escalated: " + reason);
+    complete(
+      result.status.refused
+        ? ("Taken personally: " + reason)
+        : ("Escalated: " + reason)
+    );
   });
 
   btnRow.appendChild(approveBtn);
@@ -3144,6 +3296,7 @@ function attachHumanGate(em, draftBox, result, gateHost) {
   btnRow.appendChild(escalateBtn);
 
   gateHost.appendChild(state);
+  if (gateHost._refuseHint) gateHost.appendChild(gateHost._refuseHint);
   if (meetingPanel) gateHost.appendChild(meetingPanel);
   gateHost.appendChild(btnRow);
   gateHost.appendChild(linkRow);
@@ -3850,7 +4003,7 @@ var selectedView = null;
 
 function isEscalatedOutcome(view) {
   if (!view) return false;
-  if (view.humanDone && /^Escalated/i.test(view.humanDone)) return true;
+  if (view.humanDone && (/^Escalated/i.test(view.humanDone) || /^Taken personally/i.test(view.humanDone) || /^Acknowledged/i.test(view.humanDone))) return true;
   if (view.result && view.result.status.refused) return true;
   return false;
 }
@@ -3908,13 +4061,13 @@ function updateCaseCardBadge(view) {
     view.badgeEl.className = "badge warn";
     view.badgeEl.textContent = "Edited";
     view.badgeEl.hidden = false;
-  } else if (view.humanDone && /^Escalated/i.test(view.humanDone)) {
+  } else if (view.humanDone && (/^Escalated/i.test(view.humanDone) || /^Taken personally/i.test(view.humanDone) || /^Acknowledged/i.test(view.humanDone))) {
     view.badgeEl.className = "badge danger";
-    view.badgeEl.textContent = "Escalated";
+    view.badgeEl.textContent = /^Acknowledged/i.test(view.humanDone) ? "Taken personally" : "Escalated";
     view.badgeEl.hidden = false;
   } else if (view.result && view.result.status.refused) {
     view.badgeEl.className = "badge danger";
-    view.badgeEl.textContent = "REFUSED-ESCALATE";
+    view.badgeEl.textContent = "REFUSED — take personally";
     view.badgeEl.hidden = false;
   } else if (view.busy) {
     view.badgeEl.className = "badge info";
@@ -4040,17 +4193,34 @@ function paintWorkArea(view) {
   draftPane.className = "draft-pane";
   var draftLabel = document.createElement("div");
   draftLabel.className = "draft-label";
-  draftLabel.textContent = "Draft reply (on this message)";
+  var isRefused = !!(view.result && view.result.status && view.result.status.refused);
+  draftLabel.textContent = isRefused
+    ? "No draft — agent refused to auto-reply"
+    : "Draft reply (on this message)";
+  if (isRefused) draftPane.classList.add("refused");
   var draftBox = document.createElement("textarea");
   draftBox.className = "field-input";
   draftBox.rows = 6;
-  draftBox.placeholder = "Agent draft appears here after Run…";
+  draftBox.placeholder = isRefused
+    ? "Intentionally empty. Use Human review to take this case personally."
+    : "Agent draft appears here after Run…";
   var draftText = view.editedDraft ||
     (view.result ? getField(view.result.fields, "Draft reply") : "");
+  if (isRefused && (!draftText || /^none\b/i.test(draftText))) {
+    draftText = "";
+  }
   draftBox.value = draftText;
-  draftBox.readOnly = !view.result || !!view.humanDone || !!view.busy;
+  draftBox.readOnly = !view.result || !!view.humanDone || !!view.busy || isRefused;
   draftPane.appendChild(draftLabel);
   draftPane.appendChild(draftBox);
+  if (isRefused) {
+    var refuseDraftNote = document.createElement("p");
+    refuseDraftNote.className = "muted";
+    refuseDraftNote.style.marginTop = "var(--sp-2)";
+    refuseDraftNote.textContent =
+      "Boundary cases stay summary-only so Ren never soft-replies by accident.";
+    draftPane.appendChild(refuseDraftNote);
+  }
   stage4.appendChild(outputLabel);
   stage4.appendChild(citePane);
   stage4.appendChild(draftPane);
@@ -4102,8 +4272,9 @@ function paintWorkArea(view) {
   } else if (view.result && reviewerDone && !view.humanDone) {
     attachHumanGate(em, draftBox, view.result, gate);
   } else if (view.humanDone) {
-    var doneClass = /^Escalated/i.test(view.humanDone) ? "danger" :
-      (/^Edited/i.test(view.humanDone) ? "warn" : "ok");
+    var doneClass = (/^Escalated/i.test(view.humanDone) || /^Taken personally/i.test(view.humanDone) || /^Acknowledged/i.test(view.humanDone))
+      ? "danger"
+      : (/^Edited/i.test(view.humanDone) ? "warn" : "ok");
     gate.innerHTML =
       "<span class='badge " + doneClass + "'>Complete — " + escapeHtml(view.humanDone) + "</span>" +
       "<div class='row-actions' style='margin-top: var(--sp-2);'>" +
