@@ -1764,6 +1764,38 @@ body {
     0 1px 2px color-mix(in srgb, var(--ink) 4%, transparent),
     0 18px 40px -24px color-mix(in srgb, var(--ink) 18%, transparent);
 }
+.rules-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-1);
+  color: var(--ink);
+  cursor: pointer;
+}
+.rules-draft {
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: var(--fs-0);
+  line-height: var(--lh);
+  margin-bottom: var(--sp-3);
+  min-height: 6rem;
+}
+.field-label {
+  display: block;
+  font-size: var(--fs-0);
+  color: var(--ink-2);
+  margin: var(--sp-2) 0 var(--sp-1);
+}
+.rules-step-body .field-input {
+  width: 100%;
+  margin-bottom: var(--sp-3);
+}
+.rules-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-3);
+}
 @media (max-width: 1100px) {
   .topbar .meta { display: none; }
   .view-tabs { top: 56px; padding-left: var(--sp-4); padding-right: var(--sp-4); }
@@ -1784,6 +1816,7 @@ body {
     <button type="button" class="chip" id="tab-evals" data-view="evals">Evals</button>
     <button type="button" class="chip" id="tab-traces" data-view="traces">Trace</button>
     <button type="button" class="chip" id="tab-matrix" data-view="matrix">Priority matrix</button>
+    <button type="button" class="chip" id="tab-rules" data-view="rules">Rules</button>
   </div>
 </nav>
 
@@ -2052,6 +2085,73 @@ body {
     <div class="matrix-stats" id="matrix-stats"></div>
     <h3 style="margin: var(--sp-4) 0 var(--sp-2); font-size: var(--fs-2);">Paste-ready for teacher / PRD</h3>
     <pre class="matrix-paste" id="matrix-paste"></pre>
+  </div>
+</section>
+
+<section class="evals-view" id="rules-view" aria-label="Rule builder">
+  <div class="section-title-row">
+    <div class="panel-head">Rules · guided interview</div>
+    <span class="info-tip">
+      <button type="button" class="info-tip-btn" aria-label="About rule builder">i</button>
+      <span class="info-tip-pop" role="tooltip">Build your own triage rules with a short interview. Drafts are not live until you Approve. Aurora demo rules stay the default for Ren’s inbox until you switch the toggle.</span>
+    </span>
+  </div>
+  <p class="muted" id="rules-active-banner" style="margin-top:0;"></p>
+
+  <div class="matrix-card rules-mode-card">
+    <div class="panel-head" style="margin-bottom: var(--sp-3);">Which rules does Work use?</div>
+    <div class="row-actions" style="align-items: center; flex-wrap: wrap; gap: var(--sp-3);">
+      <label class="rules-radio">
+        <input type="radio" name="rules-source" id="rules-source-aurora" value="aurora" checked>
+        Aurora demo (Ren)
+      </label>
+      <label class="rules-radio">
+        <input type="radio" name="rules-source" id="rules-source-custom" value="custom">
+        My approved rules
+      </label>
+      <span class="muted" id="rules-source-hint">Approve a pack below before switching.</span>
+    </div>
+  </div>
+
+  <div class="matrix-card" id="rules-wizard-card">
+    <div class="rules-progress muted" id="rules-progress"></div>
+    <h3 class="rules-step-title" id="rules-step-title" style="margin: var(--sp-2) 0 var(--sp-3); font-size: var(--fs-2);"></h3>
+    <p class="muted" id="rules-step-help" style="margin-top:0;"></p>
+    <div id="rules-step-body"></div>
+    <div class="row-actions" style="margin-top: var(--sp-4); flex-wrap: wrap; gap: var(--sp-2);">
+      <button type="button" class="btn" id="rules-back-btn">Back</button>
+      <button type="button" class="btn primary" id="rules-next-btn">Next</button>
+      <button type="button" class="btn" id="rules-restart-btn">Start over</button>
+    </div>
+  </div>
+
+  <div class="matrix-card" id="rules-draft-card" hidden>
+    <div class="panel-head" style="margin-bottom: var(--sp-2);">Draft rule pack</div>
+    <p class="muted" style="margin-top:0;">Edit if needed. Nothing is live until you Approve. Discard returns you to the interview.</p>
+    <label class="field-label" for="rules-draft-priority">priority_rules.md</label>
+    <textarea class="field-input rules-draft" id="rules-draft-priority" rows="8"></textarea>
+    <label class="field-label" for="rules-draft-delegation">delegation_rules.md</label>
+    <textarea class="field-input rules-draft" id="rules-draft-delegation" rows="6"></textarea>
+    <label class="field-label" for="rules-draft-escalation">escalation_rules.md</label>
+    <textarea class="field-input rules-draft" id="rules-draft-escalation" rows="8"></textarea>
+    <label class="field-label" for="rules-draft-org">org_facts.md</label>
+    <textarea class="field-input rules-draft" id="rules-draft-org" rows="5"></textarea>
+    <div class="row-actions" style="margin-top: var(--sp-4); flex-wrap: wrap; gap: var(--sp-2);">
+      <button type="button" class="btn primary" id="rules-approve-btn" disabled>Save rules</button>
+      <button type="button" class="btn" id="rules-discard-btn">Discard draft</button>
+      <button type="button" class="btn" id="rules-edit-interview-btn">Edit interview answers</button>
+    </div>
+    <p class="muted" id="rules-approve-hint" style="margin-top: var(--sp-2);"></p>
+    <p class="boundary-note" style="margin-top: var(--sp-3);">Rules do not send mail. Work triage still needs Approve / Edit / Escalate on every case.</p>
+  </div>
+
+  <div class="matrix-card" id="rules-approved-card" hidden>
+    <div class="panel-head" style="margin-bottom: var(--sp-2);">Approved pack</div>
+    <p class="muted" id="rules-approved-meta" style="margin-top:0;"></p>
+    <div class="row-actions" style="flex-wrap: wrap; gap: var(--sp-2);">
+      <button type="button" class="btn" id="rules-revise-btn">Revise (new interview)</button>
+      <button type="button" class="btn" id="rules-clear-btn">Clear approved pack</button>
+    </div>
   </div>
 </section>
 
@@ -3706,22 +3806,27 @@ function setMainView(name) {
   var evals = document.getElementById("evals-view");
   var traces = document.getElementById("traces-view");
   var matrix = document.getElementById("matrix-view");
+  var rules = document.getElementById("rules-view");
   var tabWork = document.getElementById("tab-work");
   var tabEvals = document.getElementById("tab-evals");
   var tabTraces = document.getElementById("tab-traces");
   var tabMatrix = document.getElementById("tab-matrix");
+  var tabRules = document.getElementById("tab-rules");
   if (work) work.classList.toggle("hidden", name !== "work");
   if (evals) evals.classList.toggle("visible", name === "evals");
   if (traces) traces.classList.toggle("visible", name === "traces");
   if (matrix) matrix.classList.toggle("visible", name === "matrix");
+  if (rules) rules.classList.toggle("visible", name === "rules");
   if (tabWork) tabWork.classList.toggle("active", name === "work");
   if (tabEvals) tabEvals.classList.toggle("active", name === "evals");
   if (tabTraces) tabTraces.classList.toggle("active", name === "traces");
   if (tabMatrix) tabMatrix.classList.toggle("active", name === "matrix");
+  if (tabRules) tabRules.classList.toggle("active", name === "rules");
   var banner = document.getElementById("first-run-banner");
   if (banner) banner.style.display = name === "work" ? "" : "none";
   if (name === "traces") renderTracesView();
   if (name === "matrix") syncMatrixFromWorkRuns({ quiet: true });
+  if (name === "rules") renderRuleStudio();
 }
 
 function initViewTabs() {
@@ -3729,6 +3834,8 @@ function initViewTabs() {
   document.getElementById("tab-evals").addEventListener("click", function () { setMainView("evals"); });
   document.getElementById("tab-traces").addEventListener("click", function () { setMainView("traces"); });
   document.getElementById("tab-matrix").addEventListener("click", function () { setMainView("matrix"); });
+  var tabRules = document.getElementById("tab-rules");
+  if (tabRules) tabRules.addEventListener("click", function () { setMainView("rules"); });
 }
 
 function buildOlderHistoryDisclosure(row) {
@@ -4340,11 +4447,615 @@ function attachHumanGate(em, draftBox, result, gateHost) {
   gateHost.appendChild(linkRow);
 }
 
+// ---- Rule builder (guided interview → approve → optional Work use) ----
+var RULE_PACK_STORAGE = "aurora_rule_pack_v1";
+var RULE_STUDIO = {
+  step: 0,
+  answers: emptyRuleAnswers(),
+  phase: "interview" // interview | draft | approved
+};
+
+var RULE_STEPS = [
+  {
+    key: "intro",
+    title: "Build your own triage rules",
+    help: "Answer a short interview. The app drafts priority, delegation, and escalation rules. Nothing is live until you Approve. Aurora’s Ren demo stays the default until you switch the toggle.",
+    fields: []
+  },
+  {
+    key: "who",
+    title: "Who is the operator?",
+    help: "One named person the agent works for (not “the team”).",
+    fields: [
+      { id: "userName", label: "Name", placeholder: "e.g. Alex Chen" },
+      { id: "userRole", label: "Role", placeholder: "e.g. Founder-CEO / Head of Ops" },
+      { id: "orgName", label: "Organization", placeholder: "e.g. Northwind Labs" }
+    ]
+  },
+  {
+    key: "domains",
+    title: "What kinds of mail arrive?",
+    help: "Domains and categories this person sees in a morning inbox.",
+    fields: [
+      {
+        id: "domains",
+        label: "Domains / categories",
+        placeholder: "e.g. Company customers, suppliers, investors; university students and admin",
+        rows: 3
+      }
+    ]
+  },
+  {
+    key: "p0",
+    title: "What is P0 for them?",
+    help: "Act this morning — must surface, usually needs the operator.",
+    fields: [
+      {
+        id: "p0",
+        label: "P0 examples (one idea per line)",
+        placeholder: "e.g. Payment approvals only I can grant\nKey-account asks with a deadline this week\nBoard/investor same-week asks",
+        rows: 4
+      }
+    ]
+  },
+  {
+    key: "p1",
+    title: "What is P1?",
+    help: "Important today, but not same-hour critical.",
+    fields: [
+      {
+        id: "p1",
+        label: "P1 examples (one idea per line)",
+        placeholder: "e.g. Non-urgent partner follow-ups\nInternal reports to review\nOpportunities with distant deadlines",
+        rows: 4
+      }
+    ]
+  },
+  {
+    key: "p2",
+    title: "What is P2 / noise?",
+    help: "Batch or defer — no real decision needed.",
+    fields: [
+      {
+        id: "p2",
+        label: "P2 examples (one idea per line)",
+        placeholder: "e.g. Newsletters\nCold sales\nMass “URGENT” blasts with no real stake",
+        rows: 4
+      }
+    ]
+  },
+  {
+    key: "refuse",
+    title: "What must the agent refuse?",
+    help: "Never auto-draft compliance — escalate to the operator instead.",
+    fields: [
+      {
+        id: "refuse",
+        label: "Refuse / escalate list (one trigger per line)",
+        placeholder: "e.g. Legal threats or anger\nGrade / academic-sensitive student matters\nSkip-process or out-of-policy payments\nMissing attachment the sender claimed to include",
+        rows: 5
+      }
+    ]
+  },
+  {
+    key: "delegates",
+    title: "Who can be recommended for delegation?",
+    help: "Required. One person per line: Name | Role | categories. If the operator handles everything alone, type: none",
+    fields: [
+      {
+        id: "delegates",
+        label: "Delegation directory",
+        placeholder: "e.g. Jordan Lee | Sales Lead | customers, key accounts\nOr: none",
+        rows: 4
+      }
+    ]
+  }
+];
+
+function emptyRuleAnswers() {
+  return {
+    userName: "",
+    userRole: "",
+    orgName: "",
+    domains: "",
+    p0: "",
+    p1: "",
+    p2: "",
+    refuse: "",
+    delegates: ""
+  };
+}
+
+function requiredRuleFields() {
+  var list = [];
+  RULE_STEPS.forEach(function (step) {
+    step.fields.forEach(function (f) {
+      list.push({ id: f.id, label: f.label, stepTitle: step.title });
+    });
+  });
+  return list;
+}
+
+function isRuleAnswerFilled(value) {
+  return String(value || "").trim().length > 0;
+}
+
+function getMissingRuleAnswers(answers) {
+  var a = answers || RULE_STUDIO.answers;
+  return requiredRuleFields().filter(function (f) {
+    return !isRuleAnswerFilled(a[f.id]);
+  });
+}
+
+function getMissingFieldsOnStep(stepIndex, answers) {
+  var step = RULE_STEPS[stepIndex];
+  var a = answers || RULE_STUDIO.answers;
+  if (!step || !step.fields.length) return [];
+  return step.fields.filter(function (f) {
+    return !isRuleAnswerFilled(a[f.id]);
+  });
+}
+
+function interviewAnswersComplete() {
+  return getMissingRuleAnswers(RULE_STUDIO.answers).length === 0;
+}
+
+function updateApproveRulesButton() {
+  var btn = document.getElementById("rules-approve-btn");
+  var hint = document.getElementById("rules-approve-hint");
+  var missing = getMissingRuleAnswers(RULE_STUDIO.answers);
+  var ok = missing.length === 0;
+  if (btn) {
+    btn.disabled = !ok;
+    btn.title = ok
+      ? "Approve and save this rule pack"
+      : "Finish every interview question before saving";
+  }
+  if (hint) {
+    if (ok) {
+      hint.textContent = "All interview questions answered. You can Save rules.";
+    } else {
+      hint.textContent =
+        "Save rules is disabled until every question is answered. Use Edit interview answers to go back and fill: " +
+        missing.map(function (m) { return m.label; }).join(", ") +
+        ".";
+    }
+  }
+}
+
+function generateRuleDraftPhase() {
+  captureRuleStepFields();
+  var drafts = buildRuleDraftsFromAnswers(RULE_STUDIO.answers);
+  fillDraftTextareas(drafts);
+  showRulePhase("draft");
+  updateApproveRulesButton();
+  var missing = getMissingRuleAnswers(RULE_STUDIO.answers);
+  if (missing.length) {
+    setTopStatus("warn", "Draft ready — finish skipped questions before Approve");
+  } else {
+    setTopStatus("ok", "Rule draft ready — review then Approve");
+  }
+}
+
+function approveRulePack() {
+  captureRuleStepFields();
+  var missing = getMissingRuleAnswers(RULE_STUDIO.answers);
+  updateApproveRulesButton();
+  if (missing.length) {
+    return;
+  }
+  var drafts = readDraftTextareas();
+  if (!drafts.priority.trim() || !drafts.escalation.trim() || !drafts.delegation.trim() || !drafts.orgFacts.trim()) {
+    alert("All four draft sections must have content before saving.");
+    return;
+  }
+  var pack = {
+    status: "approved",
+    useCustom: false,
+    answers: Object.assign({}, RULE_STUDIO.answers),
+    drafts: drafts,
+    approvedAt: new Date().toISOString()
+  };
+  saveRulePack(pack);
+  RULE_STUDIO.phase = "approved";
+  renderRuleStudio();
+  setTopStatus("ok", "Rules saved — turn on “My approved rules” to use on Work");
+}
+
+function clearRulePack() {
+  if (!confirm("Clear the approved rule pack from this browser?")) return;
+  localStorage.removeItem(RULE_PACK_STORAGE);
+  RULE_STUDIO.step = 0;
+  RULE_STUDIO.answers = emptyRuleAnswers();
+  RULE_STUDIO.phase = "interview";
+  renderRuleStudio();
+  setTopStatus("warn", "Custom rules cleared — Aurora demo active");
+}
+
+function loadRulePack() {
+  try {
+    var raw = localStorage.getItem(RULE_PACK_STORAGE);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (e) {
+    return null;
+  }
+}
+
+function saveRulePack(pack) {
+  localStorage.setItem(RULE_PACK_STORAGE, JSON.stringify(pack));
+}
+
+function bulletize(text) {
+  return String(text || "")
+    .split(/\n|;/)
+    .map(function (s) { return s.replace(/^[-*•]\s*/, "").trim(); })
+    .filter(Boolean);
+}
+
+function buildRuleDraftsFromAnswers(a) {
+  var name = (a.userName || "").trim() || "(name not answered yet)";
+  var role = (a.userRole || "").trim() || "(role not answered yet)";
+  var org = (a.orgName || "").trim() || "(org not answered yet)";
+  var p0 = bulletize(a.p0);
+  var p1 = bulletize(a.p1);
+  var p2 = bulletize(a.p2);
+  var refuse = bulletize(a.refuse);
+  var domains = (a.domains || "").trim() || "(domains not answered yet)";
+  var delegates = bulletize(a.delegates);
+  var alone =
+    delegates.length === 1 && /^none\b/i.test(delegates[0]);
+  if (!p0.length) p0 = ["(P0 not answered yet — finish interview before Save)"];
+  if (!p1.length) p1 = ["(P1 not answered yet — finish interview before Save)"];
+  if (!p2.length) p2 = ["(P2 not answered yet — finish interview before Save)"];
+  if (!refuse.length) refuse = ["(Refuse list not answered yet — finish interview before Save)"];
+  if (!delegates.length) delegates = ["(Delegates not answered yet — finish interview before Save)"];
+
+  var priority =
+    "Priority rules for " + name + " (" + role + ") at " + org + ".\n" +
+    "Assign exactly one tier: P0, P1, or P2. Score urgency first across: " + domains + ".\n\n" +
+    "P0 — act this morning; usually needs " + name + ":\n" +
+    p0.map(function (x) { return "- " + x; }).join("\n") + "\n\n" +
+    "P1 — handle today; agent may prepare a draft:\n" +
+    p1.map(function (x) { return "- " + x; }).join("\n") + "\n\n" +
+    "P2 — batch / defer; digest only:\n" +
+    p2.map(function (x) { return "- " + x; }).join("\n") + "\n\n" +
+    "Surface tone does not lower priority. Draft-and-recommend only — nothing sends without human approval.";
+
+  var delegation =
+    "Delegation rules for " + name + " at " + org + ".\n" +
+    "Recommend a route: " + name + " handles it, or Delegate → named person (recommendation only until approved).\n" +
+    "Order: (1) " + name + "-only / refuse list items stay with " + name + ". (2) Category match to the directory below. (3) If unclear, escalate — do not guess.\n\n" +
+    "Directory:\n" +
+    (alone
+      ? "- none — default all routes to " + name
+      : delegates.map(function (x) { return "- " + x; }).join("\n")) +
+    "\n\nDelegation never overrides the human approval gate.";
+
+  var escalation =
+    "Escalation / refuse rules for " + name + " at " + org + ".\n" +
+    "On any trigger: stop confident auto-handling, Flag REFUSED-ESCALATE or Needs approval as appropriate, and do not prepare write actions that commit " + name + ".\n\n" +
+    "Refuse / escalate when:\n" +
+    refuse.map(function (x, i) { return (i + 1) + ". " + x; }).join("\n") + "\n\n" +
+    "Also: missing data — if the body claims an attachment that is absent, or cites an unknown order/record, do not invent facts; draft an ask or escalate.\n" +
+    "Calendar conflicts — if a proposed time overlaps the provided calendar, name the conflict, do not soft-accept that slot, Prepared action none for it.\n" +
+    "Duplicates — earliest identical same-sender email: Inbox relationship none; later copy: duplicate of earlier id, Draft none - duplicate, Needs approval to dismiss.";
+
+  var orgFacts =
+    "Operator context (synthetic / user-authored). " + name + " is " + role + " at " + org + ".\n" +
+    "Mail domains: " + domains + ".\n" +
+    "Use this file for tone and naming. Do not invent company metrics, prices, or legal commitments that are not in the email or other context.\n" +
+    "All drafts are suggestions only and require " + name + "'s Approve / Edit / Escalate.";
+
+  return {
+    priority: priority,
+    delegation: delegation,
+    escalation: escalation,
+    orgFacts: orgFacts
+  };
+}
+
+function customRulesAreLive() {
+  var pack = loadRulePack();
+  return !!(pack && pack.status === "approved" && pack.useCustom);
+}
+
+function getActivePolicies() {
+  var out = {};
+  Object.keys(POLICIES).forEach(function (k) { out[k] = POLICIES[k]; });
+  var pack = loadRulePack();
+  if (pack && pack.status === "approved" && pack.useCustom && pack.drafts) {
+    if (pack.drafts.priority) out["priority_rules.md"] = pack.drafts.priority;
+    if (pack.drafts.delegation) out["delegation_rules.md"] = pack.drafts.delegation;
+    if (pack.drafts.escalation) out["escalation_rules.md"] = pack.drafts.escalation;
+    if (pack.drafts.orgFacts) out["company_facts.md"] = pack.drafts.orgFacts;
+  }
+  return out;
+}
+
+function getActiveSystemPrompt() {
+  var base = SYSTEM_PROMPT;
+  if (!customRulesAreLive()) return base;
+  var pack = loadRulePack();
+  var a = (pack && pack.answers) || {};
+  var name = a.userName || "the operator";
+  var role = a.userRole || "operator";
+  var org = a.orgName || "their organization";
+  return (
+    base +
+    "\n\nCUSTOM RULE PACK (operator-approved):\n" +
+    "You are triaging for " + name + " (" + role + ") at " + org + ".\n" +
+    "The POLICY files in the user message are THIS operator's approved rules — follow them for priority, delegation, and escalation. Prefer their name over Ren when routing or escalating. Keep draft-and-recommend-only; the human gate still applies.\n"
+  );
+}
+
+function getActiveReviewerPrompt() {
+  var base = REVIEWER_SYSTEM_PROMPT;
+  if (!customRulesAreLive()) return base;
+  return (
+    base +
+    "\n\nCUSTOM RULE PACK ACTIVE: Grade the worker against the operator-approved policy files in the user message (not Aurora Ren defaults when they conflict). Still require refuse on the operator's refuse list and never allow soft-accept of calendar conflicts.\n"
+  );
+}
+
+function updateRulesActiveBanner() {
+  var el = document.getElementById("rules-active-banner");
+  var meta = document.getElementById("top-meta");
+  var live = customRulesAreLive();
+  var pack = loadRulePack();
+  if (el) {
+    el.textContent = live
+      ? "Work is using your approved rules for " +
+        ((pack.answers && pack.answers.userName) || "the operator") +
+        ". Switch back to Aurora demo anytime."
+      : "Work defaults to Aurora demo rules (Ren). Approve a pack, then choose “My approved rules” to try them on Work.";
+  }
+  if (meta) {
+    var base =
+      "Morning triage for Ren · scenario clock 11 May 2026 · Soft Studio theme";
+    meta.textContent = live
+      ? "Custom rules live · scenario clock 11 May 2026 · Soft Studio theme"
+      : base;
+  }
+  var aurora = document.getElementById("rules-source-aurora");
+  var custom = document.getElementById("rules-source-custom");
+  var hint = document.getElementById("rules-source-hint");
+  var approved = !!(pack && pack.status === "approved");
+  if (aurora) aurora.checked = !live;
+  if (custom) {
+    custom.checked = live;
+    custom.disabled = !approved;
+  }
+  if (hint) {
+    hint.textContent = approved
+      ? (live ? "Custom pack is active on Work." : "Approved pack ready — select “My approved rules” to use it.")
+      : "Approve a pack below before switching.";
+  }
+}
+
+function captureRuleStepFields() {
+  var step = RULE_STEPS[RULE_STUDIO.step];
+  if (!step) return;
+  step.fields.forEach(function (f) {
+    var el = document.getElementById("rule-field-" + f.id);
+    if (el) RULE_STUDIO.answers[f.id] = el.value;
+  });
+}
+
+function renderRuleStep() {
+  var step = RULE_STEPS[RULE_STUDIO.step];
+  var title = document.getElementById("rules-step-title");
+  var help = document.getElementById("rules-step-help");
+  var body = document.getElementById("rules-step-body");
+  var progress = document.getElementById("rules-progress");
+  var back = document.getElementById("rules-back-btn");
+  var next = document.getElementById("rules-next-btn");
+  if (!step || !body) return;
+  if (progress) {
+    progress.textContent =
+      "Step " + (RULE_STUDIO.step + 1) + " of " + RULE_STEPS.length;
+  }
+  if (title) title.textContent = step.title;
+  if (help) help.textContent = step.help;
+  body.innerHTML = "";
+  if (!step.fields.length) {
+    var p = document.createElement("p");
+    p.className = "muted";
+    p.textContent =
+      "Tip: keep answers concrete. You can skip ahead and come back — Save rules stays off until every question is filled.";
+    body.appendChild(p);
+  }
+  step.fields.forEach(function (f) {
+    var lab = document.createElement("label");
+    lab.className = "field-label";
+    lab.setAttribute("for", "rule-field-" + f.id);
+    lab.textContent = f.label;
+    body.appendChild(lab);
+    var input;
+    if (f.rows) {
+      input = document.createElement("textarea");
+      input.rows = f.rows;
+    } else {
+      input = document.createElement("input");
+      input.type = "text";
+    }
+    input.className = "field-input";
+    input.id = "rule-field-" + f.id;
+    input.placeholder = f.placeholder || "";
+    input.value = RULE_STUDIO.answers[f.id] || "";
+    input.required = true;
+    input.setAttribute("aria-required", "true");
+    input.addEventListener("input", function () {
+      RULE_STUDIO.answers[f.id] = input.value;
+    });
+    body.appendChild(input);
+  });
+  if (back) back.disabled = RULE_STUDIO.step === 0;
+  if (next) {
+    next.textContent =
+      RULE_STUDIO.step === RULE_STEPS.length - 1 ? "Generate draft" : "Next";
+  }
+}
+
+function showRulePhase(phase) {
+  RULE_STUDIO.phase = phase;
+  var wiz = document.getElementById("rules-wizard-card");
+  var draft = document.getElementById("rules-draft-card");
+  var appr = document.getElementById("rules-approved-card");
+  if (wiz) wiz.hidden = phase !== "interview";
+  if (draft) draft.hidden = phase !== "draft";
+  if (appr) appr.hidden = phase !== "approved";
+  if (phase === "draft") updateApproveRulesButton();
+}
+
+function fillDraftTextareas(drafts) {
+  var map = {
+    "rules-draft-priority": drafts.priority,
+    "rules-draft-delegation": drafts.delegation,
+    "rules-draft-escalation": drafts.escalation,
+    "rules-draft-org": drafts.orgFacts
+  };
+  Object.keys(map).forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) el.value = map[id] || "";
+  });
+}
+
+function readDraftTextareas() {
+  return {
+    priority: (document.getElementById("rules-draft-priority") || {}).value || "",
+    delegation: (document.getElementById("rules-draft-delegation") || {}).value || "",
+    escalation: (document.getElementById("rules-draft-escalation") || {}).value || "",
+    orgFacts: (document.getElementById("rules-draft-org") || {}).value || ""
+  };
+}
+
+function renderRuleStudio() {
+  var pack = loadRulePack();
+  updateRulesActiveBanner();
+  if (pack && pack.status === "approved" && RULE_STUDIO.phase !== "draft" && RULE_STUDIO.phase !== "interview") {
+    RULE_STUDIO.phase = "approved";
+    RULE_STUDIO.answers = Object.assign(emptyRuleAnswers(), pack.answers || {});
+  }
+  if (RULE_STUDIO.phase === "approved" && pack && pack.status === "approved") {
+    showRulePhase("approved");
+    var meta = document.getElementById("rules-approved-meta");
+    if (meta) {
+      meta.textContent =
+        "Approved for " +
+        ((pack.answers && pack.answers.userName) || "?") +
+        " · " +
+        (pack.approvedAt ? new Date(pack.approvedAt).toLocaleString() : "saved") +
+        (pack.useCustom ? " · currently active on Work" : " · not active on Work yet");
+    }
+    return;
+  }
+  if (RULE_STUDIO.phase === "draft") {
+    showRulePhase("draft");
+    updateApproveRulesButton();
+    return;
+  }
+  showRulePhase("interview");
+  renderRuleStep();
+}
+
+function initRuleStudio() {
+  var pack = loadRulePack();
+  if (pack && pack.answers) {
+    RULE_STUDIO.answers = Object.assign(emptyRuleAnswers(), pack.answers);
+  }
+  if (pack && pack.status === "approved") {
+    RULE_STUDIO.phase = "approved";
+  }
+  var next = document.getElementById("rules-next-btn");
+  var back = document.getElementById("rules-back-btn");
+  var restart = document.getElementById("rules-restart-btn");
+  if (next) {
+    next.addEventListener("click", function () {
+      captureRuleStepFields();
+      if (RULE_STUDIO.step >= RULE_STEPS.length - 1) {
+        generateRuleDraftPhase();
+      } else {
+        RULE_STUDIO.step += 1;
+        renderRuleStep();
+      }
+    });
+  }
+  if (back) {
+    back.addEventListener("click", function () {
+      captureRuleStepFields();
+      if (RULE_STUDIO.step > 0) {
+        RULE_STUDIO.step -= 1;
+        renderRuleStep();
+      }
+    });
+  }
+  if (restart) {
+    restart.addEventListener("click", function () {
+      if (!confirm("Clear interview answers and start over?")) return;
+      RULE_STUDIO.step = 0;
+      RULE_STUDIO.answers = emptyRuleAnswers();
+      RULE_STUDIO.phase = "interview";
+      renderRuleStudio();
+    });
+  }
+  var approve = document.getElementById("rules-approve-btn");
+  var discard = document.getElementById("rules-discard-btn");
+  var editAns = document.getElementById("rules-edit-interview-btn");
+  if (approve) approve.addEventListener("click", approveRulePack);
+  if (discard) {
+    discard.addEventListener("click", function () {
+      RULE_STUDIO.phase = "interview";
+      RULE_STUDIO.step = 0;
+      renderRuleStudio();
+    });
+  }
+  if (editAns) {
+    editAns.addEventListener("click", function () {
+      RULE_STUDIO.phase = "interview";
+      RULE_STUDIO.step = 1;
+      renderRuleStudio();
+    });
+  }
+  var revise = document.getElementById("rules-revise-btn");
+  var clearBtn = document.getElementById("rules-clear-btn");
+  if (revise) {
+    revise.addEventListener("click", function () {
+      RULE_STUDIO.phase = "interview";
+      RULE_STUDIO.step = 0;
+      renderRuleStudio();
+    });
+  }
+  if (clearBtn) clearBtn.addEventListener("click", clearRulePack);
+
+  function onSourceChange() {
+    var packNow = loadRulePack();
+    if (!packNow || packNow.status !== "approved") {
+      updateRulesActiveBanner();
+      return;
+    }
+    var custom = document.getElementById("rules-source-custom");
+    packNow.useCustom = !!(custom && custom.checked);
+    saveRulePack(packNow);
+    updateRulesActiveBanner();
+    setTopStatus(
+      packNow.useCustom ? "ok" : "info",
+      packNow.useCustom ? "Work using your approved rules" : "Work using Aurora demo rules"
+    );
+  }
+  var aurora = document.getElementById("rules-source-aurora");
+  var custom = document.getElementById("rules-source-custom");
+  if (aurora) aurora.addEventListener("change", onSourceChange);
+  if (custom) custom.addEventListener("change", onSourceChange);
+  updateRulesActiveBanner();
+}
+
 // ---- Build the context message sent to the agent for one email ----
 function buildUserMessage(em) {
+  var policies = getActivePolicies();
   var s = senderById(em.sender_id) || {};
-  var policyText = Object.keys(POLICIES).map(function (name) {
-    return "--- " + name + " ---\n" + POLICIES[name];
+  var policyText = Object.keys(policies).map(function (name) {
+    return "--- " + name + " ---\n" + policies[name];
   }).join("\n\n");
 
   var sameSenderOthers = EMAILS.filter(function (other) {
@@ -4363,8 +5074,13 @@ function buildUserMessage(em) {
     ? JSON.stringify(sameSenderOthers, null, 2)
     : "(none — this is the only morning email from this sender)";
 
+  var liveNote = customRulesAreLive()
+    ? "RULE SOURCE: operator-approved custom rule pack (see policy files below).\n\n"
+    : "RULE SOURCE: Aurora demo policies for Ren.\n\n";
+
   return (
     "Triage the following email according to your instructions. Use ONLY the context below.\n\n" +
+    liveNote +
     "SCENARIO CLOCK (authoritative):\n" +
     "today / now / this morning = " + SCENARIO_NOW_LABEL + "\n" +
     "scenario_date = " + SCENARIO_NOW + "\n" +
@@ -4386,8 +5102,9 @@ function buildUserMessage(em) {
 }
 
 function buildChatContextBlock(focusEmailId) {
-  var policyText = Object.keys(POLICIES).map(function (name) {
-    return "--- " + name + " ---\n" + POLICIES[name];
+  var policies = getActivePolicies();
+  var policyText = Object.keys(policies).map(function (name) {
+    return "--- " + name + " ---\n" + policies[name];
   }).join("\n\n");
 
   var inboxIndex = EMAILS.map(function (e) {
@@ -5257,7 +5974,7 @@ async function runAgent(em, sessionId, parentTraceId) {
     refreshKeyStatus();
   }
   setTopStatus("info", "Worker running");
-  var api = await callMessagesApi(SYSTEM_PROMPT, buildUserMessage(em), 2048, {
+  var api = await callMessagesApi(getActiveSystemPrompt(), buildUserMessage(em), 2048, {
     emailId: em.email_id,
     role: "worker",
     sessionId: sessionId || "",
@@ -5288,7 +6005,7 @@ async function runReviewerAgent(em, workerResult, sessionId, parentTraceId) {
   }
   setTopStatus("info", "Reviewer (OpenAI) running");
   var api = await callMessagesApi(
-    REVIEWER_SYSTEM_PROMPT,
+    getActiveReviewerPrompt(),
     buildReviewerUserMessage(em, workerResult),
     512,
     {
@@ -6057,6 +6774,7 @@ initViewTabs();
 initEvalsResetButton();
 initTracesControls();
 initMatrixControls();
+initRuleStudio();
 initSessionToggle();
 initInfoTips();
 initGlobalChat();
@@ -6071,6 +6789,7 @@ renderEvalsTable();
   if (hash === "matrix" || hash === "priority-matrix") setMainView("matrix");
   else if (hash === "evals") setMainView("evals");
   else if (hash === "traces" || hash === "trace") setMainView("traces");
+  else if (hash === "rules" || hash === "rule-builder") setMainView("rules");
   else setMainView("work");
 })();
 </script>
