@@ -1710,6 +1710,27 @@ body {
 .settings-fold .settings-body { padding: 0 var(--sp-4) var(--sp-4); }
 .inbox-toolbar { padding-top: var(--sp-1); }
 .inbox-toolbar .btn.primary { min-width: 7.5rem; justify-content: center; }
+.inbox-toolbar .run-mode-label {
+  font-size: var(--fs-0);
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.inbox-toolbar .run-mode-select,
+.inbox-toolbar .run-cadence-select {
+  width: auto;
+  min-width: 8.5rem;
+  padding: var(--sp-2) var(--sp-3);
+  font-size: var(--fs-0);
+}
+.inbox-toolbar .run-cadence-select[hidden] { display: none !important; }
+#run-all-schedule[hidden] { display: none !important; }
+#run-all-btn.is-auto-on {
+  background: color-mix(in srgb, var(--warn) 88%, var(--ink));
+  border-color: var(--warn);
+  box-shadow: 0 8px 18px -10px color-mix(in srgb, var(--warn) 55%, transparent);
+}
 .session-toggle {
   border-radius: var(--radius);
   transition: border-color .2s ease, color .2s ease, background .2s ease, box-shadow .2s ease;
@@ -1777,17 +1798,31 @@ body {
       <span>Inbox</span>
       <span class="info-tip">
         <button type="button" class="info-tip-btn" aria-label="About inbox">i</button>
-        <span class="info-tip-pop align-end" role="tooltip">Click an email to open Reading · Triage. Run All walks every message in order. Demo chips jump to a known story. Settings (API keys, Google) are folded at the bottom.</span>
+          <span class="info-tip-pop align-end" role="tooltip">Click an email to open Reading · Triage. Run All can be Manual (once) or Automatic on a cadence you choose. Demo chips jump to a known story. Settings (API keys, Google) are folded at the bottom.</span>
       </span>
     </div>
     <div class="panel-body inbox-body">
-      <div class="inbox-toolbar">
-        <button id="run-all-btn" class="btn primary">Run All</button>
+      <div class="inbox-toolbar" id="run-all-controls">
+        <label class="run-mode-label" for="run-all-mode">Run All</label>
+        <select class="field-input run-mode-select" id="run-all-mode" aria-label="Run All mode">
+          <option value="manual" selected>Manual</option>
+          <option value="auto">Automatic</option>
+        </select>
+        <select class="field-input run-cadence-select" id="run-all-cadence" aria-label="Auto-run cadence" hidden>
+          <option value="120">Every 2 min</option>
+          <option value="300" selected>Every 5 min</option>
+          <option value="600">Every 10 min</option>
+          <option value="1800">Every 30 min</option>
+          <option value="3600">Every 60 min</option>
+          <option value="86400">Daily</option>
+        </select>
+        <button type="button" id="run-all-btn" class="btn primary">Run All</button>
         <span class="info-tip">
           <button type="button" class="info-tip-btn" aria-label="About Run All">i</button>
-          <span class="info-tip-pop" role="tooltip">Runs the worker (then reviewer) on each inbox email in order. Progress shows above the list. You can open other messages while a run continues.</span>
+          <span class="info-tip-pop" role="tooltip">Manual: click Run All once to walk every inbox email. Automatic: starts a schedule that re-runs the full inbox on your chosen cadence (2 min to daily). Progress shows below. Does not auto-Approve — Human review still required.</span>
         </span>
       </div>
+      <p class="muted" id="run-all-schedule" style="padding: 0 var(--sp-4);" hidden></p>
       <p class="muted" id="run-all-progress" style="padding: 0 var(--sp-4);"></p>
       <p class="muted" id="run-all-summary" style="padding: 0 var(--sp-4);"></p>
       <details class="demo-chips-fold">
@@ -2224,7 +2259,7 @@ const POLICIES = {
   "delegation_rules.md": `For every email the agent recommends a route: Ren handles it, or delegate to a named employee (recommendation only; nothing handed off until Ren approves). Order: 1) Ren-only check - payment/seal approvals, investor/board, key technical decisions, academic/student decisions, high-stakes or out-of-policy go to Ren. 2) Category match - match the email category to the employee whose handles_categories covers it. 3) History/continuity - if the sender has a last_handled_by employee, prefer them. 4) Unclear route - if multiple or no match or low confidence, do not guess; mark route unclear and escalate. Only use listed employees for their categories. Delegation never overrides the human approval gate.`,
   "escalation_rules.md": `Triggers override learned preferences. Do not prepare calendar/flight write actions on escalation. 1 Low confidence: REFUSED-ESCALATE, draft none. 2 Missing data: ONLY if body claims an attachment but attachments present is (none), OR cites an order/contract/record ID with no matching record in context. A listed filename means the file is present for Ren — do not treat as missing just because PDF bytes are not in context. Requests for internal metrics Ren must supply are not Trigger 2 — draft a reply promising real figures, do not invent them. When Trigger 2 fires: Escalation missing data, draft ask-email, Flag Needs approval. 3 Anger/legal: REFUSED-ESCALATE, draft none. 4 Out-of-policy: REFUSED-ESCALATE, no compliance draft. 5 High stakes: stated money >= 50,000 RMB, or binding partnership/contract Ren would commit to. An investor asking for board-deck metrics is P0/P1 for Ren with a draft reply — not automatic REFUSED unless they demand a binding commitment without data. Never invent amounts/metrics. 6 Academic-sensitive: grades, misconduct, disputes, recommendation letters -> REFUSED-ESCALATE, draft none. Routine signature-on-form with a deadline is P0 for Ren with a short draft — not Trigger 6 unless it is a grade/dispute/misconduct matter. Calendar conflicts: if a proposed meeting/visit date overlaps REN'S CALENDAR, name the conflicting event (e.g. CAL-01 Ningbo May 13-14), do NOT draft soft acceptance of that date, decline the conflicting date in the draft and propose a non-overlapping alternative or ask for new dates, Escalation calendar conflict, Flag Needs approval, Prepared action none for the conflicting slot.`,
   "company_facts.md": `Fictional/synthetic context. Aurora Materials is an early-stage venture-backed startup commercializing next-generation solid-state battery (SSB) materials; flagship product SSB-200. Founder-CEO Ren invented and patented the core material and is also a university professor, splitting time between company and academic advising. Key account: Acme Battery Corp (top-3 by revenue). Team: Zhao Rui (Sales Lead, key accounts), Lin Hao (Operations, suppliers/logistics/admin), Mei Zhou (Lab Coordinator, cycling tests/reports), Guo Ping (Finance Admin, prepares but cannot approve payments). Investor: Summit Ventures (Fang Li), lead investor and board member. Tone: customers/partners warm and concrete; investors concise and metric-focused; students supportive but within policy. Drafts are suggestions only and always require Ren's approval.`,
-  "sample_outputs.md": `Format example only - NOT an answer to any real email. Fields: Priority (P0/P1/P2); Domain (Company/University); Category; From (name, org, relationship note); Summary; Urgency reason (name the deadline/stakes or lack thereof); Recommended route (Ren, or Delegate -> employee (role), with continuity note); Inbox relationship (none, or duplicate of EM-XX, or related to EM-XX — same sender alone is not enough); Draft reply (or none - escalated, or none - duplicate); Prepared action (calendar event / flight options / none); Flag (Needs approval / REFUSED-ESCALATE); Escalation (none, or trigger name + reason); Confidence (High/Medium/Low); Citations (policy sections and record IDs used).`
+  "sample_outputs.md": `Format example only - NOT an answer to any real email. Fields: Priority (P0/P1/P2); Domain (Company/University); Category; From (name, org, relationship note); Summary; Urgency reason (name the deadline/stakes or lack thereof); Recommended route (Ren, or Delegate -> employee (role), with continuity note); Inbox relationship (none for earliest of an identical pair; duplicate of EM-XX only for a later copy; or related to EM-XX when distinct — same sender alone is not enough); Draft reply (or none - escalated, or none - duplicate for later duplicate only); Prepared action (calendar event / flight options / none); Flag (Needs approval / REFUSED-ESCALATE); Escalation (none, or trigger name + reason); Confidence (High/Medium/Low); Citations (policy sections and record IDs used).`
 };
 
 // =====================================================================
@@ -2245,9 +2280,12 @@ This prototype is a frozen synthetic morning. "Today" / "now" / "this morning" m
 CONTEXT
 Use ONLY the context provided to you in the user message: the email being triaged and its linked sender record, plus OTHER MORNING EMAILS FROM THE SAME SENDER (for duplicate/related detection), plus the employee directory, calendar, and flight options, and the policy files priority_rules.md, delegation_rules.md, escalation_rules.md, company_facts.md, and the format guide sample_outputs.md. Never invent facts, records, names, orders, attachments, amounts, prices, deal values, or policy text that is not in the provided context. If something required is not present, treat it as missing data, and never estimate, assume, or infer numeric values (such as prices or deal sizes) that are not explicitly stated.
 
-INBOX RELATIONSHIP - compare the email being triaged against OTHER MORNING EMAILS FROM THE SAME SENDER in the user message.
+INBOX RELATIONSHIP - compare the email being triaged (THIS email) against OTHER MORNING EMAILS FROM THE SAME SENDER in the user message.
 - Same sender alone is NOT enough to call emails duplicate or related.
-- Exact or near duplicate (same subject and essentially identical body, and same attachments if any): cite the earlier email_id as the original. For the later duplicate only: Draft reply must be "none - duplicate"; Prepared action: none; do NOT write a second reply or second prepared action. Flag Needs approval so Ren can dismiss/archive. Never silently delete or send.
+- Exact or near duplicate = same subject, essentially identical body, and same attachments if any. Among those matches, compare received_at.
+- If THIS email is the earliest of an identical pair/set: Inbox relationship: none. Do NOT use a "duplicate of …" label. Do NOT name a later copy as if THIS email were a duplicate. You may still triage THIS email normally (summary / brief ack draft if useful). Draft reply must NOT be "none - duplicate".
+- If THIS email is a later copy of an earlier identical email: Inbox relationship: duplicate of <earlier_email_id> (briefly say why). Draft reply: "none - duplicate"; Prepared action: none; do NOT write a second reply or second prepared action. Flag: Needs approval so Ren can dismiss/archive. Never silently delete or send.
+- Forbidden: labeling the original as a duplicate; writing a real second reply on a later duplicate; inventing a duplicate relationship without identical content.
 - Related but distinct (same matter/thread of work, but each email carries different facts or a different ask): cite the related email_id(s). Keep THIS email as its own separate task. Preserve its unique information in Summary and Draft reply. Do NOT merge away distinct asks, and do NOT mark it as a duplicate.
 - Otherwise: Inbox relationship: none.
 
@@ -2322,7 +2360,14 @@ WHAT YOU CHECK (be skeptical — do not rubber-stamp)
 - Missing data: claimed attachment absent or unknown order/record → must not invent terms; Escalation missing-data; draft asks for the missing item; Prepared action none.
 - Calendar conflict: proposed date overlapping Ren's calendar → must name the calendar item (e.g. CAL-01 Ningbo May 13-14), forbid soft-accept of the conflicting date, Escalation calendar conflict, Prepared action none for that slot.
 - Happy path key-account quote: P0 / Needs approval / draft OK; must NOT refuse without cause.
-- Inbox relationship: if OTHER MORNING EMAILS FROM THE SAME SENDER show an exact/near duplicate, the later email must cite the earlier ID and use Draft "none - duplicate" with Prepared action none — flag a miss if the worker writes a second reply. If two same-sender emails are related but carry different facts/asks, the worker must keep them separate, cite the related ID(s), and must NOT drop unique information or falsely call them duplicates. Same sender alone is not enough to mark duplicate/related.
+- Inbox relationship (asymmetric — grade THIS email only, not the sibling case):
+  - Exact/near duplicate: compare received_at. Earliest (original) must use Inbox relationship "none" (not "duplicate of …"). Later copy must cite the earlier email_id as "duplicate of EM-XX", Draft "none - duplicate", Prepared action none. Flag Needs approval is correct (dismiss/archive) — do NOT fail a later duplicate for needing approval.
+  - Pass a later duplicate that cites the earlier id and uses none-duplicate / prepared none.
+  - Fail an original that uses a "duplicate of …" label or narrates the later copy as if THIS were the duplicate.
+  - Fail a later copy that writes a real second reply or misses the earlier id.
+  - Do NOT fail with "despite identical content" — identical content is why it is a duplicate.
+  - Related-but-distinct: worker must keep them separate, cite related ID(s), and must NOT drop unique facts or falsely call them duplicates. Same sender alone is not enough to mark duplicate/related.
+  - Reason must describe the email under review only — do not tell the worker what a different email_id should have output.
 - Citations must use real policy names / record IDs from the provided context — flag invented IDs.
 - Ren-only decisions (payments, seals, legal, academic) must not be silently delegated as approved.
 
@@ -2330,7 +2375,7 @@ OUTPUT — reply using EXACTLY these labeled fields, each on its own line:
 VERDICT: [looks right | needs attention]
 Reason: [one line only — what matches policy, or the single most important miss]
 
-Prefer "needs attention" when the draft soft-accepts a conflict, invents data, skips a required refuse, misses a duplicate, falsely deduplicates related-but-distinct emails, drops unique facts from a related pair, or mis-routes a Ren-only item.`;
+Prefer "needs attention" when the draft soft-accepts a conflict, invents data, skips a required refuse, misses a later-duplicate (no earlier id / writes a second reply), labels an original as "duplicate of …", falsely deduplicates related-but-distinct emails, drops unique facts from a related pair, or mis-routes a Ren-only item.`;
 
 // ---- API key handling (localStorage only; never written into this file) ----
 const KEY_STORAGE = "aurora_anthropic_key";
@@ -5690,32 +5735,226 @@ async function runOneCaseView(view, opts) {
   return { kind: pack.result.status.refused ? "refused" : "ok", result: pack.result };
 }
 
-async function runAllCases() {
+async function runAllCases(opts) {
+  opts = opts || {};
   var btn = document.getElementById("run-all-btn");
   var progressEl = document.getElementById("run-all-progress");
   var summaryEl = document.getElementById("run-all-summary");
   if (!CASE_VIEWS.length) return;
+  if (RUN_ALL_STATE.running) {
+    if (progressEl && !opts.fromSchedule) {
+      progressEl.textContent = "A Run All is already in progress…";
+    }
+    return;
+  }
 
-  btn.disabled = true;
-  summaryEl.textContent = "";
+  RUN_ALL_STATE.running = true;
+  if (btn && !RUN_ALL_STATE.autoOn) btn.disabled = true;
+  if (summaryEl) summaryEl.textContent = "";
   var ok = 0, refused = 0, errors = 0;
   var total = CASE_VIEWS.length;
+  var startedLabel = opts.fromSchedule ? "Scheduled Run All" : "Run All";
 
   for (var i = 0; i < total; i++) {
-    progressEl.textContent =
-      "Running " + (i + 1) + " of " + total + " (" + CASE_VIEWS[i].em.email_id +
-      ")… Browse freely — the queue keeps going.";
+    if (progressEl) {
+      progressEl.textContent =
+        startedLabel + ": " + (i + 1) + " of " + total + " (" + CASE_VIEWS[i].em.email_id +
+        ")… Browse freely — the queue keeps going.";
+    }
     var outcome = await runOneCaseView(CASE_VIEWS[i], { focus: false });
     if (outcome.kind === "ok") ok++;
     else if (outcome.kind === "refused") refused++;
     else if (outcome.kind !== "busy" && outcome.kind !== "stale") errors++;
   }
 
-  progressEl.textContent = "Done — " + total + " of " + total + ".";
-  summaryEl.textContent =
-    "Summary: " + ok + " OK · " + refused + " REFUSED-ESCALATE · " + errors + " errors";
-  btn.disabled = false;
-  setTopStatus("ok", "Run All done");
+  if (progressEl) progressEl.textContent = "Done — " + total + " of " + total + ".";
+  if (summaryEl) {
+    summaryEl.textContent =
+      "Summary: " + ok + " OK · " + refused + " REFUSED-ESCALATE · " + errors + " errors";
+  }
+  RUN_ALL_STATE.running = false;
+  if (btn && !RUN_ALL_STATE.autoOn) btn.disabled = false;
+  setTopStatus("ok", opts.fromSchedule ? "Scheduled Run All done" : "Run All done");
+  if (RUN_ALL_STATE.autoOn) updateRunAllScheduleStatus();
+}
+
+var RUN_ALL_STATE = {
+  mode: "manual",
+  cadenceSec: 300,
+  autoOn: false,
+  running: false,
+  timerId: null,
+  tickId: null,
+  nextAt: 0
+};
+var RUN_ALL_PREF_KEY = "aurora_run_all_prefs_v1";
+
+function loadRunAllPrefs() {
+  try {
+    var raw = localStorage.getItem(RUN_ALL_PREF_KEY);
+    if (!raw) return;
+    var p = JSON.parse(raw);
+    if (p && (p.mode === "manual" || p.mode === "auto")) RUN_ALL_STATE.mode = p.mode;
+    if (p && typeof p.cadenceSec === "number" && p.cadenceSec >= 60) RUN_ALL_STATE.cadenceSec = p.cadenceSec;
+  } catch (e) { /* ignore */ }
+}
+
+function saveRunAllPrefs() {
+  try {
+    localStorage.setItem(RUN_ALL_PREF_KEY, JSON.stringify({
+      mode: RUN_ALL_STATE.mode,
+      cadenceSec: RUN_ALL_STATE.cadenceSec
+    }));
+  } catch (e) { /* ignore */ }
+}
+
+function formatCountdown(ms) {
+  if (ms <= 0) return "now";
+  var sec = Math.ceil(ms / 1000);
+  var d = Math.floor(sec / 86400);
+  var h = Math.floor((sec % 86400) / 3600);
+  var m = Math.floor((sec % 3600) / 60);
+  var s = sec % 60;
+  if (d > 0) return d + "d " + h + "h " + (m < 10 ? "0" : "") + m + "m";
+  if (h > 0) return h + "h " + (m < 10 ? "0" : "") + m + "m";
+  if (m <= 0) return s + "s";
+  return m + "m " + (s < 10 ? "0" : "") + s + "s";
+}
+
+function cadenceLabel(sec) {
+  if (sec >= 86400) return "daily";
+  if (sec % 3600 === 0) return "every " + (sec / 3600) + " hr";
+  return "every " + Math.round(sec / 60) + " min";
+}
+
+function updateRunAllScheduleStatus() {
+  var el = document.getElementById("run-all-schedule");
+  if (!el) return;
+  if (!RUN_ALL_STATE.autoOn) {
+    el.hidden = true;
+    el.textContent = "";
+    return;
+  }
+  el.hidden = false;
+  if (RUN_ALL_STATE.running) {
+    el.textContent = "Auto-run is on · currently running a full inbox pass…";
+    return;
+  }
+  var left = RUN_ALL_STATE.nextAt - Date.now();
+  el.textContent =
+    "Auto-run is on · " + cadenceLabel(RUN_ALL_STATE.cadenceSec) +
+    " · next pass in " + formatCountdown(left);
+}
+
+function clearRunAllTimers() {
+  if (RUN_ALL_STATE.timerId) {
+    clearTimeout(RUN_ALL_STATE.timerId);
+    RUN_ALL_STATE.timerId = null;
+  }
+  if (RUN_ALL_STATE.tickId) {
+    clearInterval(RUN_ALL_STATE.tickId);
+    RUN_ALL_STATE.tickId = null;
+  }
+}
+
+function scheduleNextRunAll() {
+  clearRunAllTimers();
+  if (!RUN_ALL_STATE.autoOn) return;
+  RUN_ALL_STATE.nextAt = Date.now() + (RUN_ALL_STATE.cadenceSec * 1000);
+  updateRunAllScheduleStatus();
+  RUN_ALL_STATE.tickId = setInterval(updateRunAllScheduleStatus, 1000);
+  RUN_ALL_STATE.timerId = setTimeout(async function () {
+    if (!RUN_ALL_STATE.autoOn) return;
+    await runAllCases({ fromSchedule: true });
+    if (RUN_ALL_STATE.autoOn) scheduleNextRunAll();
+  }, RUN_ALL_STATE.cadenceSec * 1000);
+}
+
+function stopRunAllAuto() {
+  RUN_ALL_STATE.autoOn = false;
+  clearRunAllTimers();
+  updateRunAllScheduleStatus();
+  syncRunAllControlsUi();
+  setTopStatus("warn", "Auto-run stopped");
+}
+
+function startRunAllAuto() {
+  if (!getApiKey()) {
+    setTopStatus("warn", "Add API key");
+    refreshKeyStatus();
+    alert("Save a Kimi worker key in Settings before starting automatic Run All.");
+    return;
+  }
+  RUN_ALL_STATE.autoOn = true;
+  syncRunAllControlsUi();
+  setTopStatus("info", "Auto-run started");
+  // First pass immediately, then cadence.
+  runAllCases({ fromSchedule: true }).then(function () {
+    if (RUN_ALL_STATE.autoOn) scheduleNextRunAll();
+  });
+}
+
+function syncRunAllControlsUi() {
+  var modeEl = document.getElementById("run-all-mode");
+  var cadenceEl = document.getElementById("run-all-cadence");
+  var btn = document.getElementById("run-all-btn");
+  var scheduleEl = document.getElementById("run-all-schedule");
+  if (modeEl) modeEl.value = RUN_ALL_STATE.mode;
+  if (cadenceEl) {
+    cadenceEl.value = String(RUN_ALL_STATE.cadenceSec);
+    cadenceEl.hidden = RUN_ALL_STATE.mode !== "auto";
+    cadenceEl.disabled = RUN_ALL_STATE.autoOn;
+  }
+  if (modeEl) modeEl.disabled = RUN_ALL_STATE.autoOn;
+  if (!btn) return;
+  btn.classList.toggle("is-auto-on", !!RUN_ALL_STATE.autoOn);
+  if (RUN_ALL_STATE.mode === "manual") {
+    btn.textContent = "Run All";
+    btn.disabled = !!RUN_ALL_STATE.running;
+    if (scheduleEl) scheduleEl.hidden = true;
+  } else if (RUN_ALL_STATE.autoOn) {
+    btn.textContent = "Stop schedule";
+    btn.disabled = false;
+  } else {
+    btn.textContent = "Start schedule";
+    btn.disabled = false;
+  }
+}
+
+function onRunAllPrimaryClick() {
+  if (RUN_ALL_STATE.mode === "auto") {
+    if (RUN_ALL_STATE.autoOn) stopRunAllAuto();
+    else startRunAllAuto();
+    return;
+  }
+  runAllCases({ fromSchedule: false });
+}
+
+function initRunAllControls() {
+  loadRunAllPrefs();
+  var modeEl = document.getElementById("run-all-mode");
+  var cadenceEl = document.getElementById("run-all-cadence");
+  var btn = document.getElementById("run-all-btn");
+  if (modeEl) {
+    modeEl.addEventListener("change", function () {
+      RUN_ALL_STATE.mode = modeEl.value === "auto" ? "auto" : "manual";
+      if (RUN_ALL_STATE.mode === "manual" && RUN_ALL_STATE.autoOn) stopRunAllAuto();
+      saveRunAllPrefs();
+      syncRunAllControlsUi();
+    });
+  }
+  if (cadenceEl) {
+    cadenceEl.addEventListener("change", function () {
+      var sec = parseInt(cadenceEl.value, 10);
+      if (!isFinite(sec) || sec < 60) sec = 300;
+      RUN_ALL_STATE.cadenceSec = sec;
+      saveRunAllPrefs();
+      if (RUN_ALL_STATE.autoOn) scheduleNextRunAll();
+      syncRunAllControlsUi();
+    });
+  }
+  if (btn) btn.onclick = onRunAllPrimaryClick;
+  syncRunAllControlsUi();
 }
 
 function render() {
@@ -5809,7 +6048,7 @@ function render() {
     chips.appendChild(chip);
   });
 
-  document.getElementById("run-all-btn").onclick = function () { runAllCases(); };
+  document.getElementById("run-all-btn").onclick = function () { onRunAllPrimaryClick(); };
   paintWelcome();
 }
 
@@ -5821,6 +6060,7 @@ initMatrixControls();
 initSessionToggle();
 initInfoTips();
 initGlobalChat();
+initRunAllControls();
 renderRunLog();
 render();
 loadEvalResults();
