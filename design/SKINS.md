@@ -7,7 +7,7 @@ Pick by your product's audience, not by personal taste:
 | Skin | Attribute | Mood | Fits |
 |---|---|---|---|
 | **Operations** (default) | `data-skin="ops"` | Dark, calm, mission-control | internal tools, ops teams, queues, triage |
-| **Studio** | `data-skin="studio"` | Light, clean, SaaS | customer-facing tools, business users, anything demoed in daylight |
+| **Studio** | `data-skin="studio"` | Liquid Glass — frosted panels, fluid blur, soft iridescent light | premium demos, daylight presentations, polished SaaS feel |
 | **Terminal** | `data-skin="term"` | Mono, green-on-black | developer tools, data/infra workflows, technical audiences |
 
 Rules:

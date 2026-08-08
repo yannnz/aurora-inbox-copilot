@@ -52,23 +52,23 @@
   --cta: var(--warn);
 }
 
-/* ── SKIN: STUDIO (light) — Soft UI × SaaS trust blue ──────────── */
+/* ── SKIN: STUDIO (light) — Liquid Glass ───────────────────────── */
 [data-skin="studio"] {
-  --bg: #F1F5FB;
-  --bg-raise: #FFFFFF;
-  --bg-inset: #E7EEF8;
-  --line: #D5E0F0;
+  --bg: #E4ECF8;
+  --bg-raise: rgba(255, 255, 255, 0.55);
+  --bg-inset: rgba(255, 255, 255, 0.28);
+  --line: rgba(255, 255, 255, 0.55);
   --ink: #0F172A;
-  --ink-2: #475569;
+  --ink-2: #334155;
   --ink-3: #64748B;
   --accent: #2563EB;
   --accent-ink: #FFFFFF;
-  --chip: #E0EAFF;
-  --shadow: 0 1px 2px rgba(15, 23, 42, .05), 0 14px 32px -16px rgba(37, 99, 235, .18);
+  --chip: rgba(37, 99, 235, 0.12);
+  --shadow: 0 8px 32px rgba(15, 23, 42, 0.08), 0 1px 0 rgba(255, 255, 255, 0.65) inset;
   --font-body: var(--font-ui);
-  --radius: 12px;
-  --radius-sm: 8px;
-  --accent-soft: #DBEAFE;
+  --radius: 18px;
+  --radius-sm: 12px;
+  --accent-soft: rgba(37, 99, 235, 0.14);
   --accent-deep: #1D4ED8;
   --cta: #EA580C;
 }

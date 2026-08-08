@@ -27,22 +27,22 @@
   --cta: var(--warn);
 }
 [data-skin="studio"] {
-  /* Soft UI Evolution × SaaS trust blue (UUPM) */
-  --bg: #F1F5FB;
-  --bg-raise: #FFFFFF;
-  --bg-inset: #E7EEF8;
-  --line: #D5E0F0;
+  /* Liquid Glass (ui-ux-pro-max) — skin variables only */
+  --bg: #E4ECF8;
+  --bg-raise: rgba(255, 255, 255, 0.55);
+  --bg-inset: rgba(255, 255, 255, 0.28);
+  --line: rgba(255, 255, 255, 0.55);
   --ink: #0F172A;
-  --ink-2: #475569;
+  --ink-2: #334155;
   --ink-3: #64748B;
   --accent: #2563EB;
   --accent-ink: #FFFFFF;
-  --chip: #E0EAFF;
-  --shadow: 0 1px 2px rgba(15, 23, 42, .05), 0 14px 32px -16px rgba(37, 99, 235, .18);
+  --chip: rgba(37, 99, 235, 0.12);
+  --shadow: 0 8px 32px rgba(15, 23, 42, 0.08), 0 1px 0 rgba(255, 255, 255, 0.65) inset;
   --font-body: var(--font-ui);
-  --radius: 12px;
-  --radius-sm: 8px;
-  --accent-soft: #DBEAFE;
+  --radius: 18px;
+  --radius-sm: 12px;
+  --accent-soft: rgba(37, 99, 235, 0.14);
   --accent-deep: #1D4ED8;
   --cta: #EA580C;
 }
@@ -1397,58 +1397,68 @@ body {
 .fold-card li:last-child { margin-bottom: 0; }
 .console.hidden { display: none; }
 
-/* ═══ Soft UI Evolution + AI-Native (UUPM) — Studio token colors only ═══ */
+/* ═══ Liquid Glass (ui-ux-pro-max) — studio tokens only ═══ */
 html { color-scheme: light; }
 body {
   background:
-    radial-gradient(1100px 520px at 8% -8%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 58%),
-    radial-gradient(900px 480px at 92% 4%, color-mix(in srgb, var(--info) 10%, transparent), transparent 52%),
-    linear-gradient(180deg, color-mix(in srgb, var(--chip) 55%, var(--bg)) 0%, var(--bg) 42%);
+    radial-gradient(900px 520px at 12% -10%, color-mix(in srgb, var(--accent) 28%, transparent), transparent 55%),
+    radial-gradient(820px 480px at 88% 8%, color-mix(in srgb, var(--info) 22%, transparent), transparent 50%),
+    radial-gradient(700px 420px at 50% 110%, color-mix(in srgb, var(--cta) 16%, transparent), transparent 55%),
+    linear-gradient(165deg, #F7FAFF 0%, var(--bg) 48%, #E8F0FF 100%);
+  background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
-  letter-spacing: -0.005em;
+  letter-spacing: -0.01em;
 }
 .console {
-  padding: var(--sp-4) var(--sp-5) var(--sp-5);
+  padding: var(--sp-5);
   gap: var(--sp-4);
 }
 .topbar {
   position: sticky; top: 0; z-index: 20;
-  backdrop-filter: blur(16px) saturate(1.2);
-  -webkit-backdrop-filter: blur(16px) saturate(1.2);
-  background: color-mix(in srgb, var(--bg-raise) 78%, transparent);
+  background: color-mix(in srgb, var(--bg-raise) 70%, transparent);
+  backdrop-filter: blur(22px) saturate(1.35);
+  -webkit-backdrop-filter: blur(22px) saturate(1.35);
   padding: var(--sp-4) var(--sp-5);
   gap: var(--sp-4);
-  border-bottom: var(--border-w) solid color-mix(in srgb, var(--line) 70%, transparent);
-  box-shadow: 0 8px 28px -20px color-mix(in srgb, var(--ink) 28%, transparent);
+  border-bottom: var(--border-w) solid var(--line);
+  box-shadow: var(--shadow);
+  transition: background .45s ease, box-shadow .45s ease;
 }
 .topbar::after {
   content: "";
   position: absolute;
-  left: 0; right: 0; bottom: -1px;
-  height: 2px;
+  left: 10%; right: 10%; bottom: 0;
+  height: 1px;
   background: linear-gradient(90deg,
-    var(--accent) 0%,
-    color-mix(in srgb, var(--info) 70%, var(--accent)) 42%,
-    var(--cta) 78%,
-    transparent 100%);
-  opacity: .85;
+    transparent,
+    color-mix(in srgb, var(--accent) 55%, transparent),
+    color-mix(in srgb, var(--info) 45%, transparent),
+    color-mix(in srgb, var(--cta) 40%, transparent),
+    transparent);
+  opacity: .7;
 }
 .topbar .product {
   font-size: var(--fs-3);
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1.15;
+  text-transform: none;
   display: inline-flex;
   align-items: center;
 }
 .topbar .product-mark {
   display: inline-flex; align-items: center; justify-content: center;
   width: 30px; height: 30px; margin-right: var(--sp-3);
-  border-radius: 9px;
-  background: linear-gradient(145deg, color-mix(in srgb, var(--accent) 88%, var(--bg-raise)), var(--accent));
+  border-radius: 999px;
+  background: linear-gradient(145deg,
+    color-mix(in srgb, var(--accent) 80%, #fff),
+    var(--accent-deep));
   color: var(--accent-ink);
-  font-size: var(--fs-0); font-weight: 800; letter-spacing: 0;
-  box-shadow: 0 6px 14px -6px color-mix(in srgb, var(--accent) 70%, transparent);
+  font-size: var(--fs-0); font-weight: 700; letter-spacing: 0;
+  border: var(--border-w) solid rgba(255,255,255,.55);
+  box-shadow:
+    0 8px 20px -8px color-mix(in srgb, var(--accent) 55%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--info) 25%, transparent);
 }
 .topbar .meta { color: var(--ink-3); max-width: 42rem; text-align: right; line-height: 1.35; }
 .topbar #top-status { margin-left: var(--sp-1); }
@@ -1458,60 +1468,68 @@ body {
   gap: var(--sp-3);
   align-items: center;
   position: sticky; top: 64px; z-index: 19;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  background: color-mix(in srgb, var(--bg) 55%, transparent);
-  border-bottom: var(--border-w) solid color-mix(in srgb, var(--line) 65%, transparent);
+  background: color-mix(in srgb, var(--bg) 35%, transparent);
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  border-bottom: var(--border-w) solid var(--line);
 }
 .view-tabs-rail {
   display: inline-flex;
   gap: var(--sp-1);
   padding: 4px;
   border-radius: 999px;
-  background: var(--bg-raise);
+  background: color-mix(in srgb, var(--bg-raise) 75%, transparent);
   border: var(--border-w) solid var(--line);
-  box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 5%, transparent),
-              inset 0 1px 0 color-mix(in srgb, var(--bg-raise) 90%, transparent);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 .view-tabs .chip {
   padding: 8px 16px;
   border-radius: 999px;
-  border-color: transparent;
+  border: var(--border-w) solid transparent;
   background: transparent;
   color: var(--ink-2);
-  transition: background .2s ease, color .2s ease, box-shadow .2s ease, transform .15s ease;
+  transition: color .45s ease, background .45s ease, box-shadow .45s ease, transform .35s ease;
 }
 .view-tabs .chip:hover {
   color: var(--ink);
-  background: color-mix(in srgb, var(--accent) 8%, var(--chip));
-  border-color: transparent;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
 }
 .view-tabs .chip.active {
-  background: var(--accent);
+  background: linear-gradient(135deg, var(--accent), var(--accent-deep));
   color: var(--accent-ink);
-  border-color: var(--accent);
-  box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--accent) 55%, transparent);
+  border-color: transparent;
+  box-shadow: 0 8px 18px -10px color-mix(in srgb, var(--accent) 60%, transparent);
+  font-weight: 700;
 }
 .panel {
-  border-color: color-mix(in srgb, var(--line) 85%, transparent);
-  box-shadow:
-    0 1px 2px color-mix(in srgb, var(--ink) 4%, transparent),
-    0 16px 40px -24px color-mix(in srgb, var(--accent) 14%, transparent);
-  transition: box-shadow .25s ease, border-color .25s ease, transform .2s ease;
+  border-color: var(--line);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--bg-raise) 82%, transparent);
+  backdrop-filter: blur(18px) saturate(1.25);
+  -webkit-backdrop-filter: blur(18px) saturate(1.25);
+  box-shadow: var(--shadow);
+  transition: box-shadow .45s ease, border-color .45s ease, transform .35s ease;
   overflow: hidden;
 }
 .panel-head {
   position: relative;
-  background: linear-gradient(180deg, var(--accent-soft), var(--bg-raise) 70%);
-  letter-spacing: .1em;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, #fff 35%, transparent),
+    transparent);
+  letter-spacing: .08em;
+  text-transform: uppercase;
   color: var(--accent-deep);
+  border-bottom: var(--border-w) solid var(--line);
+  font-weight: 700;
 }
 .panel-head::after {
   content: "";
   position: absolute;
   left: var(--sp-4); right: var(--sp-4); bottom: 0;
   height: 1px;
-  background: linear-gradient(90deg, var(--accent), transparent 85%);
+  background: linear-gradient(90deg, var(--accent), transparent 80%);
   opacity: .35;
 }
 .inbox-pane .panel-head,
@@ -1520,13 +1538,14 @@ body {
   display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3);
 }
 .case-card {
-  transition: background .2s ease, box-shadow .2s ease, padding .15s ease;
+  border-radius: var(--radius-sm);
+  transition: background .4s ease, box-shadow .4s ease, transform .35s ease;
 }
 .case-card:hover {
-  background: color-mix(in srgb, var(--accent) 7%, transparent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
 }
 .case-card.active {
-  background: color-mix(in srgb, var(--accent) 11%, transparent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
   box-shadow: inset 3px 0 0 var(--accent);
 }
 .case-card:focus-visible {
@@ -1534,25 +1553,30 @@ body {
   outline-offset: -2px;
 }
 .btn {
-  border-radius: 9px;
-  transition: background .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease, transform .15s ease;
+  border-radius: 999px;
+  letter-spacing: .02em;
+  text-transform: none;
+  font-size: var(--fs-1);
+  font-weight: 700;
+  transition: background .45s ease, border-color .45s ease, color .45s ease, box-shadow .45s ease, transform .3s ease;
+  box-shadow: 0 1px 0 rgba(255,255,255,.4) inset;
 }
 .btn:hover:not(:disabled) {
-  box-shadow: 0 6px 16px -10px color-mix(in srgb, var(--ink) 35%, transparent);
+  box-shadow: 0 10px 22px -12px color-mix(in srgb, var(--ink) 35%, transparent);
+  transform: translateY(-1px);
 }
-.btn:active:not(:disabled) { transform: translateY(1px); }
+.btn:active:not(:disabled) { transform: translateY(0); }
 .btn.primary {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 88%, var(--bg-raise)), var(--accent-deep));
-  border-color: var(--accent-deep);
-  box-shadow: 0 8px 18px -10px color-mix(in srgb, var(--accent) 70%, transparent);
+  background: linear-gradient(145deg, color-mix(in srgb, var(--accent) 75%, #fff), var(--accent-deep));
+  border-color: transparent;
+  color: var(--accent-ink);
+  box-shadow: 0 10px 24px -12px color-mix(in srgb, var(--accent) 55%, transparent);
 }
 .btn.primary:hover:not(:disabled) {
   background: var(--accent-deep);
-  border-color: var(--accent-deep);
+  border-color: transparent;
 }
-.btn.approve {
-  box-shadow: 0 8px 18px -10px color-mix(in srgb, var(--ok) 65%, transparent);
-}
+.btn.approve { box-shadow: 0 10px 24px -12px color-mix(in srgb, var(--ok) 45%, transparent); }
 .btn.approve:hover:not(:disabled) {
   background: color-mix(in srgb, var(--ok) 88%, var(--ink));
   border-color: color-mix(in srgb, var(--ok) 88%, var(--ink));
@@ -1565,24 +1589,27 @@ body {
   outline-offset: 2px;
 }
 .field-input {
-  border-radius: 9px;
-  transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, #fff 55%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: border-color .4s ease, background .4s ease, box-shadow .4s ease;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.5);
 }
 .field-input:focus {
-  border-color: var(--accent);
-  background: var(--bg-raise);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 16%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
+  background: color-mix(in srgb, #fff 75%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);
   outline: none;
 }
 .mail-read {
   position: relative;
-  background:
-    linear-gradient(180deg, var(--accent-soft) 0%, var(--bg-raise) 48px);
+  background: color-mix(in srgb, var(--bg-raise) 88%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-radius: var(--radius);
-  border: var(--border-w) solid color-mix(in srgb, var(--line) 80%, transparent);
-  box-shadow:
-    0 1px 2px color-mix(in srgb, var(--ink) 4%, transparent),
-    0 12px 28px -18px color-mix(in srgb, var(--accent) 18%, transparent);
+  border: var(--border-w) solid var(--line);
+  box-shadow: var(--shadow);
   padding: var(--sp-5);
   overflow: hidden;
 }
@@ -1592,106 +1619,128 @@ body {
   top: 0; left: 0; right: 0;
   height: 3px;
   background: linear-gradient(90deg, var(--accent), var(--info), var(--cta));
+  opacity: .85;
 }
 .mail-read .mail-subject {
   letter-spacing: -0.02em;
   font-size: var(--fs-3);
+  font-weight: 700;
   color: var(--ink);
 }
 .stage {
   margin: 0 0 var(--sp-3);
   padding: 0;
   color: var(--accent-deep);
+  letter-spacing: .1em;
+  text-transform: uppercase;
 }
 .stage::before {
-  background: linear-gradient(145deg, var(--accent), var(--accent-deep));
-  box-shadow: 0 4px 10px -4px color-mix(in srgb, var(--accent) 70%, transparent);
+  background: linear-gradient(145deg, var(--accent), var(--info));
+  box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--accent) 50%, transparent);
+  border-radius: 999px;
 }
 .stage-block {
   position: relative;
   margin-top: var(--sp-4);
   padding: var(--sp-4) var(--sp-5);
-  border: var(--border-w) solid color-mix(in srgb, var(--line) 85%, transparent);
+  border: var(--border-w) solid var(--line);
   border-radius: var(--radius);
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--accent-soft) 55%, var(--bg-raise)), var(--bg-raise) 42%);
-  box-shadow:
-    0 1px 2px color-mix(in srgb, var(--ink) 4%, transparent),
-    0 10px 28px -20px color-mix(in srgb, var(--accent) 16%, transparent);
+  background: color-mix(in srgb, var(--bg-raise) 80%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: var(--shadow);
   overflow: hidden;
+  transition: box-shadow .45s ease, transform .35s ease;
 }
 .stage-block::before {
   content: "";
   position: absolute;
   top: var(--sp-4); bottom: var(--sp-4); left: 0;
   width: 3px;
-  border-radius: 0 3px 3px 0;
-  background: linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--cta) 55%, var(--accent)));
+  border-radius: 0 4px 4px 0;
+  background: linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--cta) 50%, var(--accent)));
 }
 .stage-block:first-child { margin-top: 0; }
 .draft-pane {
   border-radius: var(--radius);
-  border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
-  background: linear-gradient(180deg, var(--accent-soft), var(--bg-inset));
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent),
-    0 10px 24px -16px color-mix(in srgb, var(--accent) 35%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 28%, var(--line));
+  background: color-mix(in srgb, var(--accent-soft) 55%, var(--bg-inset));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--shadow);
 }
 .thinking-wrap {
   display: flex;
   flex-direction: column;
   gap: var(--sp-2);
   border-radius: var(--radius);
-  border: var(--border-w) solid color-mix(in srgb, var(--info) 28%, var(--line));
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--info) 8%, var(--bg-raise)), var(--bg-inset));
-  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--bg-raise) 80%, transparent);
+  border: var(--border-w) solid color-mix(in srgb, var(--info) 30%, var(--line));
+  background: color-mix(in srgb, var(--info) 8%, var(--bg-inset));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--shadow);
 }
 #human-gate {
   margin-top: var(--sp-3);
   padding: var(--sp-4) var(--sp-5);
-  border: var(--border-w) solid color-mix(in srgb, var(--accent) 28%, var(--line));
+  border: var(--border-w) solid color-mix(in srgb, var(--accent) 30%, var(--line));
   border-radius: var(--radius);
-  background:
-    linear-gradient(165deg, var(--accent-soft) 0%, var(--bg-raise) 55%);
-  box-shadow:
-    0 1px 2px color-mix(in srgb, var(--ink) 5%, transparent),
-    0 14px 32px -18px color-mix(in srgb, var(--accent) 28%, transparent);
+  background: color-mix(in srgb, var(--bg-raise) 85%, transparent);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  box-shadow: var(--shadow);
 }
 #human-gate .row-actions { gap: var(--sp-3); }
 #human-gate .btn.approve {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--ok) 85%, var(--bg-raise)), var(--ok));
+  background: linear-gradient(145deg, color-mix(in srgb, var(--ok) 75%, #fff), var(--ok));
+  border-color: transparent;
+  color: #fff;
 }
 .demo-chips .chip,
 .slot-chips .chip {
-  background: var(--accent-soft);
-  border-color: color-mix(in srgb, var(--accent) 22%, var(--line));
-  color: var(--accent-deep);
+  background: color-mix(in srgb, var(--bg-raise) 80%, transparent);
+  border-color: var(--line);
+  border-radius: 999px;
+  color: var(--ink);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 1px 0 rgba(255,255,255,.5) inset;
+  transition: background .4s ease, border-color .4s ease, transform .3s ease;
 }
 .demo-chips .chip:hover,
 .slot-chips .chip:hover {
-  background: color-mix(in srgb, var(--accent) 18%, var(--accent-soft));
-  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
   color: var(--accent-deep);
 }
+.chip { border-radius: 999px; }
 .stat {
-  background: linear-gradient(180deg, var(--accent-soft), var(--bg-inset));
-  border-color: color-mix(in srgb, var(--accent) 18%, var(--line));
+  background: color-mix(in srgb, var(--bg-raise) 75%, transparent);
+  border-color: var(--line);
+  border-radius: var(--radius-sm);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: var(--shadow);
 }
-.stat.ok { background: linear-gradient(180deg, color-mix(in srgb, var(--ok) 14%, var(--bg-raise)), var(--bg-inset)); }
-.stat.warn { background: linear-gradient(180deg, color-mix(in srgb, var(--warn) 14%, var(--bg-raise)), var(--bg-inset)); }
-.stat.danger { background: linear-gradient(180deg, color-mix(in srgb, var(--danger) 12%, var(--bg-raise)), var(--bg-inset)); }
+.stat.ok { background: color-mix(in srgb, var(--ok) 12%, var(--bg-raise)); }
+.stat.warn { background: color-mix(in srgb, var(--warn) 12%, var(--bg-raise)); }
+.stat.danger { background: color-mix(in srgb, var(--danger) 12%, var(--bg-raise)); }
 .demo-chips-fold,
 .side-fold {
-  background: linear-gradient(180deg, var(--accent-soft), var(--bg-inset));
-  border-color: color-mix(in srgb, var(--accent) 16%, var(--line));
+  background: color-mix(in srgb, var(--bg-raise) 70%, transparent);
+  border-color: var(--line);
+  border-radius: var(--radius-sm);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 .settings-fold {
   margin: var(--sp-4) var(--sp-4) 0;
   border: var(--border-w) solid var(--line);
   border-radius: var(--radius);
-  background: color-mix(in srgb, var(--bg-raise) 80%, var(--bg-inset));
-  box-shadow: 0 8px 20px -16px color-mix(in srgb, var(--ink) 20%, transparent);
+  background: color-mix(in srgb, var(--bg-raise) 75%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: var(--shadow);
 }
 .settings-fold > summary {
   cursor: pointer;
@@ -1723,47 +1772,79 @@ body {
   min-width: 8.5rem;
   padding: var(--sp-2) var(--sp-3);
   font-size: var(--fs-0);
+  border-radius: var(--radius-sm);
 }
 .inbox-toolbar .run-cadence-select[hidden] { display: none !important; }
 #run-all-schedule[hidden] { display: none !important; }
 #run-all-btn.is-auto-on {
-  background: color-mix(in srgb, var(--warn) 88%, var(--ink));
-  border-color: var(--warn);
-  box-shadow: 0 8px 18px -10px color-mix(in srgb, var(--warn) 55%, transparent);
+  background: linear-gradient(145deg, color-mix(in srgb, var(--warn) 70%, #fff), var(--warn));
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 10px 22px -12px color-mix(in srgb, var(--warn) 50%, transparent);
 }
 .session-toggle {
   border-radius: var(--radius);
-  transition: border-color .2s ease, color .2s ease, background .2s ease, box-shadow .2s ease;
-  box-shadow: 0 10px 24px -18px color-mix(in srgb, var(--ink) 30%, transparent);
+  transition: border-color .4s ease, color .4s ease, background .4s ease, box-shadow .4s ease;
+  box-shadow: var(--shadow);
+  background: color-mix(in srgb, var(--bg-raise) 75%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 .session-toggle:hover {
-  box-shadow: 0 12px 28px -16px color-mix(in srgb, var(--accent) 40%, transparent);
+  box-shadow: 0 12px 28px -14px color-mix(in srgb, var(--accent) 40%, transparent);
+  background: color-mix(in srgb, var(--accent) 8%, var(--bg-raise));
 }
 .decision-badges .badge {
   border-radius: 999px;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 18%, transparent);
+  box-shadow: 0 1px 0 rgba(255,255,255,.45) inset;
 }
-.badge { border-radius: 999px; }
+.badge { border-radius: 999px; letter-spacing: .04em; text-transform: uppercase; }
 .refusal-card {
-  box-shadow:
-    0 1px 2px color-mix(in srgb, var(--danger) 10%, transparent),
-    0 14px 28px -16px color-mix(in srgb, var(--danger) 35%, transparent);
+  border-radius: var(--radius);
+  border: var(--border-w) solid color-mix(in srgb, var(--danger) 45%, var(--line));
+  background: color-mix(in srgb, var(--danger) 8%, var(--bg-raise));
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 12px 28px -16px color-mix(in srgb, var(--danger) 35%, transparent);
 }
 .reviewer-panel {
   border-radius: var(--radius);
-  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--bg-raise) 75%, transparent);
+  border: var(--border-w) solid var(--line);
+  background: color-mix(in srgb, var(--bg-raise) 80%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--shadow);
 }
 .empty {
-  border: var(--border-w) dashed color-mix(in srgb, var(--line) 90%, var(--ink-3));
+  border: var(--border-w) dashed color-mix(in srgb, var(--ink-3) 50%, var(--line));
   border-radius: var(--radius);
-  background: color-mix(in srgb, var(--bg-inset) 75%, transparent);
+  background: color-mix(in srgb, var(--bg-inset) 80%, transparent);
 }
-.evals-view {
-  border-radius: calc(var(--radius) + 2px);
-  box-shadow:
-    0 1px 2px color-mix(in srgb, var(--ink) 4%, transparent),
-    0 18px 40px -24px color-mix(in srgb, var(--ink) 18%, transparent);
+.evals-view,
+.matrix-card,
+.fold-card {
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--bg-raise) 78%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: var(--shadow);
+  border: var(--border-w) solid var(--line);
 }
+.chat-launcher {
+  border-radius: 999px;
+  border: var(--border-w) solid var(--line);
+  box-shadow: 0 12px 28px -10px color-mix(in srgb, var(--accent) 45%, transparent);
+  background: linear-gradient(145deg, var(--accent), var(--accent-deep));
+}
+.global-chat {
+  border-radius: var(--radius);
+  border: var(--border-w) solid var(--line);
+  background: color-mix(in srgb, var(--bg-raise) 82%, transparent);
+  backdrop-filter: blur(22px) saturate(1.3);
+  -webkit-backdrop-filter: blur(22px) saturate(1.3);
+  box-shadow: 0 20px 50px -20px color-mix(in srgb, var(--ink) 35%, transparent);
+}
+
 .rules-radio {
   display: inline-flex;
   align-items: center;
@@ -1807,7 +1888,7 @@ body {
 <header class="topbar">
   <div class="product"><span class="product-mark" aria-hidden="true">A</span>Aurora Inbox Copilot</div>
   <span id="top-status" class="badge info">Ready</span>
-  <div class="meta" id="top-meta">Morning triage for Ren · scenario clock 11 May 2026 · Soft Studio theme</div>
+  <div class="meta" id="top-meta">Morning triage for Ren · scenario clock 11 May 2026 · Liquid Glass theme</div>
 </header>
 
 <nav class="view-tabs" aria-label="Main views">
@@ -4812,9 +4893,9 @@ function updateRulesActiveBanner() {
   }
   if (meta) {
     var base =
-      "Morning triage for Ren · scenario clock 11 May 2026 · Soft Studio theme";
+      "Morning triage for Ren · scenario clock 11 May 2026 · Liquid Glass theme";
     meta.textContent = live
-      ? "Custom rules live · scenario clock 11 May 2026 · Soft Studio theme"
+      ? "Custom rules live · scenario clock 11 May 2026 · Liquid Glass theme"
       : base;
   }
   var aurora = document.getElementById("rules-source-aurora");
