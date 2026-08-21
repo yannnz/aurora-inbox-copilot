@@ -25,7 +25,8 @@ const KIMI_URL = "https://api.moonshot.cn/anthropic/v1/messages";
 const OPENAI_URL =
   process.env.OPENAI_URL ||
   "https://api.openai.com/v1/chat/completions";
-const PORT = 8787;
+const PORT = Number(process.env.PORT || 8787);
+const HOST = process.env.HOST || "0.0.0.0";
 
 const OPENAI_HTTP_PROXY =
   process.env.OPENAI_HTTP_PROXY ||
@@ -472,8 +473,8 @@ const server = http.createServer(function (req, res) {
   res.end();
 });
 
-server.listen(PORT, "127.0.0.1", function () {
-  console.log("Aurora server at http://localhost:" + PORT + "/");
+server.listen(PORT, HOST, function () {
+  console.log("Aurora server at http://localhost:" + PORT + "/ (bound to " + HOST + ")");
   console.log("  Open the app here (required for Google Calendar OAuth).");
   console.log("  POST /       → Kimi direct, then via " + OPENAI_HTTP_PROXY + " if needed");
   console.log("  POST /openai → OpenAI via " + OPENAI_HTTP_PROXY);
