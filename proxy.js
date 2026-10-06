@@ -2,14 +2,16 @@
  * Aurora local server + API proxy.
  *
  * GET  /*           → static files (open http://localhost:8787/ for Google OAuth)
- * POST /            → Kimi (direct, then VPN fallback)
+ * POST /            → DeepSeek Anthropic-compatible (direct, then VPN fallback)
  * POST /openai      → OpenAI via Shadowsocks HTTP proxy (default 127.0.0.1:10808)
+ * POST /typesafe    → TypeSafe Jev System One (direct, then VPN fallback)
  *
  * Optional Laminar tracing (https://github.com/lmnr-ai/lmnr):
  *   Set LMNR_PROJECT_API_KEY when starting this process, and/or paste a project
- *   key in the app Settings. Defaults to self-hosted Laminar on localhost
- *   (UI :5667, API :8000/:8001). Override with LMNR_BASE_URL / LMNR_HTTP_PORT /
- *   LMNR_GRPC_PORT. Kimi/OpenAI keys are never written into this file.
+ *   key in the app Settings. Defaults to Laminar Cloud (https://api.lmnr.ai,
+ *   http 443 / grpc 8443) so a plain `node proxy.js` keeps tracing. For
+ *   self-hosted Laminar set LMNR_BASE_URL=http://localhost LMNR_HTTP_PORT=8000
+ *   LMNR_GRPC_PORT=8001. DeepSeek/OpenAI keys are never written into this file.
  */
 
 const http = require("http");
@@ -21,7 +23,8 @@ const net = require("net");
 const tls = require("tls");
 
 const ROOT = __dirname;
-const KIMI_URL = "https://api.moonshot.cn/anthropic/v1/messages";
+const DEEPSEEK_URL = "https://api.deepseek.com/anthropic/v1/messages";
+const TYPESAFE_URL = process.env.TYPESAFE_URL || "https://api.typesafe.ai/v1/systemone";
 const OPENAI_URL =
   process.env.OPENAI_URL ||
   "https://api.openai.com/v1/chat/completions";
@@ -51,17 +54,23 @@ var observe = null;
 var laminarReady = false;
 var laminarInitKey = "";
 var laminarInitEndpoint = "";
+var laminarIgnoredKey = "";
 
 function laminarConfig() {
-  var baseUrl = String(process.env.LMNR_BASE_URL || "http://localhost").trim();
-  var httpPort = Number(process.env.LMNR_HTTP_PORT || 8000);
-  var grpcPort = Number(process.env.LMNR_GRPC_PORT || 8001);
+  var baseUrl = String(process.env.LMNR_BASE_URL || "https://api.lmnr.ai").trim();
+  var isLocal = /localhost|127\.0\.0\.1/.test(baseUrl);
+  var httpPort = Number(process.env.LMNR_HTTP_PORT || (isLocal ? 8000 : 443));
+  var grpcPort = Number(process.env.LMNR_GRPC_PORT || (isLocal ? 8001 : 8443));
   return {
     baseUrl: baseUrl,
     httpPort: httpPort,
     grpcPort: grpcPort,
     endpointLabel: baseUrl + " (http " + httpPort + ", grpc " + grpcPort + ")"
   };
+}
+
+function laminarUiUrl(cfg) {
+  return /localhost|127\.0\.0\.1/.test(cfg.baseUrl) ? "http://localhost:5667/" : "https://www.laminar.sh/";
 }
 
 function ensureLaminar(apiKeyFromHeader) {
@@ -71,14 +80,19 @@ function ensureLaminar(apiKeyFromHeader) {
   if (laminarReady && laminarInitKey === key && laminarInitEndpoint === cfg.endpointLabel) {
     return true;
   }
+  // The Laminar SDK only honours its first initialize() per process; later keys are ignored.
+  if (laminarReady) {
+    if (laminarIgnoredKey !== key) {
+      laminarIgnoredKey = key;
+      console.warn("Laminar key changed in Settings, but tracing still uses the key this server started with.");
+      console.warn("Restart the Aurora server (Ctrl+C, then node proxy.js) to send traces with the new key.");
+    }
+    return true;
+  }
   try {
     var lmnr = require("@lmnr-ai/lmnr");
     Laminar = lmnr.Laminar;
     observe = lmnr.observe;
-    if (laminarReady && Laminar.shutdown) {
-      try { Laminar.shutdown(); } catch (e) { /* ignore */ }
-      laminarReady = false;
-    }
     Laminar.initialize({
       projectApiKey: key,
       baseUrl: cfg.baseUrl,
@@ -89,7 +103,7 @@ function ensureLaminar(apiKeyFromHeader) {
     laminarReady = true;
     laminarInitKey = key;
     laminarInitEndpoint = cfg.endpointLabel;
-    console.log("Laminar tracing enabled → " + cfg.endpointLabel + " | UI http://localhost:5667/");
+    console.log("Laminar tracing enabled → " + cfg.endpointLabel + " | UI " + laminarUiUrl(cfg));
     return true;
   } catch (e) {
     console.warn("Laminar unavailable:", e && e.message ? e.message : e);
@@ -103,7 +117,7 @@ function setCors(res) {
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader(
     "Access-Control-Allow-Headers",
-    "authorization, anthropic-version, content-type, x-lmnr-project-api-key, x-aurora-email-id, x-aurora-role, x-aurora-session-id"
+    "authorization, x-api-key, anthropic-version, content-type, x-lmnr-project-api-key, x-aurora-email-id, x-aurora-role, x-aurora-session-id"
   );
   res.setHeader("Access-Control-Allow-Private-Network", "true");
 }
@@ -111,7 +125,7 @@ function setCors(res) {
 function targetFor(urlPath) {
   var p = (urlPath || "/").split("?")[0];
   if (p === "/openai" || p === "/openai/") return OPENAI_URL;
-  return KIMI_URL;
+  return DEEPSEEK_URL;
 }
 
 function isOpenAiTarget(target) {
@@ -255,25 +269,100 @@ function networkHint(err, kind) {
       );
     }
     return (
-      "Could not reach Kimi (tried direct, then via " + OPENAI_HTTP_PROXY + "). " +
-      "If Global Mode is on, keep Shadowsocks enabled; or switch to Auto Mode so China APIs go direct."
+      "Could not reach DeepSeek (tried direct, then via " + OPENAI_HTTP_PROXY + "). " +
+      "If api.deepseek.com is blocked, keep Shadowsocks Global Mode on and retry."
     );
   }
   return msg;
 }
 
-async function postKimi(headers, body) {
+async function postDeepSeek(headers, body) {
   try {
-    var direct = await postJson(KIMI_URL, headers, body, null);
+    var direct = await postJson(DEEPSEEK_URL, headers, body, null);
     return { upstream: direct, via: "direct" };
   } catch (e1) {
     try {
-      var proxied = await postJson(KIMI_URL, headers, body, OPENAI_HTTP_PROXY);
+      var proxied = await postJson(DEEPSEEK_URL, headers, body, OPENAI_HTTP_PROXY);
       return { upstream: proxied, via: OPENAI_HTTP_PROXY + " (fallback)" };
     } catch (e2) {
       throw new Error(String(e1.message || e1) + " | fallback: " + String(e2.message || e2));
     }
   }
+}
+
+async function postTypeSafe(headers, body) {
+  try {
+    var direct = await postJson(TYPESAFE_URL, headers, body, null);
+    return { upstream: direct, via: "direct" };
+  } catch (e1) {
+    try {
+      var proxied = await postJson(TYPESAFE_URL, headers, body, OPENAI_HTTP_PROXY);
+      return { upstream: proxied, via: OPENAI_HTTP_PROXY + " (fallback)" };
+    } catch (e2) {
+      throw new Error(String(e1.message || e1) + " | fallback: " + String(e2.message || e2));
+    }
+  }
+}
+
+function handleTypeSafePost(req, res) {
+  const chunks = [];
+  req.on("data", function (c) { chunks.push(c); });
+  req.on("end", async function () {
+    const body = Buffer.concat(chunks);
+    const headers = { "content-type": "application/json" };
+    var auth = String(req.headers["authorization"] || "").trim();
+    if (auth) headers["authorization"] = auth;
+    var emailId = String(req.headers["x-aurora-email-id"] || "").trim();
+    var sessionId = String(req.headers["x-aurora-session-id"] || "").trim();
+    var tracing = ensureLaminar(String(req.headers["x-lmnr-project-api-key"] || "").trim());
+    var spanInput = { note: "unparseable request body" };
+    try {
+      var parsedReq = JSON.parse(body.toString("utf8"));
+      spanInput = { provider: "typesafe", model: parsedReq.model || "", state: parsedReq.state, questions: parsedReq.questions };
+    } catch (e) { /* keep note */ }
+    try {
+      var out;
+      if (tracing && observe) {
+        out = await observe(
+          {
+            name: "aurora.jev",
+            sessionId: sessionId || undefined,
+            spanType: "LLM",
+            tags: ["aurora-inbox", "jev"].concat(emailId ? [emailId] : []),
+            metadata: { email_id: emailId || null, role: "jev", provider: "typesafe", model: spanInput.model || null },
+            input: spanInput
+          },
+          async function () {
+            var r = await postTypeSafe(headers, body);
+            var answers = null;
+            try { answers = JSON.parse(r.upstream.text || "").answers || null; } catch (e) { /* raw */ }
+            return { upstream: r.upstream, via: r.via, response: answers || String(r.upstream.text || "").slice(0, 2000) };
+          }
+        );
+      } else {
+        out = await postTypeSafe(headers, body);
+      }
+      setCors(res);
+      res.setHeader("Content-Type", "application/json");
+      res.writeHead(out.upstream.status || 502);
+      res.end(out.upstream.text || "");
+    } catch (e) {
+      var msg = String(e && e.message ? e.message : e);
+      setCors(res);
+      res.setHeader("Content-Type", "application/json");
+      res.writeHead(502);
+      res.end(JSON.stringify({
+        error: {
+          message: /timeout|ENOTFOUND|ECONNREFUSED|CONNECT|Bad HTTPS/i.test(msg)
+            ? "Could not reach TypeSafe (tried direct, then via " + OPENAI_HTTP_PROXY + "). " +
+              "If api.typesafe.ai is blocked, keep Shadowsocks Global Mode on and retry."
+            : msg,
+          upstream: TYPESAFE_URL,
+          via: "direct+fallback"
+        }
+      }));
+    }
+  });
 }
 
 function redactLlmPayload(rawBody, useVpn) {
@@ -293,7 +382,7 @@ function redactLlmPayload(rawBody, useVpn) {
     };
   }
   return {
-    provider: "kimi",
+    provider: "deepseek",
     model: parsed.model || "",
     system: parsed.system || "",
     messages: parsed.messages || [],
@@ -351,6 +440,8 @@ function serveStatic(req, res) {
     var ext = path.extname(filePath).toLowerCase();
     setCors(res);
     res.setHeader("Content-Type", MIME[ext] || "application/octet-stream");
+    // Always revalidate so a normal reload never runs an outdated index.html.
+    res.setHeader("Cache-Control", "no-cache");
     res.writeHead(200);
     res.end(data);
   });
@@ -365,10 +456,18 @@ function handleApiPost(req, res) {
     const target = targetFor(req.url);
     const useVpn = isOpenAiTarget(target);
     const headers = {
-      "content-type": "application/json",
-      "authorization": auth
+      "content-type": "application/json"
     };
-    if (!useVpn) {
+    if (useVpn) {
+      headers["authorization"] = auth;
+    } else {
+      // DeepSeek Anthropic-compatible API prefers x-api-key.
+      var bearer = "";
+      var m = String(auth).match(/^Bearer\s+(.+)$/i);
+      if (m) bearer = m[1].trim();
+      var xKey = String(req.headers["x-api-key"] || "").trim() || bearer;
+      if (xKey) headers["x-api-key"] = xKey;
+      if (auth) headers["authorization"] = auth;
       headers["anthropic-version"] = "2023-06-01";
     }
 
@@ -386,7 +485,7 @@ function handleApiPost(req, res) {
           via: OPENAI_HTTP_PROXY
         };
       }
-      return await postKimi(headers, body);
+      return await postDeepSeek(headers, body);
     }
 
     try {
@@ -453,6 +552,10 @@ const server = http.createServer(function (req, res) {
   }
 
   var urlPath = (req.url || "/").split("?")[0];
+  if (req.method === "POST" && (urlPath === "/typesafe" || urlPath === "/typesafe/")) {
+    handleTypeSafePost(req, res);
+    return;
+  }
   var isApiPost =
     req.method === "POST" &&
     (urlPath === "/" || urlPath === "/openai" || urlPath === "/openai/");
@@ -475,9 +578,10 @@ const server = http.createServer(function (req, res) {
 server.listen(PORT, "127.0.0.1", function () {
   console.log("Aurora server at http://localhost:" + PORT + "/");
   console.log("  Open the app here (required for Google Calendar OAuth).");
-  console.log("  POST /       → Kimi direct, then via " + OPENAI_HTTP_PROXY + " if needed");
+  console.log("  POST /       → DeepSeek direct, then via " + OPENAI_HTTP_PROXY + " if needed");
   console.log("  POST /openai → OpenAI via " + OPENAI_HTTP_PROXY);
-  console.log("  Laminar: local " + laminarConfig().endpointLabel + " | UI http://localhost:5667/");
+  console.log("  POST /typesafe → TypeSafe Jev direct, then via " + OPENAI_HTTP_PROXY + " if needed");
+  console.log("  Laminar: " + laminarConfig().endpointLabel + " | UI " + laminarUiUrl(laminarConfig()));
   if (process.env.LMNR_PROJECT_API_KEY) {
     ensureLaminar(process.env.LMNR_PROJECT_API_KEY);
   } else {

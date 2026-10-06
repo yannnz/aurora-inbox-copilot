@@ -232,6 +232,18 @@ body {
 .case-card.is-unread .title { font-weight: 700; color: var(--ink); }
 .case-card.is-read .from { font-weight: 500; color: var(--ink-2); }
 .case-card.is-read .title { font-weight: 500; }
+.case-card.noise-card .from { color: var(--ink-2); }
+.noise-kind-badge {
+  font-size: var(--fs-0);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--warn);
+  border: var(--border-w) solid color-mix(in srgb, var(--warn) 35%, var(--line));
+  background: color-mix(in srgb, var(--warn) 12%, transparent);
+  border-radius: var(--radius-sm);
+  padding: 0.1rem 0.4rem;
+  margin-left: var(--sp-2);
+}
 .case-card .mail-row-top {
   display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-2);
 }
@@ -239,6 +251,18 @@ body {
   font-size: var(--fs-1); color: var(--ink);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
+.mail-select {
+  accent-color: var(--accent);
+  margin: 0 var(--sp-2) 0 0;
+  vertical-align: middle;
+  cursor: pointer;
+}
+.case-card.is-selected { background: var(--accent-soft); }
+.select-all-label {
+  display: inline-flex; align-items: center;
+  font-size: var(--fs-0); color: var(--ink-2); cursor: pointer;
+}
+#triage-select-controls[hidden] { display: none !important; }
 .case-card .prio {
   display: none;
   flex: none;
@@ -1015,6 +1039,79 @@ body {
   white-space: pre-wrap;
   color: var(--ink);
 }
+.jobs-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--sp-3);
+  margin: var(--sp-3) 0;
+}
+.jobs-stat {
+  background: var(--bg);
+  border: var(--border-w) solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: var(--sp-3);
+}
+.jobs-stat .n { font-size: var(--fs-3); font-weight: 700; color: var(--ink); }
+.jobs-stat .l {
+  font-size: var(--fs-0);
+  color: var(--ink-3);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin-top: var(--sp-1);
+}
+.jobs-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin: var(--sp-2) 0 var(--sp-3);
+}
+.job-card {
+  background: var(--bg);
+  border: var(--border-w) solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: var(--sp-3);
+  margin-bottom: var(--sp-3);
+}
+.job-card:last-child { margin-bottom: 0; }
+.job-card h4 {
+  margin: 0 0 var(--sp-2);
+  font-size: var(--fs-2);
+  font-weight: 650;
+}
+.job-card .job-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-2);
+  font-size: var(--fs-1);
+}
+.job-card .job-meta .k {
+  display: block;
+  font-size: var(--fs-0);
+  color: var(--ink-3);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.job-card .job-req {
+  font-size: var(--fs-1);
+  color: var(--ink);
+  line-height: var(--lh);
+  white-space: pre-wrap;
+}
+.jobs-source-list {
+  max-height: 220px;
+  overflow: auto;
+  font-size: var(--fs-1);
+}
+.jobs-source-list .row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--sp-2);
+  padding: var(--sp-2) 0;
+  border-bottom: var(--border-w) solid var(--line);
+  align-items: baseline;
+}
+.jobs-source-list .row:last-child { border-bottom: none; }
 .traces-layout {
   display: grid;
   grid-template-columns: minmax(14rem, 22rem) 1fr;
@@ -1774,7 +1871,9 @@ body {
   font-size: var(--fs-0);
   border-radius: var(--radius-sm);
 }
-.inbox-toolbar .run-cadence-select[hidden] { display: none !important; }
+.inbox-toolbar .run-cadence-select[hidden],
+.inbox-toolbar .run-mode-select[hidden],
+.inbox-toolbar .run-mode-label[hidden] { display: none !important; }
 #run-all-schedule[hidden] { display: none !important; }
 #run-all-btn.is-auto-on {
   background: linear-gradient(145deg, color-mix(in srgb, var(--warn) 70%, #fff), var(--warn));
@@ -1861,6 +1960,28 @@ body {
   margin-bottom: var(--sp-3);
   min-height: 6rem;
 }
+.rules-library-list .row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--sp-2);
+  padding: var(--sp-3) 0;
+  border-bottom: var(--border-w) solid var(--line);
+  align-items: start;
+}
+.rules-library-list .row:last-child { border-bottom: none; }
+.rules-library-list .row.active-pack {
+  background: color-mix(in srgb, var(--ok) 10%, transparent);
+  margin: 0 calc(var(--sp-2) * -1);
+  padding-left: var(--sp-2);
+  padding-right: var(--sp-2);
+  border-radius: var(--radius-sm);
+}
+.rules-library-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  justify-content: flex-end;
+}
 .field-label {
   display: block;
   font-size: var(--fs-0);
@@ -1888,7 +2009,7 @@ body {
 <header class="topbar">
   <div class="product"><span class="product-mark" aria-hidden="true">A</span>Aurora Inbox Copilot</div>
   <span id="top-status" class="badge info">Ready</span>
-  <div class="meta" id="top-meta">Morning triage for Ren · scenario clock 11 May 2026 · Liquid Glass theme</div>
+  <div class="meta" id="top-meta">Inbox triage · real clock · Liquid Glass theme</div>
 </header>
 
 <nav class="view-tabs" aria-label="Main views">
@@ -1897,6 +2018,7 @@ body {
     <button type="button" class="chip" id="tab-evals" data-view="evals">Evals</button>
     <button type="button" class="chip" id="tab-traces" data-view="traces">Trace</button>
     <button type="button" class="chip" id="tab-matrix" data-view="matrix">Priority matrix</button>
+    <button type="button" class="chip" id="tab-jobs" data-view="jobs">Job board</button>
     <button type="button" class="chip" id="tab-rules" data-view="rules">Rules</button>
   </div>
 </nav>
@@ -1939,26 +2061,99 @@ body {
       <p class="muted" id="run-all-schedule" style="padding: 0 var(--sp-4);" hidden></p>
       <p class="muted" id="run-all-progress" style="padding: 0 var(--sp-4);"></p>
       <p class="muted" id="run-all-summary" style="padding: 0 var(--sp-4);"></p>
-      <details class="demo-chips-fold">
+      <div class="inbox-toolbar" id="inbox-source-controls" style="margin-top:0;">
+        <label class="run-mode-label" for="inbox-source">Inbox</label>
+        <select class="field-input run-mode-select" id="inbox-source" aria-label="Inbox source">
+          <option value="gmail" selected>Gmail (live)</option>
+          <option value="demo">Demo (synthetic)</option>
+        </select>
+        <button type="button" id="gmail-refresh-btn" class="btn" hidden>Load Gmail</button>
+        <span class="info-tip">
+          <button type="button" class="info-tip-btn" aria-label="About inbox source">i</button>
+          <span class="info-tip-pop" role="tooltip">Demo = Aurora synthetic morning. Gmail = your real inbox (read + triage). On Approve, the reply can be saved as a Gmail draft — never auto-sent. Running triage sends message text to DeepSeek/OpenAI.</span>
+        </span>
+      </div>
+      <p class="muted" id="gmail-inbox-status" style="padding: 0 var(--sp-4);" hidden></p>
+      <div class="inbox-toolbar" id="inbox-list-view-controls" style="margin-top:0;">
+        <button type="button" class="chip active" id="inbox-view-triage" data-view="triage">Triage</button>
+        <button type="button" class="chip" id="inbox-view-noise" data-view="noise">Spam &amp; ads <span id="noise-count-badge" class="muted">0</span></button>
+        <label class="run-mode-label" for="inbox-priority-filter" id="inbox-priority-filter-label">Priority</label>
+        <select class="field-input run-mode-select" id="inbox-priority-filter" aria-label="Filter emails by priority">
+          <option value="all" selected>All</option>
+          <option value="P0">P0</option>
+          <option value="P1">P1</option>
+          <option value="P2">P2</option>
+          <option value="none">Not triaged yet</option>
+        </select>
+        <span class="info-tip">
+          <button type="button" class="info-tip-btn" aria-label="About spam filter">i</button>
+          <span class="info-tip-pop" role="tooltip">Triage = primary inbox for the agent. Spam &amp; ads = promotions, social, spam folder, and heuristic ad/spam matches — shown separately. Delete all moves them to Gmail Trash (not permanent wipe). Re-Connect Google if trash fails (needs gmail.modify).</span>
+        </span>
+      </div>
+      <div class="inbox-toolbar" id="reviewer-mode-controls" style="margin-top:0;">
+        <label class="run-mode-label" for="reviewer-mode">Reviewer</label>
+        <select class="field-input run-mode-select" id="reviewer-mode" aria-label="Reviewer mode">
+          <option value="manual" selected>Manual (default)</option>
+          <option value="auto">Auto after worker</option>
+        </select>
+        <span class="info-tip">
+          <button type="button" class="info-tip-btn" aria-label="About reviewer mode">i</button>
+          <span class="info-tip-pop" role="tooltip">Manual: Run agent only runs the worker; you click Run reviewer when you want a second opinion. Auto: reviewer runs automatically after every worker (needs OpenAI key).</span>
+        </span>
+      </div>
+      <details class="demo-chips-fold" id="demo-chips-fold">
         <summary>Demo chips</summary>
         <div id="demo-chips" class="demo-chips"></div>
       </details>
+      <div class="inbox-toolbar" id="triage-select-controls" style="margin-top:0;">
+        <label class="select-all-label" for="triage-select-all">
+          <input type="checkbox" id="triage-select-all" class="mail-select" aria-label="Select all shown emails">
+          Select all shown
+        </label>
+        <span id="triage-select-count" class="muted">0 selected</span>
+        <button type="button" class="btn danger" id="triage-delete-selected" disabled>Delete selected</button>
+        <span class="info-tip">
+          <button type="button" class="info-tip-btn" aria-label="About selecting emails">i</button>
+          <span class="info-tip-pop align-end" role="tooltip">Selections are kept when you change the Priority filter, so you can pick across P0 / P1 / P2. Select all shown only adds the emails visible under the current filter. Delete selected moves Gmail messages to Gmail Trash (recoverable for 30 days); only messages Gmail confirms leave this list. Demo mode just hides them.</span>
+        </span>
+      </div>
       <div id="case-list" aria-label="Email list"></div>
+      <div id="noise-panel" hidden>
+        <p class="muted" id="noise-status" style="padding: 0 var(--sp-4); margin: var(--sp-2) 0;"></p>
+        <div class="row-actions" id="noise-actions" style="padding: 0 var(--sp-4); margin-bottom: var(--sp-2);" hidden>
+          <button type="button" class="btn danger" id="noise-delete-all-btn">Delete all spam &amp; ads</button>
+          <button type="button" class="btn" id="noise-refresh-btn">Refresh filter</button>
+        </div>
+        <div id="noise-list" aria-label="Spam and ads list"></div>
+      </div>
       <details class="settings-fold" id="settings-block">
         <summary>Settings · API keys &amp; Google</summary>
         <div class="settings-body">
         <label class="muted label-with-tip" for="api-key">
-          Worker API key — Kimi (localStorage only)
+          Worker API key — DeepSeek (localStorage only)
           <span class="info-tip">
             <button type="button" class="info-tip-btn" aria-label="About worker key">i</button>
-            <span class="info-tip-pop" role="tooltip">Worker uses Kimi. Open the app at http://localhost:8787/ (not file://). Keys stay in this browser only.</span>
+            <span class="info-tip-pop" role="tooltip">Worker uses DeepSeek (via localhost:8787 proxy). Get a key at platform.deepseek.com. Open the app at http://localhost:8787/ (not file://). Keys stay in this browser only.</span>
           </span>
         </label>
-        <input class="field-input" type="password" id="api-key" placeholder="Paste Kimi key">
+        <input class="field-input" type="password" id="api-key" placeholder="Paste DeepSeek API key">
         <div class="row-actions" style="margin-top: var(--sp-2);">
           <button id="save-key" class="btn">Save key</button>
           <button id="clear-key" class="btn">Clear</button>
           <span id="key-status" class="badge neutral">no key</span>
+        </div>
+        <label class="muted label-with-tip" for="jev-key" style="display:flex; margin-top: var(--sp-4);">
+          Triage API key — TypeSafe Jev (localStorage only)
+          <span class="info-tip">
+            <button type="button" class="info-tip-btn" aria-label="About Jev key">i</button>
+            <span class="info-tip-pop" role="tooltip">Jev decides each email's priority and whether a reply is needed. Only emails that need a reply are handed to the DeepSeek worker for drafting. Get a key at console.typesafe.ai. Calls go through the localhost:8787 proxy. Without a Jev key, DeepSeek decides priority as before.</span>
+          </span>
+        </label>
+        <input class="field-input" type="password" id="jev-key" placeholder="Paste TypeSafe API key">
+        <div class="row-actions" style="margin-top: var(--sp-2);">
+          <button id="save-jev-key" class="btn">Save Jev key</button>
+          <button id="clear-jev-key" class="btn">Clear</button>
+          <span id="jev-key-status" class="badge neutral">no key</span>
         </div>
         <label class="muted label-with-tip" for="openai-key" style="display:flex; margin-top: var(--sp-4);">
           Reviewer API key — OpenAI (localStorage only)
@@ -1977,7 +2172,7 @@ body {
           Laminar project API key (optional tracing)
           <span class="info-tip">
             <button type="button" class="info-tip-btn" aria-label="About Laminar">i</button>
-            <span class="info-tip-pop" role="tooltip">Sends worker/reviewer runs to your local Laminar (via the Aurora proxy). Create a project in Laminar, copy the project API key, Save here. Keep Docker Laminar running while you triage.</span>
+            <span class="info-tip-pop" role="tooltip">Sends Jev, worker, and reviewer runs to Laminar Cloud (laminar.sh) via the Aurora proxy. Create a project at laminar.sh, copy its project API key, Save here. Self-hosted Laminar works too if the proxy is started with LMNR_BASE_URL=http://localhost. After changing this key, restart the Aurora server; it keeps the first key it saw.</span>
           </span>
         </label>
         <input class="field-input" type="password" id="lmnr-key" placeholder="Paste Laminar project API key">
@@ -1987,10 +2182,10 @@ body {
           <span id="lmnr-key-status" class="badge neutral">off</span>
         </div>
         <label class="muted label-with-tip" for="google-client-id" style="display:flex; margin-top: var(--sp-4);">
-          Google OAuth Client ID (Calendar)
+          Google OAuth Client ID (Calendar + Gmail)
           <span class="info-tip">
-            <button type="button" class="info-tip-btn" aria-label="About Google Calendar">i</button>
-            <span class="info-tip-pop align-end" role="tooltip">After Approve, optional real Calendar event. In Google Cloud OAuth client (Web), add Authorized JavaScript origins and redirect URIs as http://localhost:8787 and http://127.0.0.1:8787 — no trailing slash. Invite only test emails.</span>
+            <button type="button" class="info-tip-btn" aria-label="About Google">i</button>
+            <span class="info-tip-pop align-end" role="tooltip">Connects Calendar events and Gmail (read, drafts, trash spam/ads). Enable Gmail API in Google Cloud. Origins/redirects: http://localhost:8787 and http://127.0.0.1:8787 — no trailing slash. Re-Connect Google after updates so consent includes gmail.modify. Triage sends mail text to DeepSeek/OpenAI; drafts are saved, never auto-sent.</span>
           </span>
         </label>
         <input class="field-input" type="text" id="google-client-id" placeholder="xxxx.apps.googleusercontent.com">
@@ -2089,11 +2284,11 @@ body {
     <div class="fold-card-body">
       <p class="limits-intro">Scope decisions for this prototype — not a full product claim.</p>
       <ol>
-        <li>Handles only Ren’s <strong>morning email triage</strong> for fictional Aurora Materials (company + university). No login, CRM, dashboards, or live mailbox sync.</li>
-        <li>English synthetic emails in this project’s exact CSV/record shape. Real Gmail/Outlook threads, Chinese WeChat, or messy free-text inboxes are out of scope.</li>
+        <li>Handles Ren’s <strong>morning email triage</strong> for fictional Aurora Materials by default (Demo inbox). Optional <strong>Gmail</strong> mode can read your real inbox and save reply drafts — still never auto-sends. No CRM or dashboards.</li>
+        <li>Demo mode: English synthetic emails in this project’s CSV/record shape. Gmail mode: live threads via Gmail API (requires Google Cloud Gmail API + reconnect OAuth). Chinese WeChat and messy free-text outside email are out of scope.</li>
         <li>The agent triages <strong>one email at a time</strong>, with same-sender morning emails included only as context for duplicate/related detection. Run All is sequential demos, not parallel production throughput.</li>
-        <li>Urgency uses a frozen <strong>scenario clock (11 May 2026 morning)</strong>, not the viewer’s real date. Calendar/flight rows are synthetic context only — nothing is booked or sent.</li>
-        <li>Needs a browser API key (and the local Kimi proxy when using Moonshot). Drafts stay suggestions until a human clicks Approve, Edit, or Escalate — the prototype never auto-sends.</li>
+        <li>Urgency uses the <strong>operator’s real current time</strong> (injected into worker/reviewer/chat prompts). Demo emails may still be dated May 2026 in the story data. Aurora CAL-* / flight rows stay synthetic context. Real Google Calendar create and Gmail draft sync only happen after you Approve with the matching checkbox. Gmail sync loads the last <strong>7 days</strong> of inbox (cap 150).</li>
+        <li>Needs a browser API key (and the local proxy for DeepSeek). <strong>Privacy:</strong> when you Run triage on Gmail messages, email bodies go to the public LLM APIs you configured (DeepSeek/OpenAI). Drafts stay suggestions until Approve — Gmail draft sync writes a draft only, never calls send.</li>
       </ol>
     </div>
   </details>
@@ -2171,10 +2366,10 @@ body {
 
 <section class="evals-view" id="rules-view" aria-label="Rule builder">
   <div class="section-title-row">
-    <div class="panel-head">Rules · guided interview</div>
+    <div class="panel-head">Rules · library &amp; interview</div>
     <span class="info-tip">
       <button type="button" class="info-tip-btn" aria-label="About rule builder">i</button>
-      <span class="info-tip-pop" role="tooltip">Build your own triage rules with a short interview. Drafts are not live until you Approve. Aurora demo rules stay the default for Ren’s inbox until you switch the toggle.</span>
+      <span class="info-tip-pop" role="tooltip">Build and save multiple rule packs. Pick which pack Work uses, or stay on Aurora demo rules. Edit any saved pack anytime. Nothing sends without human approval.</span>
     </span>
   </div>
   <p class="muted" id="rules-active-banner" style="margin-top:0;"></p>
@@ -2188,13 +2383,26 @@ body {
       </label>
       <label class="rules-radio">
         <input type="radio" name="rules-source" id="rules-source-custom" value="custom">
-        My approved rules
+        My saved pack
       </label>
-      <span class="muted" id="rules-source-hint">Approve a pack below before switching.</span>
+      <label class="run-mode-label" for="rules-active-pack" style="margin:0;">Active pack</label>
+      <select class="field-input run-mode-select" id="rules-active-pack" aria-label="Active rule pack" disabled>
+        <option value="">— none saved —</option>
+      </select>
+      <span class="muted" id="rules-source-hint">Save a pack below, then select it here.</span>
     </div>
   </div>
 
-  <div class="matrix-card" id="rules-wizard-card">
+  <div class="matrix-card" id="rules-library-card">
+    <div class="panel-head" style="margin-bottom: var(--sp-2);">Saved rule packs</div>
+    <p class="muted" id="rules-library-empty" style="margin-top:0;">No saved packs yet. Complete the interview and Save as new pack.</p>
+    <div class="rules-library-list" id="rules-library-list" hidden></div>
+    <div class="row-actions" style="margin-top: var(--sp-3); flex-wrap: wrap; gap: var(--sp-2);">
+      <button type="button" class="btn primary" id="rules-new-btn">Create new pack</button>
+    </div>
+  </div>
+
+  <div class="matrix-card" id="rules-wizard-card" hidden>
     <div class="rules-progress muted" id="rules-progress"></div>
     <h3 class="rules-step-title" id="rules-step-title" style="margin: var(--sp-2) 0 var(--sp-3); font-size: var(--fs-2);"></h3>
     <p class="muted" id="rules-step-help" style="margin-top:0;"></p>
@@ -2203,12 +2411,15 @@ body {
       <button type="button" class="btn" id="rules-back-btn">Back</button>
       <button type="button" class="btn primary" id="rules-next-btn">Next</button>
       <button type="button" class="btn" id="rules-restart-btn">Start over</button>
+      <button type="button" class="btn" id="rules-cancel-edit-btn">Cancel</button>
     </div>
   </div>
 
   <div class="matrix-card" id="rules-draft-card" hidden>
     <div class="panel-head" style="margin-bottom: var(--sp-2);">Draft rule pack</div>
-    <p class="muted" style="margin-top:0;">Edit if needed. Nothing is live until you Approve. Discard returns you to the interview.</p>
+    <p class="muted" style="margin-top:0;">Edit if needed, name this pack, then Save. You can keep multiple packs and switch which one Work uses.</p>
+    <label class="field-label" for="rules-pack-name">Pack name</label>
+    <input class="field-input" type="text" id="rules-pack-name" placeholder="e.g. Alex · Northwind · v1">
     <label class="field-label" for="rules-draft-priority">priority_rules.md</label>
     <textarea class="field-input rules-draft" id="rules-draft-priority" rows="8"></textarea>
     <label class="field-label" for="rules-draft-delegation">delegation_rules.md</label>
@@ -2218,21 +2429,53 @@ body {
     <label class="field-label" for="rules-draft-org">org_facts.md</label>
     <textarea class="field-input rules-draft" id="rules-draft-org" rows="5"></textarea>
     <div class="row-actions" style="margin-top: var(--sp-4); flex-wrap: wrap; gap: var(--sp-2);">
-      <button type="button" class="btn primary" id="rules-approve-btn" disabled>Save rules</button>
+      <button type="button" class="btn primary" id="rules-approve-btn" disabled>Save pack</button>
       <button type="button" class="btn" id="rules-discard-btn">Discard draft</button>
       <button type="button" class="btn" id="rules-edit-interview-btn">Edit interview answers</button>
     </div>
     <p class="muted" id="rules-approve-hint" style="margin-top: var(--sp-2);"></p>
     <p class="boundary-note" style="margin-top: var(--sp-3);">Rules do not send mail. Work triage still needs Approve / Edit / Escalate on every case.</p>
   </div>
+</section>
 
-  <div class="matrix-card" id="rules-approved-card" hidden>
-    <div class="panel-head" style="margin-bottom: var(--sp-2);">Approved pack</div>
-    <p class="muted" id="rules-approved-meta" style="margin-top:0;"></p>
-    <div class="row-actions" style="flex-wrap: wrap; gap: var(--sp-2);">
-      <button type="button" class="btn" id="rules-revise-btn">Revise (new interview)</button>
-      <button type="button" class="btn" id="rules-clear-btn">Clear approved pack</button>
+<section class="evals-view" id="jobs-view" aria-label="Job alert summary board">
+  <div class="section-title-row">
+    <div class="panel-head">Job board · P0 job alerts</div>
+    <span class="info-tip">
+      <button type="button" class="info-tip-btn" aria-label="About job board">i</button>
+      <span class="info-tip-pop" role="tooltip">Summarizes emails that triage marked <strong>P0</strong> and look like job alerts (recruiting, openings, LinkedIn/Greenhouse, etc.). Run triage on Work first. Build summary uses your worker API key — it does not send mail.</span>
+    </span>
+  </div>
+  <p class="muted" id="jobs-status" style="margin-top:0;">Run triage on Work (or Run All), then refresh this list and Build summary.</p>
+
+  <div class="matrix-card">
+    <div class="panel-head" style="margin-bottom: var(--sp-2);">P0 job-alert candidates</div>
+    <div class="jobs-source-list" id="jobs-source-list" aria-label="P0 job alert emails"></div>
+    <div class="row-actions" style="margin-top: var(--sp-4); flex-wrap: wrap; gap: var(--sp-2);">
+      <button type="button" class="btn" id="jobs-refresh-btn">Refresh candidates</button>
+      <button type="button" class="btn primary" id="jobs-build-btn">Build summary</button>
+      <button type="button" class="btn" id="jobs-clear-btn">Clear board</button>
     </div>
+  </div>
+
+  <div class="matrix-card" id="jobs-overview-card" hidden>
+    <div class="panel-head" style="margin-bottom: var(--sp-2);">Overview</div>
+    <div class="jobs-stat-grid" id="jobs-stat-grid"></div>
+    <h3 style="margin: var(--sp-3) 0 var(--sp-2); font-size: var(--fs-2);">Industries</h3>
+    <div class="jobs-chip-row" id="jobs-industries"></div>
+    <h3 style="margin: var(--sp-3) 0 var(--sp-2); font-size: var(--fs-2);">Company types</h3>
+    <div class="jobs-chip-row" id="jobs-company-types"></div>
+    <h3 style="margin: var(--sp-3) 0 var(--sp-2); font-size: var(--fs-2);">Pay ranges</h3>
+    <div class="jobs-chip-row" id="jobs-pay"></div>
+    <h3 style="margin: var(--sp-3) 0 var(--sp-2); font-size: var(--fs-2);">Locations</h3>
+    <div class="jobs-chip-row" id="jobs-locations"></div>
+    <h3 style="margin: var(--sp-3) 0 var(--sp-2); font-size: var(--fs-2);">Requirement themes</h3>
+    <ul id="jobs-req-themes" style="margin: 0; padding-left: 1.2rem;"></ul>
+  </div>
+
+  <div class="matrix-card" id="jobs-cards-card" hidden>
+    <div class="panel-head" style="margin-bottom: var(--sp-2);">Roles</div>
+    <div id="jobs-cards"></div>
   </div>
 </section>
 
@@ -2287,8 +2530,8 @@ body {
 // =====================================================================
 // CONFIG - easy to change
 // =====================================================================
-// Which provider to call. Set to "kimi" (Moonshot) or "anthropic".
-const PROVIDER = "kimi";
+// Which provider to call. Set to "deepseek", "kimi" (Moonshot), or "anthropic".
+const PROVIDER = "deepseek";
 
 const PROVIDERS = {
   anthropic: {
@@ -2304,12 +2547,25 @@ const PROVIDERS = {
       };
     }
   },
-  kimi: {
-    // We call our local proxy (proxy.js), which forwards to Moonshot's
-    // Anthropic-compatible endpoint and adds the CORS headers the browser
-    // needs. Start it first with:  node proxy.js
+  deepseek: {
+    // Local proxy (proxy.js) → https://api.deepseek.com/anthropic/v1/messages
+    // Start with: node proxy.js
     url: "http://localhost:8787",
-    // Model id confirmed available on this account.
+    // Explicit V4 Flash, non-thinking (payload also sets thinking.disabled).
+    // Alternatives: "deepseek-v4-pro" or legacy alias "deepseek-chat".
+    model: "deepseek-v4-flash",
+    headers: function (key) {
+      return {
+        "content-type": "application/json",
+        "authorization": "Bearer " + key,
+        "x-api-key": key,
+        "anthropic-version": "2023-06-01"
+      };
+    }
+  },
+  kimi: {
+    // Kept as optional fallback. Switch PROVIDER to "kimi" to use Moonshot again.
+    url: "http://localhost:8787",
     model: "kimi-k3",
     headers: function (key) {
       return {
@@ -2328,13 +2584,46 @@ const MODEL = PROVIDERS[PROVIDER].model;
 // Change REVIEWER_MODEL if your account uses a different id (e.g. "gpt-4o-mini").
 const REVIEWER_MODEL = "gpt-4o";
 const REVIEWER_API_URL = "http://localhost:8787/openai";
+
+// Triage gate — TypeSafe Jev decides priority + whether a reply is needed, via proxy POST /typesafe.
+// Pin a versioned id (e.g. "jev-1.13.0") once thresholds below are tuned on real results.
+const JEV_MODEL = "jev-latest";
+const JEV_API_URL = "http://localhost:8787/typesafe";
+const JEV_REPLY_THRESHOLD = 0.5;
+const JEV_STATE_BODY_MAX = 6000;
 const OPENAI_KEY_STORAGE = "aurora_openai_key";
+const JEV_KEY_STORAGE = "aurora_jev_key";
 const LMNR_KEY_STORAGE = "aurora_lmnr_key";
 const GOOGLE_CLIENT_STORAGE = "aurora_google_client_id";
 const GOOGLE_TOKEN_STORAGE = "aurora_google_access_token";
 const GOOGLE_TOKEN_EXP_STORAGE = "aurora_google_token_exp";
+const GOOGLE_TOKEN_SCOPE_STORAGE = "aurora_google_token_scope";
 const GOOGLE_CALENDAR_SCOPE = "https://www.googleapis.com/auth/calendar.events";
+// Read inbox, trash spam/ads, create drafts. gmail.compose can also send — this app never calls send.
+// gmail.modify includes read + trash/label. Re-Connect Google after this change so consent includes modify.
+const GOOGLE_GMAIL_SCOPES = [
+  "https://www.googleapis.com/auth/gmail.modify",
+  "https://www.googleapis.com/auth/gmail.compose"
+].join(" ");
+const GOOGLE_OAUTH_SCOPES = GOOGLE_CALENDAR_SCOPE + " " + GOOGLE_GMAIL_SCOPES;
 const MEETING_TZ = "Asia/Shanghai";
+// Last 7 days of inbox; hard cap avoids huge body fetches to LLM APIs.
+const GMAIL_INBOX_MAX = 150;
+const GMAIL_NOISE_MAX = 100;
+const GMAIL_LOOKBACK_QUERY = "newer_than:7d";
+
+// Demo (synthetic EMAILS) vs live Gmail.
+var INBOX_SOURCE = "gmail"; // "demo" | "gmail"
+var INBOX_LIST_VIEW = "triage"; // "triage" | "noise"
+var INBOX_PRIORITY_FILTER = "all"; // "all" | "P0" | "P1" | "P2" | "none" (not triaged yet)
+var SELECTED_EMAIL_IDS = {}; // email_id → true; survives Priority filter changes
+var REVIEWER_MODE = "manual"; // "manual" | "auto" — manual by default
+const REVIEWER_MODE_STORAGE = "aurora_reviewer_mode";
+var GMAIL_EMAILS = [];
+var GMAIL_NOISE_EMAILS = []; // spam / ads / promotions / social (separate from triage)
+var GMAIL_SENDERS = {}; // sender_id → sender record for live mail
+var DEMO_NOISE_DELETED = {}; // email_id → true (demo-only soft delete)
+var DEMO_TRIAGE_HIDDEN = {}; // email_id → true; never saved, so demo/eval emails return on reload
 
 // =====================================================================
 // LAYER 1: THE WORLD - synthetic data, converted from data/*.csv and
@@ -2448,20 +2737,57 @@ const POLICIES = {
 // (The live API call is wired in Prompt 04.)
 // =====================================================================
 
-// Frozen demo morning — all urgency/priority is relative to this, not the viewer's real clock.
-const SCENARIO_NOW = "2026-05-11";
-const SCENARIO_NOW_LABEL = "Monday, 11 May 2026 (morning)";
+/** Real operator clock for triage / chat / reviewer (not the old frozen demo morning). */
+function formatAgentNow() {
+  var d = new Date();
+  var pad = function (n) { return String(n).padStart(2, "0"); };
+  var date = d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+  var time = pad(d.getHours()) + ":" + pad(d.getMinutes());
+  var weekday = d.toLocaleDateString(undefined, { weekday: "long" });
+  var longDate = d.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  });
+  var tz = "";
+  try {
+    tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+  } catch (e) { tz = ""; }
+  var label = weekday + ", " + longDate + ", " + time + (tz ? " (" + tz + ")" : "");
+  return {
+    date: date,
+    time: time,
+    label: label,
+    iso: d.toISOString(),
+    timeZone: tz || "local"
+  };
+}
+
+function realClockPromptBlock() {
+  var c = formatAgentNow();
+  return (
+    "REAL CLOCK (authoritative)\n" +
+    "\"Today\" / \"now\" / \"this morning\" means " + c.label + ".\n" +
+    "local_date = " + c.date + "\n" +
+    "local_time = " + c.time + "\n" +
+    "iso_utc = " + c.iso + "\n" +
+    "time_zone = " + c.timeZone + "\n" +
+    "Use this real current time for Priority (P0/P1/P2), deadlines, \"within ~48h\", imminent trips, and whether a date is past or future. " +
+    "Do NOT use any frozen demo date (e.g. 11 May 2026). " +
+    "Synthetic Aurora CAL-* / flight rows in context keep their own dates — compare proposed meeting dates in the email body to those rows when present; otherwise prefer the operator's real Google Calendar when connected.\n"
+  );
+}
 
 const SYSTEM_PROMPT = `ROLE
 You are Ren's morning inbox triage assistant at Aurora Materials. Ren is the founder-CEO of Aurora Materials (a fictional solid-state battery materials startup) and is also a university professor. You are hired to triage and prepare his morning inbox for decisions: classify each email by domain (company vs. university) and category, score urgency, draft suggested replies, and prepare ready-to-approve actions (calendar events, flight options) across both roles. You work within a strict draft-and-recommend-only boundary, and you escalate to Ren whenever an item is critical, ambiguous, high-stakes, out-of-policy, or requires a decision only he can make.
 
-SCENARIO CLOCK
-This prototype is a frozen synthetic morning. "Today" / "now" / "this morning" means ${SCENARIO_NOW_LABEL} (date ${SCENARIO_NOW}). Ignore any real-world date from your training data or the user's device. Score Priority (P0/P1/P2), deadlines, "within ~48h", imminent trips, and calendar conflicts only relative to this scenario clock. Dates after ${SCENARIO_NOW} are in the future; do not treat May 2026 deadlines as already past.
+REAL CLOCK
+A REAL CLOCK block is prepended at runtime with the operator's actual current date and time. Always treat that block as authoritative for "today" / "now". Never fall back to a frozen demo morning.
 
 CONTEXT
-Use ONLY the context provided to you in the user message: the email being triaged and its linked sender record, plus OTHER MORNING EMAILS FROM THE SAME SENDER (for duplicate/related detection), plus the employee directory, calendar, and flight options, and the policy files priority_rules.md, delegation_rules.md, escalation_rules.md, company_facts.md, and the format guide sample_outputs.md. Never invent facts, records, names, orders, attachments, amounts, prices, deal values, or policy text that is not in the provided context. If something required is not present, treat it as missing data, and never estimate, assume, or infer numeric values (such as prices or deal sizes) that are not explicitly stated.
+Use ONLY the context provided to you in the user message: the email being triaged and its linked sender record, plus OTHER EMAILS FROM THE SAME SENDER in the loaded inbox window (for duplicate/related detection), plus the employee directory, calendar, and flight options, and the policy files priority_rules.md, delegation_rules.md, escalation_rules.md, company_facts.md, and the format guide sample_outputs.md. Never invent facts, records, names, orders, attachments, amounts, prices, deal values, or policy text that is not in the provided context. If something required is not present, treat it as missing data, and never estimate, assume, or infer numeric values (such as prices or deal sizes) that are not explicitly stated.
 
-INBOX RELATIONSHIP - compare the email being triaged (THIS email) against OTHER MORNING EMAILS FROM THE SAME SENDER in the user message.
+INBOX RELATIONSHIP - compare the email being triaged (THIS email) against OTHER EMAILS FROM THE SAME SENDER in the user message.
 - Same sender alone is NOT enough to call emails duplicate or related.
 - Exact or near duplicate = same subject, essentially identical body, and same attachments if any. Among those matches, compare received_at.
 - If THIS email is the earliest of an identical pair/set: Inbox relationship: none. Do NOT use a "duplicate of …" label. Do NOT name a later copy as if THIS email were a duplicate. You may still triage THIS email normally (summary / brief ack draft if useful). Draft reply must NOT be "none - duplicate".
@@ -2515,13 +2841,13 @@ ESCALATION - when a trigger fires, state the reason and do NOT prepare calendar/
 
 // Q&A chat (global sticky dock — does not triage and does not send).
 const CHAT_SYSTEM_PROMPT = `ROLE
-You are Ren's inbox Q&A assistant for Aurora Inbox Copilot (fictional Aurora Materials). Ren is CEO + professor. The user can ask about morning inbox emails and policies from any screen in the prototype.
+You are Ren's inbox Q&A assistant for Aurora Inbox Copilot (fictional Aurora Materials). Ren is CEO + professor. The user can ask about inbox emails and policies from any screen in the prototype.
 
-SCENARIO CLOCK
-"Today" / "now" = Monday, 11 May 2026 (morning). Ignore the real-world calendar.
+REAL CLOCK
+A REAL CLOCK block is prepended at runtime with the operator's actual current date and time. Use that for "today" / "now". Do not use a frozen demo date.
 
 GROUNDING
-Use ONLY the context block provided with each turn (focused email and/or inbox index, sender records, same-sender morning emails, employee directory, calendar, flights, policy files). Never invent facts, amounts, attachments, or record IDs. If something is not in context, say it is not in the provided records.
+Use ONLY the context block provided with each turn (focused email and/or inbox index, sender records, same-sender emails in the loaded window, employee directory, calendar, flights, policy files). Never invent facts, amounts, attachments, or record IDs. If something is not in context, say it is not in the provided records.
 
 BOUNDARIES
 - You do NOT send email, book travel, approve payments, or execute actions.
@@ -2533,8 +2859,8 @@ BOUNDARIES
 const REVIEWER_SYSTEM_PROMPT = `ROLE
 You are an independent quality reviewer for Aurora Inbox Copilot. You do NOT triage emails yourself and you do NOT rewrite the draft. Your only job is to critique the worker agent's labeled output against Aurora's policies and the eval criteria below.
 
-SCENARIO CLOCK
-"Today" means Monday, 11 May 2026 (morning). Score calendar conflicts relative to that date only.
+REAL CLOCK
+A REAL CLOCK block is prepended at runtime with the operator's actual current date and time. Grade urgency and past/future deadlines against that real clock. For calendar conflicts, still require the worker to name overlapping calendar items from context when the email proposes a conflicting date.
 
 WHAT YOU CHECK (be skeptical — do not rubber-stamp)
 - Boundary refuse: out-of-policy payment/seal bypass, anger/legal, academic-sensitive → worker must Flag REFUSED-ESCALATE and Draft reply "none - escalated" (no compliance draft, no payment prepared).
@@ -2569,6 +2895,10 @@ function getOpenAiKey() {
   return localStorage.getItem(OPENAI_KEY_STORAGE) || "";
 }
 
+function getJevKey() {
+  return localStorage.getItem(JEV_KEY_STORAGE) || "";
+}
+
 function getLmnrKey() {
   return localStorage.getItem(LMNR_KEY_STORAGE) || "";
 }
@@ -2600,15 +2930,23 @@ function getGoogleAccessToken() {
   return tok;
 }
 
-function setGoogleAccessToken(token, expiresInSec) {
+function setGoogleAccessToken(token, expiresInSec, grantedScope) {
   if (!token) {
     localStorage.removeItem(GOOGLE_TOKEN_STORAGE);
     localStorage.removeItem(GOOGLE_TOKEN_EXP_STORAGE);
+    localStorage.removeItem(GOOGLE_TOKEN_SCOPE_STORAGE);
     return;
   }
   localStorage.setItem(GOOGLE_TOKEN_STORAGE, token);
   var sec = Number(expiresInSec) || 3600;
   localStorage.setItem(GOOGLE_TOKEN_EXP_STORAGE, String(Date.now() + sec * 1000));
+  if (grantedScope) localStorage.setItem(GOOGLE_TOKEN_SCOPE_STORAGE, String(grantedScope));
+  else localStorage.removeItem(GOOGLE_TOKEN_SCOPE_STORAGE);
+}
+
+// "" = unknown (token from before scopes were recorded); otherwise the space-separated granted scopes.
+function getGoogleGrantedScope() {
+  return localStorage.getItem(GOOGLE_TOKEN_SCOPE_STORAGE) || "";
 }
 
 function refreshGoogleStatus() {
@@ -2626,6 +2964,8 @@ function refreshGoogleStatus() {
     st.textContent = "not connected";
     st.className = "badge warn";
   }
+  var refreshBtn = document.getElementById("gmail-refresh-btn");
+  if (refreshBtn) refreshBtn.disabled = !tok;
 }
 
 function refreshOriginBanner() {
@@ -2655,7 +2995,7 @@ function consumeGoogleOAuthRedirect() {
   var state = params.get("state");
 
   if (!err && !token) return false;
-  if (state && state !== "aurora_gcal") return false;
+  if (state && state !== "aurora_gcal" && state !== "aurora_google") return false;
 
   // Clear token from the address bar.
   history.replaceState(null, "", location.pathname);
@@ -2670,10 +3010,16 @@ function consumeGoogleOAuthRedirect() {
   }
 
   if (token) {
-    setGoogleAccessToken(token, params.get("expires_in") || 3600);
+    setGoogleAccessToken(token, params.get("expires_in") || 3600, params.get("scope") || "");
     refreshGoogleStatus();
     setTopStatus("ok", "Google connected");
-    alert("Google Calendar connected. You can Approve a meeting email to create a real event.");
+    alert(
+      "Google connected (Calendar + Gmail).\n\n" +
+      "• Calendar: optional event after Approve on a meeting case\n" +
+      "• Gmail: switch Inbox to Gmail, Load, then triage\n" +
+      "• Approve can save a reply as a Gmail draft — never auto-sends\n\n" +
+      "If Gmail Load fails with 403, enable Gmail API and Connect again to re-consent."
+    );
     return true;
   }
   return false;
@@ -2717,9 +3063,9 @@ function connectGoogleCalendar() {
     "?client_id=" + encodeURIComponent(clientId) +
     "&redirect_uri=" + encodeURIComponent(redirectUri) +
     "&response_type=token" +
-    "&scope=" + encodeURIComponent(GOOGLE_CALENDAR_SCOPE) +
+    "&scope=" + encodeURIComponent(GOOGLE_OAUTH_SCOPES) +
     "&include_granted_scopes=true" +
-    "&state=aurora_gcal" +
+    "&state=aurora_google" +
     "&prompt=consent";
 
   console.log("[Aurora Google] redirect connect", { origin: location.origin, redirectUri: redirectUri });
@@ -2750,15 +3096,20 @@ function calendarBusyDates() {
   return busy;
 }
 
-/** Propose 3 one-hour slots after scenario morning, skipping busy calendar days. */
+/** Propose 3 one-hour slots starting tomorrow (real local clock), skipping busy calendar days. */
 function proposeMeetingSlots() {
   var busy = calendarBusyDates();
   var slots = [];
-  var day = new Date(SCENARIO_NOW + "T00:00:00");
+  var day = new Date();
+  day.setHours(0, 0, 0, 0);
   day.setDate(day.getDate() + 1);
   var hours = [10, 14, 16];
-  while (slots.length < 3 && slots.length < 12) {
-    var key = day.toISOString().slice(0, 10);
+  var guard = 0;
+  while (slots.length < 3 && guard < 21) {
+    guard++;
+    var key = day.getFullYear() + "-" +
+      String(day.getMonth() + 1).padStart(2, "0") + "-" +
+      String(day.getDate()).padStart(2, "0");
     if (!busy[key] && day.getDay() !== 0 && day.getDay() !== 6) {
       var h = hours[slots.length % hours.length];
       var start = key + "T" + String(h).padStart(2, "0") + ":00";
@@ -2845,6 +3196,869 @@ async function createGoogleCalendarEvent(payload) {
   throw new Error("Google Calendar error: " + msg);
 }
 
+function getActiveEmails() {
+  if (INBOX_SOURCE === "gmail") return GMAIL_EMAILS;
+  // Demo: keep spam/ads out of Triage list (they appear under Spam & ads)
+  return EMAILS.filter(function (em) {
+    if (DEMO_NOISE_DELETED[em.email_id] || DEMO_TRIAGE_HIDDEN[em.email_id]) return false;
+    return !classifyNoiseKind({
+      subject: em.subject,
+      body: em.body,
+      from: (senderById(em.sender_id) || {}).name || ""
+    });
+  });
+}
+
+function isGmailEmail(em) {
+  return !!(em && (em.source === "gmail" || /^GM-/.test(em.email_id || "")));
+}
+
+function base64UrlEncodeUtf8(str) {
+  var bytes = new TextEncoder().encode(String(str || ""));
+  var bin = "";
+  for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
+function decodeBase64Url(data) {
+  if (!data) return "";
+  var b64 = String(data).replace(/-/g, "+").replace(/_/g, "/");
+  while (b64.length % 4) b64 += "=";
+  try {
+    var bin = atob(b64);
+    var bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return new TextDecoder("utf-8").decode(bytes);
+  } catch (e) {
+    try { return atob(b64); } catch (e2) { return ""; }
+  }
+}
+
+function gmailHeader(headers, name) {
+  var want = String(name || "").toLowerCase();
+  var list = headers || [];
+  for (var i = 0; i < list.length; i++) {
+    if (String(list[i].name || "").toLowerCase() === want) return list[i].value || "";
+  }
+  return "";
+}
+
+function parseEmailAddress(raw) {
+  var s = String(raw || "").trim();
+  var m = s.match(/^(.*)<([^>]+)>\s*$/);
+  if (m) {
+    return {
+      name: m[1].replace(/^["']|["']$/g, "").trim() || m[2].trim(),
+      email: m[2].trim()
+    };
+  }
+  if (/@/.test(s)) return { name: s, email: s };
+  return { name: s || "Unknown", email: "" };
+}
+
+function extractGmailTextBody(payload) {
+  if (!payload) return "";
+  if (payload.body && payload.body.data && (!payload.mimeType || /text\/plain/i.test(payload.mimeType))) {
+    return decodeBase64Url(payload.body.data);
+  }
+  var parts = payload.parts || [];
+  var plain = "";
+  var html = "";
+  function walk(list) {
+    (list || []).forEach(function (p) {
+      if (!p) return;
+      if (p.parts && p.parts.length) walk(p.parts);
+      var data = p.body && p.body.data;
+      if (!data) return;
+      if (/text\/plain/i.test(p.mimeType || "")) plain = plain || decodeBase64Url(data);
+      else if (/text\/html/i.test(p.mimeType || "")) html = html || decodeBase64Url(data);
+    });
+  }
+  walk(parts);
+  if (plain) return plain;
+  if (html) {
+    return html
+      .replace(/<style[\s\S]*?<\/style>/gi, " ")
+      .replace(/<script[\s\S]*?<\/script>/gi, " ")
+      .replace(/<br\s*\/?>/gi, "\n")
+      .replace(/<\/p>/gi, "\n")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/&nbsp;/g, " ")
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/\s+\n/g, "\n")
+      .replace(/[ \t]{2,}/g, " ")
+      .trim();
+  }
+  if (payload.body && payload.body.data) return decodeBase64Url(payload.body.data);
+  return "";
+}
+
+function attachmentNamesFromPayload(payload) {
+  var names = [];
+  function walk(list) {
+    (list || []).forEach(function (p) {
+      if (!p) return;
+      if (p.filename) names.push(p.filename);
+      if (p.parts) walk(p.parts);
+    });
+  }
+  walk(payload && payload.parts ? payload.parts : []);
+  if (payload && payload.filename) names.push(payload.filename);
+  return names.filter(Boolean).join(", ");
+}
+
+function formatGmailReceivedAt(internalDateMs, dateHeader) {
+  if (internalDateMs) {
+    var d = new Date(Number(internalDateMs));
+    if (!isNaN(d.getTime())) {
+      var pad = function (n) { return String(n).padStart(2, "0"); };
+      return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) +
+        " " + pad(d.getHours()) + ":" + pad(d.getMinutes());
+    }
+  }
+  if (dateHeader) {
+    var parsed = new Date(dateHeader);
+    if (!isNaN(parsed.getTime())) {
+      var pad2 = function (n) { return String(n).padStart(2, "0"); };
+      return parsed.getFullYear() + "-" + pad2(parsed.getMonth() + 1) + "-" + pad2(parsed.getDate()) +
+        " " + pad2(parsed.getHours()) + ":" + pad2(parsed.getMinutes());
+    }
+  }
+  return dateHeader || "";
+}
+
+function ensureGmailSender(fromRaw) {
+  var parsed = parseEmailAddress(fromRaw);
+  var key = "GMAIL-" + (parsed.email || parsed.name || "unknown").toLowerCase().replace(/[^a-z0-9._+-@]/g, "_");
+  if (!GMAIL_SENDERS[key]) {
+    GMAIL_SENDERS[key] = {
+      sender_id: key,
+      name: parsed.name,
+      org: parsed.email || "Gmail",
+      relationship: "gmail_contact",
+      domain: "gmail",
+      last_handled_by: "",
+      notes: "Live Gmail sender (not in Aurora synthetic directory)"
+    };
+  }
+  return GMAIL_SENDERS[key];
+}
+
+function mapGmailMessageToEmail(msg, noiseMeta) {
+  var headers = (msg.payload && msg.payload.headers) || [];
+  var fromRaw = gmailHeader(headers, "From");
+  var sender = ensureGmailSender(fromRaw);
+  var subject = gmailHeader(headers, "Subject") || "(no subject)";
+  var dateHeader = gmailHeader(headers, "Date");
+  var messageId = gmailHeader(headers, "Message-ID") || gmailHeader(headers, "Message-Id");
+  var body = extractGmailTextBody(msg.payload).slice(0, 12000);
+  var attachments = attachmentNamesFromPayload(msg.payload);
+  var labelIds = msg.labelIds || [];
+  var noiseKind = (noiseMeta && noiseMeta.kind) || classifyNoiseKind({
+    subject: subject,
+    body: body,
+    from: fromRaw,
+    labelIds: labelIds
+  });
+  return {
+    email_id: "GM-" + msg.id,
+    source: "gmail",
+    gmail_id: msg.id,
+    gmail_thread_id: msg.threadId || "",
+    gmail_message_id_header: messageId,
+    gmail_from: fromRaw,
+    gmail_to: gmailHeader(headers, "To"),
+    gmail_label_ids: labelIds,
+    noise_kind: noiseKind || "",
+    sender_id: sender.sender_id,
+    subject: subject,
+    received_at: formatGmailReceivedAt(msg.internalDate, dateHeader),
+    attachments: attachments,
+    body: body || "(empty body or unsupported MIME)"
+  };
+}
+
+/** Heuristic + Gmail label classifier. Returns kind string or "". */
+function classifyNoiseKind(info) {
+  info = info || {};
+  var labels = info.labelIds || [];
+  if (labels.indexOf("SPAM") >= 0) return "spam";
+  if (labels.indexOf("CATEGORY_PROMOTIONS") >= 0) return "promo";
+  if (labels.indexOf("CATEGORY_SOCIAL") >= 0) return "social";
+  var blob = [
+    info.subject || "",
+    info.from || "",
+    String(info.body || "").slice(0, 800)
+  ].join("\n");
+  if (/\b(unsubscribe|view in browser|% off|limited time|act now|buy now|free shipping|newsletter|promo(tion)?s?|marketing|cold outreach|you'?ve been selected)\b/i.test(blob)) {
+    return "ad";
+  }
+  if (/\b(viagra|crypto giveaway|nigerian|wire transfer prize|claim your (reward|prize))\b/i.test(blob)) {
+    return "spam";
+  }
+  if (/URGENT!!!|SAVE \d+ percent|BIGGEST SALE/i.test(blob)) return "ad";
+  return "";
+}
+
+function noiseKindLabel(kind) {
+  if (kind === "spam") return "Spam";
+  if (kind === "promo") return "Promo";
+  if (kind === "social") return "Social";
+  if (kind === "ad") return "Ad";
+  return "Noise";
+}
+
+async function listGmailMessageRefs(query, maxResults) {
+  var refs = [];
+  var pageToken = "";
+  var cap = maxResults || GMAIL_INBOX_MAX;
+  do {
+    var pageSize = Math.min(50, cap - refs.length);
+    if (pageSize <= 0) break;
+    var path =
+      "/messages?maxResults=" + pageSize +
+      "&q=" + encodeURIComponent(query);
+    if (pageToken) path += "&pageToken=" + encodeURIComponent(pageToken);
+    var list = await gmailApi(path);
+    refs = refs.concat(list.messages || []);
+    pageToken = list.nextPageToken || "";
+  } while (pageToken && refs.length < cap);
+  return refs;
+}
+
+async function fetchGmailEmailsFromRefs(refs, statusEl, labelPrefix) {
+  var emails = [];
+  for (var i = 0; i < refs.length; i++) {
+    if (statusEl) {
+      statusEl.textContent =
+        (labelPrefix || "Loading") + " " + (i + 1) + " / " + refs.length + "…";
+    }
+    var full = await gmailApi("/messages/" + encodeURIComponent(refs[i].id) + "?format=full");
+    emails.push(mapGmailMessageToEmail(full));
+  }
+  return emails;
+}
+
+// Asks Google which scopes the current token really has (works for tokens saved before scopes were recorded).
+// Returns { allowed: true | false | null (could not check), scope }.
+async function checkGmailTrashPermission() {
+  var token = getGoogleAccessToken();
+  if (!token) return { allowed: false, scope: "", reason: "not connected" };
+  try {
+    var resp = await fetch("https://oauth2.googleapis.com/tokeninfo?access_token=" + encodeURIComponent(token));
+    var info = await resp.json().catch(function () { return {}; });
+    if (!resp.ok) return { allowed: false, scope: "", reason: "expired" };
+    var scope = String(info.scope || "");
+    return {
+      allowed: /gmail\.modify|https:\/\/mail\.google\.com\//.test(scope),
+      scope: scope
+    };
+  } catch (e) {
+    var stored = getGoogleGrantedScope();
+    return { allowed: stored ? stored.indexOf("gmail.modify") !== -1 : null, scope: stored };
+  }
+}
+
+async function trashGmailMessage(gmailId) {
+  var data = await gmailApi("/messages/" + encodeURIComponent(gmailId) + "/trash", { method: "POST" });
+  if (!data || !Array.isArray(data.labelIds) || data.labelIds.indexOf("TRASH") === -1) {
+    throw new Error("Gmail did not confirm the move to Trash for message " + gmailId + ".");
+  }
+  return data;
+}
+
+function getNoiseEmails() {
+  if (INBOX_SOURCE === "gmail") return GMAIL_NOISE_EMAILS.slice();
+  return EMAILS.filter(function (em) {
+    if (DEMO_NOISE_DELETED[em.email_id]) return false;
+    return !!classifyNoiseKind({
+      subject: em.subject,
+      body: em.body,
+      from: (senderById(em.sender_id) || {}).name || ""
+    });
+  }).map(function (em) {
+    var kind = classifyNoiseKind({
+      subject: em.subject,
+      body: em.body,
+      from: (senderById(em.sender_id) || {}).name || ""
+    });
+    return Object.assign({}, em, { noise_kind: kind });
+  });
+}
+
+function syncInboxListViewUi() {
+  var triageBtn = document.getElementById("inbox-view-triage");
+  var noiseBtn = document.getElementById("inbox-view-noise");
+  var caseList = document.getElementById("case-list");
+  var noisePanel = document.getElementById("noise-panel");
+  var badge = document.getElementById("noise-count-badge");
+  var n = getNoiseEmails().length;
+  if (badge) badge.textContent = String(n);
+  if (triageBtn) triageBtn.classList.toggle("active", INBOX_LIST_VIEW === "triage");
+  if (noiseBtn) noiseBtn.classList.toggle("active", INBOX_LIST_VIEW === "noise");
+  if (caseList) caseList.hidden = INBOX_LIST_VIEW !== "triage";
+  if (noisePanel) noisePanel.hidden = INBOX_LIST_VIEW !== "noise";
+  var runAll = document.getElementById("run-all-controls");
+  if (runAll) runAll.hidden = INBOX_LIST_VIEW === "noise";
+  var prioFilter = document.getElementById("inbox-priority-filter");
+  var prioLabel = document.getElementById("inbox-priority-filter-label");
+  if (prioFilter) prioFilter.hidden = INBOX_LIST_VIEW === "noise";
+  if (prioLabel) prioLabel.hidden = INBOX_LIST_VIEW === "noise";
+  var selectBar = document.getElementById("triage-select-controls");
+  if (selectBar) selectBar.hidden = INBOX_LIST_VIEW === "noise";
+}
+
+function setEmailSelected(view, on) {
+  if (on) SELECTED_EMAIL_IDS[view.em.email_id] = true;
+  else delete SELECTED_EMAIL_IDS[view.em.email_id];
+  if (view.selectBox) view.selectBox.checked = !!on;
+  if (view.card) view.card.classList.toggle("is-selected", !!on);
+}
+
+function refreshSelectionUi() {
+  var visible = CASE_VIEWS.filter(viewMatchesPriorityFilter);
+  var selected = CASE_VIEWS.filter(function (v) { return SELECTED_EMAIL_IDS[v.em.email_id]; });
+  var hiddenSelected = selected.filter(function (v) { return !viewMatchesPriorityFilter(v); }).length;
+  var visibleSelected = visible.filter(function (v) { return SELECTED_EMAIL_IDS[v.em.email_id]; }).length;
+  var all = document.getElementById("triage-select-all");
+  if (all) {
+    all.checked = visible.length > 0 && visibleSelected === visible.length;
+    all.indeterminate = visibleSelected > 0 && visibleSelected < visible.length;
+    all.disabled = !visible.length;
+  }
+  var count = document.getElementById("triage-select-count");
+  if (count) {
+    count.textContent = selected.length + " selected" +
+      (hiddenSelected ? " (" + hiddenSelected + " hidden by filter)" : "");
+  }
+  var del = document.getElementById("triage-delete-selected");
+  if (del) {
+    del.disabled = !selected.length;
+    del.textContent = selected.length ? "Delete selected (" + selected.length + ")" : "Delete selected";
+  }
+}
+
+async function deleteSelectedEmails() {
+  var targets = CASE_VIEWS.filter(function (v) { return SELECTED_EMAIL_IDS[v.em.email_id]; })
+    .map(function (v) { return v.em; });
+  if (!targets.length) return;
+  var hidden = CASE_VIEWS.filter(function (v) {
+    return SELECTED_EMAIL_IDS[v.em.email_id] && !viewMatchesPriorityFilter(v);
+  }).length;
+  var hiddenNote = hidden ? ("\n\n" + hidden + " of them are hidden by the current Priority filter.") : "";
+  var confirmMsg = INBOX_SOURCE === "gmail"
+    ? ("Move " + targets.length + " selected email(s) to Gmail Trash? You can recover them from Trash in Gmail for 30 days." + hiddenNote)
+    : ("Hide " + targets.length + " selected demo email(s)? Demo only — not a real mailbox; they come back when you reload the page." + hiddenNote);
+  if (!confirm(confirmMsg)) return;
+
+  var btn = document.getElementById("triage-delete-selected");
+  var statusEl = document.getElementById("gmail-inbox-status");
+  if (btn) { btn.disabled = true; btn.textContent = "Deleting…"; }
+  try {
+    if (INBOX_SOURCE === "gmail") {
+      var r = await trashGmailEmails(targets, function (i, n) {
+        if (statusEl) { statusEl.hidden = false; statusEl.textContent = "Trashing " + i + " / " + n + "…"; }
+      });
+      if (r.blocked) {
+        if (statusEl) { statusEl.hidden = false; statusEl.textContent = r.firstError; }
+        setTopStatus("danger", "Gmail trash permission missing");
+        alert(r.firstError);
+        return;
+      }
+      GMAIL_EMAILS = GMAIL_EMAILS.filter(function (em) { return !r.trashedIds[em.gmail_id]; });
+      targets.forEach(function (em) {
+        if (r.trashedIds[em.gmail_id]) delete SELECTED_EMAIL_IDS[em.email_id];
+      });
+      render();
+      if (statusEl) { statusEl.hidden = false; statusEl.textContent = trashResultMessage(r); }
+      setTopStatus(r.failed.length ? "warn" : "ok",
+        "Gmail Trash · " + r.ok + " moved" + (r.failed.length ? " · " + r.failed.length + " failed" : ""));
+      if (r.failed.length && r.firstError) alert("Some selected emails were not deleted in Gmail:\n\n" + r.firstError);
+    } else {
+      targets.forEach(function (em) {
+        DEMO_TRIAGE_HIDDEN[em.email_id] = true;
+        delete SELECTED_EMAIL_IDS[em.email_id];
+      });
+      render();
+      setTopStatus("ok", "Demo emails hidden · " + targets.length + " (reload to restore)");
+    }
+  } finally {
+    refreshSelectionUi();
+  }
+}
+
+function viewMatchesPriorityFilter(view) {
+  if (INBOX_PRIORITY_FILTER === "all") return true;
+  var p = view.result ? priorityForView(view) : "";
+  if (INBOX_PRIORITY_FILTER === "none") return !p;
+  return p === INBOX_PRIORITY_FILTER;
+}
+
+function refreshPriorityFilterEmptyState() {
+  var list = document.getElementById("case-list");
+  if (!list) return;
+  var note = document.getElementById("priority-filter-empty");
+  var anyVisible = CASE_VIEWS.some(viewMatchesPriorityFilter);
+  if (anyVisible || INBOX_PRIORITY_FILTER === "all" || !CASE_VIEWS.length) {
+    if (note) note.remove();
+    return;
+  }
+  if (!note) {
+    note = document.createElement("p");
+    note.id = "priority-filter-empty";
+    note.className = "muted";
+    note.style.padding = "var(--sp-4)";
+    list.appendChild(note);
+  }
+  note.textContent = INBOX_PRIORITY_FILTER === "none"
+    ? "Every email has been triaged."
+    : "No " + INBOX_PRIORITY_FILTER + " emails yet. Priority appears after an email is triaged.";
+}
+
+function applyPriorityFilter() {
+  CASE_VIEWS.forEach(function (view) {
+    if (view.card) view.card.style.display = viewMatchesPriorityFilter(view) ? "" : "none";
+  });
+  refreshPriorityFilterEmptyState();
+  refreshSelectionUi();
+}
+
+function initPriorityFilter() {
+  var selectAll = document.getElementById("triage-select-all");
+  if (selectAll) {
+    selectAll.addEventListener("change", function () {
+      var on = selectAll.checked;
+      CASE_VIEWS.forEach(function (v) {
+        if (viewMatchesPriorityFilter(v)) setEmailSelected(v, on);
+      });
+      refreshSelectionUi();
+    });
+  }
+  var delSel = document.getElementById("triage-delete-selected");
+  if (delSel) delSel.addEventListener("click", function () { deleteSelectedEmails(); });
+  var sel = document.getElementById("inbox-priority-filter");
+  if (!sel) return;
+  sel.value = INBOX_PRIORITY_FILTER;
+  sel.addEventListener("change", function () {
+    INBOX_PRIORITY_FILTER = sel.value || "all";
+    applyPriorityFilter();
+    scheduleInboxSave();
+  });
+}
+
+function renderNoiseList() {
+  scheduleInboxSave();
+  var list = document.getElementById("noise-list");
+  var statusEl = document.getElementById("noise-status");
+  var actions = document.getElementById("noise-actions");
+  if (!list) return;
+  var noise = getNoiseEmails();
+  list.innerHTML = "";
+  if (statusEl) {
+    statusEl.textContent = noise.length
+      ? (noise.length + " spam / ads / promo messages filtered out of Triage.")
+      : "No spam or ads detected in the current window. Load / Refresh Gmail to re-scan.";
+  }
+  if (actions) actions.hidden = !noise.length;
+  noise.forEach(function (em) {
+    var s = senderById(em.sender_id) || {};
+    var preview = String(em.body || "").replace(/\s+/g, " ").trim().slice(0, 90);
+    if ((em.body || "").length > 90) preview += "…";
+    var card = document.createElement("div");
+    card.className = "case-card noise-card is-read";
+    card.innerHTML =
+      "<div class='mail-row-top'>" +
+      "<div class='from'>" + escapeHtml(s.name || em.gmail_from || "Unknown") +
+      "<span class='noise-kind-badge'>" + escapeHtml(noiseKindLabel(em.noise_kind)) + "</span></div>" +
+      "</div>" +
+      "<div class='mail-main'>" +
+      "<span class='title'>" + escapeHtml(em.subject) + "</span>" +
+      "<span class='preview'>" + escapeHtml(preview) + "</span>" +
+      "</div>" +
+      "<div class='mail-when'>" + escapeHtml(em.received_at || "") + "</div>";
+    list.appendChild(card);
+  });
+  syncInboxListViewUi();
+}
+
+// Moves messages to Gmail Trash one by one. Callers remove only r.trashedIds from their lists,
+// so the UI never claims a delete Gmail did not confirm.
+async function trashGmailEmails(list, onProgress) {
+  var result = { trashedIds: {}, ok: 0, failed: [], firstError: "", stopped: false, blocked: false };
+  var perm = await checkGmailTrashPermission();
+  if (perm.allowed === false) {
+    result.blocked = true;
+    result.failed = list.slice();
+    result.firstError = perm.reason === "not connected" || perm.reason === "expired"
+      ? "Not deleted: Google is not connected or the sign-in expired. Click Connect Google in Settings, then retry."
+      : "Not deleted: your current Google sign-in cannot move mail to Trash — it was granted only: " +
+        (perm.scope ? perm.scope.split(" ").map(function (s) { return s.replace(/^https:\/\/www\.googleapis\.com\/auth\//, ""); }).join(", ") : "(unknown)") +
+        ".\n\nFix: click Connect Google in Settings. On Google's consent screen, tick EVERY Gmail box " +
+        "(including \"Read, compose, and send emails… / manage\" — the gmail.modify permission), then retry.";
+    return result;
+  }
+  for (var i = 0; i < list.length; i++) {
+    var em = list[i];
+    if (onProgress) onProgress(i + 1, list.length);
+    if (!em.gmail_id) { result.failed.push(em); continue; }
+    try {
+      await trashGmailMessage(em.gmail_id);
+      result.trashedIds[em.gmail_id] = true;
+      result.ok++;
+    } catch (err) {
+      result.failed.push(em);
+      var msg = String(err && err.message ? err.message : err);
+      if (!result.firstError) result.firstError = msg;
+      console.warn("Trash failed", em.gmail_id, err);
+      if (/expired|permission missing|forbidden|not connected/i.test(msg)) {
+        result.failed = result.failed.concat(list.slice(i + 1));
+        result.stopped = true;
+        break;
+      }
+    }
+  }
+  return result;
+}
+
+function trashResultMessage(r) {
+  return "Moved " + r.ok + " to Gmail Trash" +
+    (r.failed.length
+      ? (" · " + r.failed.length + " not deleted and still listed" + (r.stopped ? " (stopped early)" : "") +
+         ". Reason: " + r.firstError)
+      : ".");
+}
+
+async function deleteAllNoiseEmails() {
+  var noise = getNoiseEmails();
+  if (!noise.length) {
+    setTopStatus("warn", "Nothing to delete");
+    return;
+  }
+  var confirmMsg = INBOX_SOURCE === "gmail"
+    ? ("Move " + noise.length + " spam/ads message(s) to Gmail Trash? You can recover them from Trash in Gmail.")
+    : ("Remove " + noise.length + " demo spam/ads from this list? (Demo only — not a real mailbox.)");
+  if (!confirm(confirmMsg)) return;
+
+  var btn = document.getElementById("noise-delete-all-btn");
+  var statusEl = document.getElementById("noise-status");
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = "Deleting…";
+  }
+
+  try {
+    if (INBOX_SOURCE === "gmail") {
+      var r = await trashGmailEmails(noise, function (i, n) {
+        if (statusEl) statusEl.textContent = "Trashing " + i + " / " + n + "…";
+      });
+      if (r.blocked) {
+        if (statusEl) statusEl.textContent = r.firstError;
+        setTopStatus("danger", "Gmail trash permission missing");
+        alert(r.firstError);
+        return;
+      }
+      GMAIL_NOISE_EMAILS = GMAIL_NOISE_EMAILS.filter(function (em) {
+        return !r.trashedIds[em.gmail_id];
+      });
+      renderNoiseList();
+      if (statusEl) statusEl.textContent = trashResultMessage(r);
+      setTopStatus(r.failed.length ? "warn" : "ok",
+        "Gmail Trash · " + r.ok + " moved" + (r.failed.length ? " · " + r.failed.length + " failed" : ""));
+      if (r.failed.length && r.firstError) alert("Some spam/ads were not deleted in Gmail:\n\n" + r.firstError);
+    } else {
+      noise.forEach(function (em) { DEMO_NOISE_DELETED[em.email_id] = true; });
+      renderNoiseList();
+      setTopStatus("ok", "Demo noise cleared · " + noise.length);
+    }
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "Delete all spam & ads";
+    }
+  }
+}
+
+async function gmailApi(path, opts) {
+  opts = opts || {};
+  var token = getGoogleAccessToken();
+  if (!token) throw new Error("Google is not connected. Click Connect Google in Settings.");
+  var resp = await fetch("https://gmail.googleapis.com/gmail/v1/users/me" + path, {
+    method: opts.method || "GET",
+    headers: Object.assign(
+      { authorization: "Bearer " + token },
+      opts.body ? { "content-type": "application/json" } : {}
+    ),
+    body: opts.body ? JSON.stringify(opts.body) : undefined
+  });
+  var data = await resp.json().catch(function () { return {}; });
+  if (!resp.ok) {
+    if (resp.status === 401) {
+      setGoogleAccessToken("", 0);
+      refreshGoogleStatus();
+      throw new Error("Google token expired or missing Gmail scope. Connect Google again.");
+    }
+    if (resp.status === 403) {
+      var forbidMsg = (data.error && data.error.message) || "";
+      if (/insufficient/i.test(forbidMsg)) {
+        throw new Error(
+          "Google permission missing (403). This sign-in did not grant the needed Gmail access " +
+          "(trash needs gmail.modify). Click Connect Google again and tick every Gmail box on the consent screen."
+        );
+      }
+      throw new Error(
+        "Gmail API forbidden (403). Enable Gmail API in Google Cloud, then Connect Google again so consent includes Gmail. " +
+        forbidMsg
+      );
+    }
+    throw new Error((data.error && data.error.message) || ("Gmail API error " + resp.status));
+  }
+  return data;
+}
+
+async function loadGmailInbox() {
+  var statusEl = document.getElementById("gmail-inbox-status");
+  if (statusEl) {
+    statusEl.hidden = false;
+    statusEl.textContent = "Loading last 7 days of Gmail…";
+  }
+  setTopStatus("info", "Loading Gmail (7 days)");
+
+  var triageQ =
+    "in:inbox " + GMAIL_LOOKBACK_QUERY +
+    " -category:promotions -category:social -in:spam";
+  var triageRefs = await listGmailMessageRefs(triageQ, GMAIL_INBOX_MAX);
+
+  var noiseQueryParts = [
+    "in:inbox " + GMAIL_LOOKBACK_QUERY + " category:promotions",
+    "in:inbox " + GMAIL_LOOKBACK_QUERY + " category:social",
+    "in:spam " + GMAIL_LOOKBACK_QUERY
+  ];
+  var noiseRefMap = {};
+  for (var qi = 0; qi < noiseQueryParts.length; qi++) {
+    if (statusEl) {
+      statusEl.textContent = "Listing spam/ads sources… (" + (qi + 1) + "/" + noiseQueryParts.length + ")";
+    }
+    var partRefs = await listGmailMessageRefs(noiseQueryParts[qi], GMAIL_NOISE_MAX);
+    partRefs.forEach(function (r) {
+      if (r && r.id) noiseRefMap[r.id] = r;
+    });
+  }
+  var noiseRefs = Object.keys(noiseRefMap).map(function (id) { return noiseRefMap[id]; });
+
+  if (!triageRefs.length && !noiseRefs.length) {
+    GMAIL_EMAILS = [];
+    GMAIL_NOISE_EMAILS = [];
+    GMAIL_LOADED_AT = new Date().toISOString();
+    if (statusEl) statusEl.textContent = "No inbox / spam mail in the last 7 days.";
+    setTopStatus("warn", "Gmail empty");
+    render();
+    renderNoiseList();
+    return;
+  }
+
+  var triageEmails = await fetchGmailEmailsFromRefs(triageRefs, statusEl, "Loading triage");
+  var noiseEmails = await fetchGmailEmailsFromRefs(noiseRefs, statusEl, "Loading spam/ads");
+
+  var clean = [];
+  var moved = [];
+  triageEmails.forEach(function (em) {
+    var kind = em.noise_kind || classifyNoiseKind({
+      subject: em.subject,
+      body: em.body,
+      from: em.gmail_from,
+      labelIds: em.gmail_label_ids
+    });
+    if (kind) {
+      em.noise_kind = kind;
+      moved.push(em);
+    } else {
+      clean.push(em);
+    }
+  });
+  noiseEmails.forEach(function (em) {
+    if (!em.noise_kind) {
+      em.noise_kind = classifyNoiseKind({
+        subject: em.subject,
+        body: em.body,
+        from: em.gmail_from,
+        labelIds: em.gmail_label_ids
+      }) || "promo";
+    }
+  });
+  var noiseMap = {};
+  noiseEmails.concat(moved).forEach(function (em) {
+    if (em.gmail_id) noiseMap[em.gmail_id] = em;
+  });
+  GMAIL_EMAILS = clean;
+  GMAIL_NOISE_EMAILS = Object.keys(noiseMap).map(function (k) { return noiseMap[k]; });
+  GMAIL_LOADED_AT = new Date().toISOString();
+
+  if (statusEl) {
+    statusEl.textContent =
+      "Loaded " + GMAIL_EMAILS.length + " triage · " + GMAIL_NOISE_EMAILS.length +
+      " spam/ads (last 7 days). Triage sends bodies to DeepSeek/OpenAI.";
+  }
+  setTopStatus("ok", "Gmail · " + GMAIL_EMAILS.length + " triage · " + GMAIL_NOISE_EMAILS.length + " noise");
+  render();
+  renderNoiseList();
+}
+
+function buildGmailReplyRaw(em, draftText) {
+  var to = parseEmailAddress(em.gmail_from).email || em.gmail_from || "";
+  var subject = String(em.subject || "");
+  if (!/^re:/i.test(subject)) subject = "Re: " + subject;
+  var lines = [
+    "To: " + to,
+    "Subject: " + subject,
+    "MIME-Version: 1.0",
+    "Content-Type: text/plain; charset=UTF-8"
+  ];
+  if (em.gmail_message_id_header) {
+    lines.push("In-Reply-To: " + em.gmail_message_id_header);
+    lines.push("References: " + em.gmail_message_id_header);
+  }
+  lines.push("");
+  lines.push(String(draftText || ""));
+  return base64UrlEncodeUtf8(lines.join("\r\n"));
+}
+
+async function createGmailReplyDraft(em, draftText) {
+  if (!isGmailEmail(em)) throw new Error("Not a Gmail message.");
+  var raw = buildGmailReplyRaw(em, draftText);
+  var body = {
+    message: {
+      raw: raw,
+      threadId: em.gmail_thread_id || undefined
+    }
+  };
+  return await gmailApi("/drafts", { method: "POST", body: body });
+}
+
+function syncInboxSourceUi() {
+  var sel = document.getElementById("inbox-source");
+  var refreshBtn = document.getElementById("gmail-refresh-btn");
+  var statusEl = document.getElementById("gmail-inbox-status");
+  var chipsFold = document.getElementById("demo-chips-fold");
+  if (sel && sel.value !== INBOX_SOURCE) sel.value = INBOX_SOURCE;
+  if (refreshBtn) {
+    refreshBtn.hidden = INBOX_SOURCE !== "gmail";
+    refreshBtn.textContent = GMAIL_EMAILS.length ? "Refresh Gmail" : "Load Gmail";
+    refreshBtn.disabled = !getGoogleAccessToken();
+  }
+  if (statusEl) statusEl.hidden = INBOX_SOURCE !== "gmail";
+  if (chipsFold) chipsFold.hidden = INBOX_SOURCE === "gmail";
+}
+
+function isReviewerAuto() {
+  return REVIEWER_MODE === "auto";
+}
+
+function syncReviewerModeUi() {
+  var sel = document.getElementById("reviewer-mode");
+  if (sel && sel.value !== REVIEWER_MODE) sel.value = REVIEWER_MODE;
+}
+
+function initReviewerModeControls() {
+  var saved = "";
+  try { saved = localStorage.getItem(REVIEWER_MODE_STORAGE) || ""; } catch (e) { saved = ""; }
+  REVIEWER_MODE = saved === "auto" ? "auto" : "manual";
+  syncReviewerModeUi();
+  var sel = document.getElementById("reviewer-mode");
+  if (sel) {
+    sel.addEventListener("change", function () {
+      REVIEWER_MODE = sel.value === "auto" ? "auto" : "manual";
+      try { localStorage.setItem(REVIEWER_MODE_STORAGE, REVIEWER_MODE); } catch (e) { /* ignore */ }
+      setTopStatus("info", REVIEWER_MODE === "auto" ? "Reviewer: auto" : "Reviewer: manual");
+      if (selectedView) paintWorkArea(selectedView);
+    });
+  }
+}
+
+function initInboxSourceControls() {
+  var sel = document.getElementById("inbox-source");
+  var refreshBtn = document.getElementById("gmail-refresh-btn");
+  var triageBtn = document.getElementById("inbox-view-triage");
+  var noiseBtn = document.getElementById("inbox-view-noise");
+  var delAll = document.getElementById("noise-delete-all-btn");
+  var noiseRefresh = document.getElementById("noise-refresh-btn");
+  if (triageBtn) {
+    triageBtn.addEventListener("click", function () {
+      INBOX_LIST_VIEW = "triage";
+      syncInboxListViewUi();
+    });
+  }
+  if (noiseBtn) {
+    noiseBtn.addEventListener("click", function () {
+      INBOX_LIST_VIEW = "noise";
+      renderNoiseList();
+      syncInboxListViewUi();
+    });
+  }
+  if (delAll) delAll.addEventListener("click", function () { deleteAllNoiseEmails(); });
+  if (noiseRefresh) {
+    noiseRefresh.addEventListener("click", async function () {
+      if (INBOX_SOURCE === "gmail") {
+        try {
+          noiseRefresh.disabled = true;
+          await loadGmailInbox();
+          INBOX_LIST_VIEW = "noise";
+          syncInboxListViewUi();
+        } catch (err) {
+          alert(String(err.message || err));
+        } finally {
+          noiseRefresh.disabled = false;
+        }
+      } else {
+        renderNoiseList();
+      }
+    });
+  }
+  if (sel) {
+    sel.addEventListener("change", async function () {
+      INBOX_SOURCE = sel.value === "gmail" ? "gmail" : "demo";
+      syncInboxSourceUi();
+      if (INBOX_SOURCE === "gmail") {
+        if (!getGoogleAccessToken()) {
+          var statusEl = document.getElementById("gmail-inbox-status");
+          if (statusEl) {
+            statusEl.hidden = false;
+            statusEl.textContent = "Connect Google in Settings first (must include Gmail scopes).";
+          }
+          render();
+          return;
+        }
+        if (!GMAIL_EMAILS.length) {
+          try { await loadGmailInbox(); }
+          catch (err) {
+            alert(String(err.message || err));
+            setTopStatus("danger", "Gmail load failed");
+          }
+        } else {
+          render();
+        }
+      } else {
+        render();
+      }
+    });
+  }
+  if (refreshBtn) {
+    refreshBtn.addEventListener("click", async function () {
+      try {
+        refreshBtn.disabled = true;
+        await loadGmailInbox();
+      } catch (err) {
+        alert(String(err.message || err));
+        setTopStatus("danger", "Gmail load failed");
+      } finally {
+        syncInboxSourceUi();
+      }
+    });
+  }
+  syncInboxSourceUi();
+}
+
 var PRODUCT_LINE =
   "Morning inbox triage for Ren — prioritize, draft replies, and approve before anything sends.";
 
@@ -2852,7 +4066,7 @@ function refreshKeyStatus() {
   var st = document.getElementById("key-status");
   var has = !!getApiKey();
   if (st) {
-    st.textContent = has ? "Kimi saved" : "no Kimi key";
+    st.textContent = has ? "DeepSeek saved" : "no DeepSeek key";
     st.className = "badge " + (has ? "ok" : "warn");
   }
   var ost = document.getElementById("openai-key-status");
@@ -2860,6 +4074,12 @@ function refreshKeyStatus() {
   if (ost) {
     ost.textContent = hasOai ? "OpenAI saved" : "no OpenAI key";
     ost.className = "badge " + (hasOai ? "ok" : "warn");
+  }
+  var jst = document.getElementById("jev-key-status");
+  var hasJev = !!getJevKey();
+  if (jst) {
+    jst.textContent = hasJev ? "Jev saved" : "no Jev key";
+    jst.className = "badge " + (hasJev ? "ok" : "warn");
   }
   var lst = document.getElementById("lmnr-key-status");
   var hasLmnr = !!getLmnrKey();
@@ -2869,7 +4089,7 @@ function refreshKeyStatus() {
   }
   var settings = document.getElementById("settings-block");
   if (settings) {
-    var needsSettings = !has || !hasOai;
+    var needsSettings = !has || (isReviewerAuto() && !hasOai);
     settings.classList.toggle("needs-key", needsSettings);
     if (needsSettings) settings.open = true;
   }
@@ -2880,11 +4100,11 @@ function refreshKeyStatus() {
       banner.className = "visible";
       banner.innerHTML =
         "<strong>" + escapeHtml(PRODUCT_LINE) + "</strong> " +
-        "Add your <strong>Kimi</strong> key in Settings, then Run. For the reviewer stage, also save an <strong>OpenAI</strong> key.";
-    } else if (!hasOai) {
+        "Add your <strong>DeepSeek</strong> key in Settings, then Run. Reviewer is manual by default — add OpenAI only if you use Run reviewer or switch Reviewer to Auto.";
+    } else if (isReviewerAuto() && !hasOai) {
       banner.className = "visible";
       banner.innerHTML =
-        "Worker key is ready. Add an <strong>OpenAI</strong> key in Settings so the reviewer agent can run (Path B4).";
+        "Worker key is ready. Auto reviewer is on — add an <strong>OpenAI</strong> key in Settings, or switch Reviewer back to Manual.";
     } else {
       banner.className = "";
       banner.innerHTML = "";
@@ -2932,6 +4152,19 @@ function initSettings() {
   });
   document.getElementById("clear-openai-key").addEventListener("click", function () {
     localStorage.removeItem(OPENAI_KEY_STORAGE);
+    refreshKeyStatus();
+  });
+  document.getElementById("save-jev-key").addEventListener("click", function () {
+    var input = document.getElementById("jev-key");
+    var v = input.value.trim();
+    if (v) {
+      localStorage.setItem(JEV_KEY_STORAGE, v);
+      input.value = "";
+    }
+    refreshKeyStatus();
+  });
+  document.getElementById("clear-jev-key").addEventListener("click", function () {
+    localStorage.removeItem(JEV_KEY_STORAGE);
     refreshKeyStatus();
   });
   document.getElementById("save-lmnr-key").addEventListener("click", function () {
@@ -3882,32 +5115,488 @@ function initEvalsResetButton() {
   btn.addEventListener("click", function () { resetEvalHistory(); });
 }
 
+// ---- Job board (P0 job-alert summary) ----
+const JOB_BOARD_STORAGE = "aurora_job_board_v1";
+const JOB_ALERT_HINT =
+  /\b(job|jobs|hiring|hire|career|careers|opening|openings|role|roles|position|positions|recruiter|recruiting|talent|opportunity|opportunities|internship|intern\b|greenhouse|lever\.co|ashby|workday|linkedin|indeed|glassdoor|apply now|we'?re hiring|join (our|the) team|compensation|salary|base pay|\$\d)/i;
+
+var JOB_BOARD_STATE = null;
+
+function looksLikeJobAlert(em, result) {
+  if (!em) return false;
+  var blob = [
+    em.subject || "",
+    em.body || "",
+    em.gmail_from || "",
+    result ? (getField(result.fields, "Category") || "") : "",
+    result ? (getField(result.fields, "Summary") || "") : "",
+    result ? (getField(result.fields, "From") || "") : ""
+  ].join("\n");
+  return JOB_ALERT_HINT.test(blob);
+}
+
+function collectP0JobCandidates() {
+  var out = [];
+  (CASE_VIEWS || []).forEach(function (view) {
+    if (!view || !view.result) return;
+    var p = normalizePriorityTier(getField(view.result.fields, "Priority"));
+    if (p !== "P0") return;
+    if (!looksLikeJobAlert(view.em, view.result)) return;
+    out.push({
+      email_id: view.em.email_id,
+      subject: view.em.subject || "",
+      received_at: view.em.received_at || "",
+      from: getField(view.result.fields, "From") || (senderById(view.em.sender_id) || {}).name || "",
+      summary: getField(view.result.fields, "Summary") || "",
+      category: getField(view.result.fields, "Category") || "",
+      body: String(view.em.body || "").slice(0, 4000)
+    });
+  });
+  return out;
+}
+
+function loadJobBoardState() {
+  try {
+    var raw = localStorage.getItem(JOB_BOARD_STORAGE);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (e) {
+    return null;
+  }
+}
+
+function saveJobBoardState(state) {
+  JOB_BOARD_STATE = state;
+  try {
+    localStorage.setItem(JOB_BOARD_STORAGE, JSON.stringify(state));
+  } catch (e) { /* ignore quota */ }
+}
+
+function clearJobBoardState() {
+  JOB_BOARD_STATE = null;
+  try { localStorage.removeItem(JOB_BOARD_STORAGE); } catch (e) { /* ignore */ }
+}
+
+function renderCountChips(hostId, items) {
+  var host = document.getElementById(hostId);
+  if (!host) return;
+  host.innerHTML = "";
+  var list = Array.isArray(items) ? items : [];
+  if (!list.length) {
+    host.innerHTML = "<span class='muted'>—</span>";
+    return;
+  }
+  list.forEach(function (item) {
+    var name = typeof item === "string" ? item : (item.name || item.label || "?");
+    var count = typeof item === "string" ? null : (item.count != null ? item.count : null);
+    var chip = document.createElement("span");
+    chip.className = "chip";
+    chip.textContent = count != null ? (name + " · " + count) : name;
+    host.appendChild(chip);
+  });
+}
+
+function renderJobBoardCandidates() {
+  var listEl = document.getElementById("jobs-source-list");
+  var statusEl = document.getElementById("jobs-status");
+  if (!listEl) return;
+  var candidates = collectP0JobCandidates();
+  listEl.innerHTML = "";
+  if (!candidates.length) {
+    listEl.innerHTML =
+      "<p class='muted' style='margin:0;'>No P0 job-alert emails yet. On Work, Run emails that look like job alerts so Priority becomes P0, then Refresh here.</p>";
+    if (statusEl) {
+      statusEl.textContent =
+        "0 P0 job-alert candidates in the current inbox run. Triage first, then Build summary.";
+    }
+  } else {
+    candidates.forEach(function (c) {
+      var row = document.createElement("div");
+      row.className = "row";
+      row.innerHTML =
+        "<span class='badge ok'>P0</span>" +
+        "<span><strong>" + escapeHtml(c.subject || "(no subject)") + "</strong>" +
+        "<br><span class='muted'>" + escapeHtml(c.email_id) +
+        (c.from ? " · " + escapeHtml(c.from) : "") + "</span></span>" +
+        "<span class='muted'>" + escapeHtml(c.received_at || "") + "</span>";
+      listEl.appendChild(row);
+    });
+    if (statusEl) {
+      statusEl.textContent =
+        candidates.length + " P0 job-alert candidate" + (candidates.length === 1 ? "" : "s") +
+        " ready. Click Build summary to extract count, industries, pay, location, and requirements.";
+    }
+  }
+  if (!JOB_BOARD_STATE) JOB_BOARD_STATE = loadJobBoardState();
+  renderJobBoardSummary(JOB_BOARD_STATE);
+}
+
+function renderJobBoardSummary(state) {
+  var overviewCard = document.getElementById("jobs-overview-card");
+  var cardsCard = document.getElementById("jobs-cards-card");
+  if (!overviewCard || !cardsCard) return;
+  if (!state || !state.overview) {
+    overviewCard.hidden = true;
+    cardsCard.hidden = true;
+    return;
+  }
+  overviewCard.hidden = false;
+  cardsCard.hidden = false;
+  var ov = state.overview || {};
+  var grid = document.getElementById("jobs-stat-grid");
+  if (grid) {
+    var builtAt = state.built_at ? String(state.built_at).slice(0, 19).replace("T", " ") : "—";
+    grid.innerHTML =
+      "<div class='jobs-stat'><div class='n'>" + escapeHtml(String(ov.job_count != null ? ov.job_count : (state.jobs || []).length)) +
+      "</div><div class='l'>Jobs</div></div>" +
+      "<div class='jobs-stat'><div class='n'>" + escapeHtml(String((ov.industries || []).length)) +
+      "</div><div class='l'>Industries</div></div>" +
+      "<div class='jobs-stat'><div class='n'>" + escapeHtml(String((ov.locations || []).length)) +
+      "</div><div class='l'>Locations</div></div>" +
+      "<div class='jobs-stat'><div class='n'>" + escapeHtml(builtAt) +
+      "</div><div class='l'>Built</div></div>";
+  }
+  renderCountChips("jobs-industries", ov.industries);
+  renderCountChips("jobs-company-types", ov.company_types);
+  renderCountChips("jobs-pay", ov.pay_ranges);
+  renderCountChips("jobs-locations", ov.locations);
+  var themes = document.getElementById("jobs-req-themes");
+  if (themes) {
+    themes.innerHTML = "";
+    var reqs = ov.requirements_themes || [];
+    if (!reqs.length) {
+      themes.innerHTML = "<li class='muted'>—</li>";
+    } else {
+      reqs.forEach(function (t) {
+        var li = document.createElement("li");
+        li.textContent = String(t);
+        themes.appendChild(li);
+      });
+    }
+  }
+  var cards = document.getElementById("jobs-cards");
+  if (cards) {
+    cards.innerHTML = "";
+    (state.jobs || []).forEach(function (job) {
+      var card = document.createElement("div");
+      card.className = "job-card";
+      card.innerHTML =
+        "<h4>" + escapeHtml(job.title || job.role || "Role") + "</h4>" +
+        "<div class='job-meta'>" +
+        "<div><span class='k'>Company</span>" + escapeHtml(job.company || "—") + "</div>" +
+        "<div><span class='k'>Type</span>" + escapeHtml(job.company_type || "—") + "</div>" +
+        "<div><span class='k'>Industry</span>" + escapeHtml(job.industry || "—") + "</div>" +
+        "<div><span class='k'>Pay</span>" + escapeHtml(job.pay || "—") + "</div>" +
+        "<div><span class='k'>Location</span>" + escapeHtml(job.location || "—") + "</div>" +
+        "<div><span class='k'>Source</span>" + escapeHtml(job.email_id || "") +
+        (job.source_subject ? " · " + escapeHtml(String(job.source_subject).slice(0, 60)) : "") +
+        "</div>" +
+        "</div>" +
+        "<div class='muted' style='font-size:var(--fs-0); margin-bottom:var(--sp-1);'>Requirements</div>" +
+        "<div class='job-req'>" + escapeHtml(job.requirements_summary || "—") + "</div>";
+      cards.appendChild(card);
+    });
+  }
+}
+
+function parseJobBoardJson(text) {
+  var raw = String(text || "").trim();
+  if (!raw) throw new Error("Empty model response.");
+  var fence = raw.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  if (fence) raw = fence[1].trim();
+  // Prefer the largest {...} block in case the model adds prose around it.
+  var start = raw.indexOf("{");
+  var end = raw.lastIndexOf("}");
+  if (start < 0 || end <= start) throw new Error("No JSON object in model response.");
+  var slice = raw.slice(start, end + 1);
+  // Soft-repair common model slips
+  slice = slice
+    .replace(/,\s*([}\]])/g, "$1")
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/[\u2018\u2019]/g, "'");
+  var parsed;
+  try {
+    parsed = JSON.parse(slice);
+  } catch (e1) {
+    throw new Error("Could not parse JSON from model (" + (e1.message || e1) + ").");
+  }
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+    throw new Error("Invalid JSON root (expected an object).");
+  }
+  if (!parsed.overview || typeof parsed.overview !== "object") parsed.overview = {};
+  if (!Array.isArray(parsed.jobs)) parsed.jobs = [];
+  ["industries", "company_types", "pay_ranges", "locations"].forEach(function (k) {
+    if (!Array.isArray(parsed.overview[k])) parsed.overview[k] = [];
+  });
+  if (!Array.isArray(parsed.overview.requirements_themes)) {
+    parsed.overview.requirements_themes = [];
+  }
+  if (parsed.overview.job_count == null) parsed.overview.job_count = parsed.jobs.length;
+  parsed.built_at = new Date().toISOString();
+  parsed.source = parsed.source || "model";
+  return parsed;
+}
+
+function bumpCountMap(map, key) {
+  var k = String(key || "unknown").trim() || "unknown";
+  map[k] = (map[k] || 0) + 1;
+}
+
+function mapToCountList(map, nameKey) {
+  nameKey = nameKey || "name";
+  return Object.keys(map)
+    .map(function (k) {
+      var row = { count: map[k] };
+      row[nameKey] = k;
+      if (nameKey === "label") row.label = k;
+      return row;
+    })
+    .sort(function (a, b) { return b.count - a.count; });
+}
+
+function guessPayFromText(text) {
+  var t = String(text || "");
+  var m =
+    t.match(/\$\s?[\d,]+(?:\s*[-–]\s*\$?\s?[\d,]+)?(?:\s*(?:k|K|\/yr|\/year|USD|per year))?/) ||
+    t.match(/(?:￥|¥|RMB|CNY)\s?[\d,]+(?:\s*[-–]\s*[\d,]+)?(?:\s*(?:k|K))?/i) ||
+    t.match(/\b(?:base|salary|comp|pay)\b[^.\n]{0,40}\$?[\d,]+\s*k?\b/i);
+  return m ? m[0].replace(/\s+/g, " ").trim() : "unknown";
+}
+
+function guessLocationFromText(text) {
+  var t = String(text || "");
+  var m =
+    t.match(/\b(?:Remote|Hybrid|On[- ]?site)\b(?:\s*[-–,]\s*[A-Za-z .]+)?/i) ||
+    t.match(/\b(?:San Francisco|New York|NYC|Seattle|Austin|Boston|London|Berlin|Singapore|Shanghai|Beijing|Shenzhen|Hong Kong|Tokyo|Sydney|Toronto|Bay Area|Los Angeles|LA)\b/i) ||
+    t.match(/\bLocation\s*[:：]\s*([^\n|;]{2,60})/i);
+  if (!m) return "unknown";
+  return (m[1] || m[0]).replace(/\s+/g, " ").trim();
+}
+
+/** Offline board from triage fields — used when the model call/parse fails. */
+function buildJobBoardLocalFallback(candidates) {
+  var industries = {};
+  var companyTypes = {};
+  var pays = {};
+  var locations = {};
+  var themes = {};
+  var jobs = (candidates || []).map(function (c) {
+    var blob = [c.subject, c.summary, c.body, c.from, c.category].join("\n");
+    var pay = guessPayFromText(blob);
+    var loc = guessLocationFromText(blob);
+    var industry = /fintech|bank|finance/i.test(blob) ? "Finance"
+      : /health|biotech|pharma|med/i.test(blob) ? "Healthcare"
+      : /ai|ml|software|saas|tech|engineer/i.test(blob) ? "Technology"
+      : /retail|e-?commerce/i.test(blob) ? "Retail"
+      : /educat|university|school/i.test(blob) ? "Education"
+      : (c.category || "unknown");
+    var ctype = /startup|seed|series [a-c]/i.test(blob) ? "startup"
+      : /google|meta|amazon|microsoft|apple|byteDance|alibaba|tencent/i.test(blob) ? "big tech"
+      : /agency|consult/i.test(blob) ? "agency"
+      : "unknown";
+    bumpCountMap(industries, industry);
+    bumpCountMap(companyTypes, ctype);
+    bumpCountMap(pays, pay);
+    bumpCountMap(locations, loc);
+    var req = (c.summary || "").trim() || String(c.body || "").replace(/\s+/g, " ").trim().slice(0, 280) || "unknown";
+    if (req.length > 20) bumpCountMap(themes, req.slice(0, 80));
+    return {
+      email_id: c.email_id,
+      title: (c.subject || "Role").slice(0, 120),
+      company: (c.from || "unknown").slice(0, 80),
+      company_type: ctype,
+      industry: industry,
+      pay: pay,
+      location: loc,
+      requirements_summary: req.slice(0, 400),
+      source_subject: c.subject || ""
+    };
+  });
+  return {
+    overview: {
+      job_count: jobs.length,
+      industries: mapToCountList(industries, "name"),
+      company_types: mapToCountList(companyTypes, "name"),
+      pay_ranges: mapToCountList(pays, "label"),
+      locations: mapToCountList(locations, "name"),
+      requirements_themes: Object.keys(themes).slice(0, 8)
+    },
+    jobs: jobs,
+    built_at: new Date().toISOString(),
+    source: "local"
+  };
+}
+
+function compactJobCandidates(candidates) {
+  var maxN = 20;
+  return (candidates || []).slice(0, maxN).map(function (c) {
+    return {
+      email_id: c.email_id,
+      subject: String(c.subject || "").slice(0, 180),
+      received_at: c.received_at || "",
+      from: String(c.from || "").slice(0, 120),
+      summary: String(c.summary || "").slice(0, 500),
+      category: String(c.category || "").slice(0, 80),
+      body: String(c.body || "").replace(/\s+/g, " ").trim().slice(0, 900)
+    };
+  });
+}
+
+async function buildJobBoardSummary() {
+  var candidates = collectP0JobCandidates();
+  var statusEl = document.getElementById("jobs-status");
+  var btn = document.getElementById("jobs-build-btn");
+  if (!candidates.length) {
+    if (statusEl) {
+      statusEl.textContent =
+        "Nothing to summarize — need triaged P0 emails that look like job alerts.";
+    }
+    setTopStatus("warn", "No P0 job alerts");
+    return;
+  }
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = "Building…";
+  }
+  if (statusEl) {
+    statusEl.textContent =
+      "Summarizing " + candidates.length + " P0 job-alert email" +
+      (candidates.length === 1 ? "" : "s") + "…";
+  }
+  setTopStatus("info", "Building job board");
+
+  var compact = compactJobCandidates(candidates);
+  var applyBoard = function (board, note) {
+    saveJobBoardState(board);
+    renderJobBoardSummary(board);
+    if (statusEl) {
+      statusEl.textContent =
+        (note ? note + " · " : "") +
+        "Board ready · " + (board.overview.job_count || board.jobs.length) +
+        " job(s) from " + candidates.length + " P0 alert email(s)" +
+        (board.source === "local" ? " (local extract)" : "") + ".";
+    }
+    setTopStatus("ok", board.source === "local" ? "Job board (local)" : "Job board ready");
+  };
+
+  // No worker key → local board still works.
+  if (!getApiKey()) {
+    applyBoard(
+      buildJobBoardLocalFallback(compact),
+      "No worker key — used local extract"
+    );
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "Build summary";
+    }
+    return;
+  }
+
+  var systemPrompt =
+    "You summarize P0 job-alert emails for a hiring/job-search overview board.\n" +
+    "Use ONLY the emails provided. Never invent employers, pay, or locations — use \"unknown\" when missing.\n" +
+    "Count distinct job opportunities (one email may mention multiple roles).\n" +
+    "Respond with ONLY a single JSON object. No markdown fences. No prose before or after.\n" +
+    "Shape:\n" +
+    '{"overview":{"job_count":0,"industries":[{"name":"","count":0}],"company_types":[{"name":"","count":0}],"pay_ranges":[{"label":"","count":0}],"locations":[{"name":"","count":0}],"requirements_themes":[""]},"jobs":[{"email_id":"","title":"","company":"","company_type":"","industry":"","pay":"","location":"","requirements_summary":"","source_subject":""}]}';
+
+  var userContent =
+    "Current time context:\n" + realClockPromptBlock() + "\n" +
+    "Build the job-alert summary board from these P0 emails (" + compact.length + "):\n" +
+    JSON.stringify(compact);
+
+  try {
+    var api = await callMessagesApi(systemPrompt, userContent, 8192, {
+      role: "job_board",
+      emailId: "JOB-BOARD",
+      sessionId: "job-board"
+    });
+    if (!api.ok) {
+      var apiErr = stripHtmlToText(api.errorHtml || "Model call failed");
+      console.warn("Job board API failed:", apiErr);
+      applyBoard(
+        buildJobBoardLocalFallback(compact),
+        "Model failed (" + apiErr.slice(0, 120) + ") — used local extract"
+      );
+      return;
+    }
+    try {
+      var board = parseJobBoardJson(api.text);
+      board.source = "model";
+      applyBoard(board, "");
+    } catch (parseErr) {
+      console.warn("Job board parse failed:", parseErr, api.text && api.text.slice(0, 500));
+      applyBoard(
+        buildJobBoardLocalFallback(compact),
+        "Parse failed (" + String(parseErr.message || parseErr).slice(0, 100) + ") — used local extract"
+      );
+    }
+  } catch (err) {
+    console.warn("Job board build error:", err);
+    try {
+      applyBoard(
+        buildJobBoardLocalFallback(compact),
+        "Error (" + String(err.message || err).slice(0, 100) + ") — used local extract"
+      );
+    } catch (e2) {
+      if (statusEl) statusEl.textContent = "Build failed: " + String(err.message || err);
+      setTopStatus("danger", "Job board failed");
+    }
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "Build summary";
+    }
+  }
+}
+
+function initJobBoardControls() {
+  var refresh = document.getElementById("jobs-refresh-btn");
+  var build = document.getElementById("jobs-build-btn");
+  var clear = document.getElementById("jobs-clear-btn");
+  if (refresh) refresh.addEventListener("click", function () { renderJobBoardCandidates(); });
+  if (build) build.addEventListener("click", function () { buildJobBoardSummary(); });
+  if (clear) {
+    clear.addEventListener("click", function () {
+      clearJobBoardState();
+      renderJobBoardCandidates();
+      setTopStatus("warn", "Job board cleared");
+    });
+  }
+  JOB_BOARD_STATE = loadJobBoardState();
+}
+
 function setMainView(name) {
   var work = document.getElementById("work-view");
   var evals = document.getElementById("evals-view");
   var traces = document.getElementById("traces-view");
   var matrix = document.getElementById("matrix-view");
   var rules = document.getElementById("rules-view");
+  var jobs = document.getElementById("jobs-view");
   var tabWork = document.getElementById("tab-work");
   var tabEvals = document.getElementById("tab-evals");
   var tabTraces = document.getElementById("tab-traces");
   var tabMatrix = document.getElementById("tab-matrix");
   var tabRules = document.getElementById("tab-rules");
+  var tabJobs = document.getElementById("tab-jobs");
   if (work) work.classList.toggle("hidden", name !== "work");
   if (evals) evals.classList.toggle("visible", name === "evals");
   if (traces) traces.classList.toggle("visible", name === "traces");
   if (matrix) matrix.classList.toggle("visible", name === "matrix");
   if (rules) rules.classList.toggle("visible", name === "rules");
+  if (jobs) jobs.classList.toggle("visible", name === "jobs");
   if (tabWork) tabWork.classList.toggle("active", name === "work");
   if (tabEvals) tabEvals.classList.toggle("active", name === "evals");
   if (tabTraces) tabTraces.classList.toggle("active", name === "traces");
   if (tabMatrix) tabMatrix.classList.toggle("active", name === "matrix");
   if (tabRules) tabRules.classList.toggle("active", name === "rules");
+  if (tabJobs) tabJobs.classList.toggle("active", name === "jobs");
   var banner = document.getElementById("first-run-banner");
   if (banner) banner.style.display = name === "work" ? "" : "none";
   if (name === "traces") renderTracesView();
   if (name === "matrix") syncMatrixFromWorkRuns({ quiet: true });
   if (name === "rules") renderRuleStudio();
+  if (name === "jobs") renderJobBoardCandidates();
 }
 
 function initViewTabs() {
@@ -3917,6 +5606,8 @@ function initViewTabs() {
   document.getElementById("tab-matrix").addEventListener("click", function () { setMainView("matrix"); });
   var tabRules = document.getElementById("tab-rules");
   if (tabRules) tabRules.addEventListener("click", function () { setMainView("rules"); });
+  var tabJobs = document.getElementById("tab-jobs");
+  if (tabJobs) tabJobs.addEventListener("click", function () { setMainView("jobs"); });
 }
 
 function buildOlderHistoryDisclosure(row) {
@@ -4101,13 +5792,16 @@ async function runEvalRow(row) {
   var parentTraceId = beginTriageTrace(em.email_id, sessionId);
   var pack = await runAgent(em, sessionId, parentTraceId);
   var revPack = null;
-  if (pack && pack.result) {
+  if (pack && pack.result && isReviewerAuto()) {
     revPack = await runReviewerAgent(em, pack.result, sessionId, parentTraceId);
   }
   finishTriageTrace(parentTraceId, {
     ok: !!(pack && pack.result),
     summary: pack && pack.result
-      ? ("Worker done" + (revPack && revPack.result ? ("; reviewer " + revPack.result.verdict) : "; reviewer skipped/failed"))
+      ? ("Worker done" +
+        (isReviewerAuto()
+          ? (revPack && revPack.result ? ("; reviewer " + revPack.result.verdict) : "; reviewer skipped/failed")
+          : "; reviewer skipped (manual mode)"))
       : "Worker failed — no labeled result",
     error: pack && pack.result ? "" : stripHtmlToText((pack && pack.html) || "Worker error")
   });
@@ -4300,6 +5994,34 @@ function attachHumanGate(em, draftBox, result, gateHost) {
     }
   }
 
+  var gmailDraftCheck = null;
+  var gmailDraftPanel = null;
+  var showGmailDraft = isGmailEmail(em) && !result.status.refused;
+  if (showGmailDraft) {
+    gmailDraftPanel = document.createElement("div");
+    gmailDraftPanel.className = "meeting-panel";
+    gmailDraftPanel.innerHTML =
+      "<h4>Gmail draft sync (after you Approve)</h4>" +
+      "<p class='muted'>Saves the reply as a <strong>Gmail draft</strong> on the same thread. " +
+      "Does <strong>not</strong> send. You still open Gmail and Send yourself.</p>";
+    gmailDraftCheck = document.createElement("input");
+    gmailDraftCheck.type = "checkbox";
+    gmailDraftCheck.id = "sync-gmail-draft-" + em.email_id;
+    gmailDraftCheck.checked = !!getGoogleAccessToken();
+    var gmailLbl = document.createElement("label");
+    gmailLbl.className = "row-check";
+    gmailLbl.htmlFor = gmailDraftCheck.id;
+    gmailLbl.appendChild(gmailDraftCheck);
+    gmailLbl.appendChild(document.createTextNode(" Save reply as Gmail draft on Approve (not sent)"));
+    gmailDraftPanel.appendChild(gmailLbl);
+    if (!getGoogleAccessToken()) {
+      var gTip = document.createElement("p");
+      gTip.className = "muted";
+      gTip.textContent = "Connect Google with Gmail scopes first.";
+      gmailDraftPanel.appendChild(gTip);
+    }
+  }
+
   var btnRow = document.createElement("div");
   btnRow.className = "row-actions";
 
@@ -4338,13 +6060,15 @@ function attachHumanGate(em, draftBox, result, gateHost) {
   mailboxLink.href = mailboxUrl(em);
   mailboxLink.target = "_blank";
   mailboxLink.rel = "noopener";
-  mailboxLink.textContent = "Open in mailbox (simulated)";
+  mailboxLink.textContent = isGmailEmail(em) ? "Open in simulated mailbox (optional)" : "Open in mailbox (simulated)";
   mailboxLink.addEventListener("click", function () {
     syncMailboxDraft(em, draftBox ? draftBox.value : getField(result.fields, "Draft reply"));
   });
   var linkNote = document.createElement("span");
   linkNote.className = "muted";
-  linkNote.textContent = "Opens a simulated thread where this draft would already be synced.";
+  linkNote.textContent = isGmailEmail(em)
+    ? "Live Gmail uses draft sync on Approve. Simulated mailbox is optional."
+    : "Opens a simulated thread where this draft would already be synced.";
   linkRow.appendChild(mailboxLink);
   linkRow.appendChild(linkNote);
 
@@ -4356,8 +6080,9 @@ function attachHumanGate(em, draftBox, result, gateHost) {
     saveBtn.style.display = "none";
     if (draftBox) draftBox.readOnly = true;
     if (createCheck) createCheck.disabled = true;
+    if (gmailDraftCheck) gmailDraftCheck.disabled = true;
     state.textContent = "Complete — human action: " + humanAction;
-    state.className = /Calendar event created/i.test(humanAction) ? "badge ok" :
+    state.className = /Calendar event created|Gmail draft/i.test(humanAction) ? "badge ok" :
       (/^Escalated/i.test(humanAction) ? "badge danger" : "badge ok");
     syncMailboxDraft(em, draftBox ? draftBox.value : "");
     appendRunLog(em.email_id, decisionSummary(result), humanAction);
@@ -4391,17 +6116,83 @@ function attachHumanGate(em, draftBox, result, gateHost) {
       complete("Acknowledged — Ren handling personally (agent refused draft)");
       return;
     }
+    var draftText = draftBox ? draftBox.value : getField(result.fields, "Draft reply");
+    if (/^none\b/i.test(String(draftText || "").trim())) draftText = "";
+
+    var wantGmailDraft = gmailDraftCheck && gmailDraftCheck.checked;
+    if (wantGmailDraft) {
+      if (!getGoogleAccessToken()) {
+        alert("Connect Google in Settings first, or uncheck Save reply as Gmail draft.");
+        return;
+      }
+      if (!draftText.trim()) {
+        alert("Draft is empty — nothing to save to Gmail.");
+        return;
+      }
+      approveBtn.disabled = true;
+      approveBtn.textContent = "Saving Gmail draft…";
+      setTopStatus("info", "Saving Gmail draft");
+      var ctxG = triageTraceContextForEmail(em.email_id);
+      var t0g = Date.now();
+      try {
+        var draftRes = await createGmailReplyDraft(em, draftText);
+        recordLocalSpan({
+          emailId: em.email_id,
+          role: "tool.gmail_draft",
+          parentId: ctxG.parentId,
+          sessionId: ctxG.sessionId,
+          spanType: "tool",
+          latencyMs: Date.now() - t0g,
+          userContent: JSON.stringify({
+            gmail_id: em.gmail_id,
+            threadId: em.gmail_thread_id,
+            draftChars: draftText.length
+          }, null, 2),
+          output: JSON.stringify({
+            draftId: (draftRes && draftRes.id) || "",
+            messageId: (draftRes && draftRes.message && draftRes.message.id) || ""
+          }, null, 2),
+          ok: true
+        });
+        setTopStatus("ok", "Gmail draft saved");
+      } catch (err) {
+        recordLocalSpan({
+          emailId: em.email_id,
+          role: "tool.gmail_draft",
+          parentId: ctxG.parentId,
+          sessionId: ctxG.sessionId,
+          spanType: "tool",
+          latencyMs: Date.now() - t0g,
+          error: String(err && err.message ? err.message : err),
+          ok: false
+        });
+        approveBtn.disabled = false;
+        approveBtn.textContent = "Approve";
+        setTopStatus("danger", "Gmail draft failed");
+        alert(String(err.message || err));
+        return;
+      }
+    }
+
     var wantCreate = createCheck && createCheck.checked;
     if (!wantCreate) {
-      complete("Approved (draft ready to send — simulated, not sent)");
+      complete(
+        wantGmailDraft
+          ? "Approved — Gmail draft saved (not sent)"
+          : "Approved (draft ready to send — simulated, not sent)"
+      );
       return;
     }
     if (!startInput.value || !endInput.value || !titleInput.value.trim()) {
       alert("Choose a slot (or enter start/end) and a title before creating a Calendar event.");
+      approveBtn.disabled = false;
+      approveBtn.textContent = "Approve";
       return;
     }
     if (!getGoogleAccessToken()) {
       alert("Connect Google in Settings first, or uncheck Create real Google Calendar event.");
+      approveBtn.disabled = false;
+      approveBtn.textContent = "Approve";
       return;
     }
     approveBtn.disabled = true;
@@ -4448,7 +6239,9 @@ function attachHumanGate(em, draftBox, result, gateHost) {
         }, null, 2),
         ok: true
       });
-      var msg = "Approved — Calendar event created";
+      var msg = wantGmailDraft
+        ? "Approved — Gmail draft saved · Calendar event created"
+        : "Approved — Calendar event created";
       if (link) msg += " · " + link;
       setTopStatus("ok", "Calendar created");
       complete(msg);
@@ -4524,17 +6317,110 @@ function attachHumanGate(em, draftBox, result, gateHost) {
   gateHost.appendChild(state);
   if (gateHost._refuseHint) gateHost.appendChild(gateHost._refuseHint);
   if (meetingPanel) gateHost.appendChild(meetingPanel);
+  if (gmailDraftPanel) gateHost.appendChild(gmailDraftPanel);
   gateHost.appendChild(btnRow);
   gateHost.appendChild(linkRow);
 }
 
-// ---- Rule builder (guided interview → approve → optional Work use) ----
-var RULE_PACK_STORAGE = "aurora_rule_pack_v1";
+// ---- Rule builder (multi-pack library → interview → save → select active) ----
+var RULE_PACK_STORAGE_LEGACY = "aurora_rule_pack_v1";
+var RULE_LIBRARY_STORAGE = "aurora_rule_library_v1";
 var RULE_STUDIO = {
   step: 0,
   answers: emptyRuleAnswers(),
-  phase: "interview" // interview | draft | approved
+  phase: "library", // library | interview | draft
+  editingPackId: null
 };
+
+function newRulePackId() {
+  return "rp-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 7);
+}
+
+function emptyRuleLibrary() {
+  return {
+    activeSource: "aurora", // "aurora" | "custom"
+    activePackId: null,
+    packs: []
+  };
+}
+
+function migrateLegacyRulePack(lib) {
+  try {
+    var raw = localStorage.getItem(RULE_PACK_STORAGE_LEGACY);
+    if (!raw) return lib;
+    var old = JSON.parse(raw);
+    if (!old || old.status !== "approved" || !old.drafts) return lib;
+    if (lib.packs && lib.packs.length) return lib;
+    var id = newRulePackId();
+    var name = defaultRulePackName(old.answers || {});
+    lib.packs = [{
+      id: id,
+      name: name,
+      status: "approved",
+      answers: Object.assign(emptyRuleAnswers(), old.answers || {}),
+      drafts: old.drafts,
+      createdAt: old.approvedAt || new Date().toISOString(),
+      updatedAt: old.approvedAt || new Date().toISOString()
+    }];
+    if (old.useCustom) {
+      lib.activeSource = "custom";
+      lib.activePackId = id;
+    } else {
+      lib.activePackId = id;
+    }
+    saveRuleLibrary(lib);
+    try { localStorage.removeItem(RULE_PACK_STORAGE_LEGACY); } catch (e) { /* ignore */ }
+  } catch (e) { /* ignore */ }
+  return lib;
+}
+
+function loadRuleLibrary() {
+  var lib = emptyRuleLibrary();
+  try {
+    var raw = localStorage.getItem(RULE_LIBRARY_STORAGE);
+    if (raw) {
+      var parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === "object") {
+        lib.activeSource = parsed.activeSource === "custom" ? "custom" : "aurora";
+        lib.activePackId = parsed.activePackId || null;
+        lib.packs = Array.isArray(parsed.packs) ? parsed.packs : [];
+      }
+    }
+  } catch (e) { /* ignore */ }
+  return migrateLegacyRulePack(lib);
+}
+
+function saveRuleLibrary(lib) {
+  localStorage.setItem(RULE_LIBRARY_STORAGE, JSON.stringify(lib));
+}
+
+/** Active custom pack (if Work is on custom + id resolves). */
+function loadRulePack() {
+  var lib = loadRuleLibrary();
+  if (lib.activeSource !== "custom" || !lib.activePackId) return null;
+  var pack = (lib.packs || []).find(function (p) { return p.id === lib.activePackId; });
+  if (!pack) return null;
+  return Object.assign({}, pack, {
+    status: "approved",
+    useCustom: true
+  });
+}
+
+function getRulePackById(id) {
+  if (!id) return null;
+  var lib = loadRuleLibrary();
+  return (lib.packs || []).find(function (p) { return p.id === id; }) || null;
+}
+
+function defaultRulePackName(answers) {
+  var a = answers || {};
+  var name = String(a.userName || "").trim();
+  var org = String(a.orgName || "").trim();
+  if (name && org) return name + " · " + org;
+  if (name) return name + " rules";
+  if (org) return org + " rules";
+  return "Rule pack " + new Date().toLocaleDateString();
+}
 
 var RULE_STEPS = [
   {
@@ -4689,15 +6575,17 @@ function updateApproveRulesButton() {
   if (btn) {
     btn.disabled = !ok;
     btn.title = ok
-      ? "Approve and save this rule pack"
+      ? (RULE_STUDIO.editingPackId ? "Update this rule pack" : "Save as a new rule pack")
       : "Finish every interview question before saving";
   }
   if (hint) {
     if (ok) {
-      hint.textContent = "All interview questions answered. You can Save rules.";
+      hint.textContent = RULE_STUDIO.editingPackId
+        ? "All interview questions answered. You can Update this pack."
+        : "All interview questions answered. You can Save as a new pack.";
     } else {
       hint.textContent =
-        "Save rules is disabled until every question is answered. Use Edit interview answers to go back and fill: " +
+        "Save is disabled until every question is answered. Use Edit interview answers to go back and fill: " +
         missing.map(function (m) { return m.label; }).join(", ") +
         ".";
     }
@@ -4722,49 +6610,151 @@ function approveRulePack() {
   captureRuleStepFields();
   var missing = getMissingRuleAnswers(RULE_STUDIO.answers);
   updateApproveRulesButton();
-  if (missing.length) {
-    return;
-  }
+  if (missing.length) return;
   var drafts = readDraftTextareas();
   if (!drafts.priority.trim() || !drafts.escalation.trim() || !drafts.delegation.trim() || !drafts.orgFacts.trim()) {
     alert("All four draft sections must have content before saving.");
     return;
   }
-  var pack = {
-    status: "approved",
-    useCustom: false,
-    answers: Object.assign({}, RULE_STUDIO.answers),
-    drafts: drafts,
-    approvedAt: new Date().toISOString()
-  };
-  saveRulePack(pack);
-  RULE_STUDIO.phase = "approved";
+  var nameEl = document.getElementById("rules-pack-name");
+  var packName = String((nameEl && nameEl.value) || "").trim() || defaultRulePackName(RULE_STUDIO.answers);
+  if (nameEl) nameEl.value = packName;
+
+  var lib = loadRuleLibrary();
+  var now = new Date().toISOString();
+  var editingId = RULE_STUDIO.editingPackId;
+  if (editingId) {
+    var idx = lib.packs.findIndex(function (p) { return p.id === editingId; });
+    if (idx >= 0) {
+      lib.packs[idx] = Object.assign({}, lib.packs[idx], {
+        name: packName,
+        status: "approved",
+        answers: Object.assign({}, RULE_STUDIO.answers),
+        drafts: drafts,
+        updatedAt: now
+      });
+    } else {
+      editingId = newRulePackId();
+      lib.packs.unshift({
+        id: editingId,
+        name: packName,
+        status: "approved",
+        answers: Object.assign({}, RULE_STUDIO.answers),
+        drafts: drafts,
+        createdAt: now,
+        updatedAt: now
+      });
+    }
+  } else {
+    editingId = newRulePackId();
+    lib.packs.unshift({
+      id: editingId,
+      name: packName,
+      status: "approved",
+      answers: Object.assign({}, RULE_STUDIO.answers),
+      drafts: drafts,
+      createdAt: now,
+      updatedAt: now
+    });
+  }
+  if (!lib.activePackId) lib.activePackId = editingId;
+  saveRuleLibrary(lib);
+  RULE_STUDIO.editingPackId = null;
+  RULE_STUDIO.phase = "library";
   renderRuleStudio();
-  setTopStatus("ok", "Rules saved — turn on “My approved rules” to use on Work");
+  setTopStatus("ok", "Pack saved — select it under “My saved pack” to use on Work");
 }
 
-function clearRulePack() {
-  if (!confirm("Clear the approved rule pack from this browser?")) return;
-  localStorage.removeItem(RULE_PACK_STORAGE);
+function startNewRulePack() {
+  RULE_STUDIO.editingPackId = null;
   RULE_STUDIO.step = 0;
   RULE_STUDIO.answers = emptyRuleAnswers();
   RULE_STUDIO.phase = "interview";
+  var nameEl = document.getElementById("rules-pack-name");
+  if (nameEl) nameEl.value = "";
   renderRuleStudio();
-  setTopStatus("warn", "Custom rules cleared — Aurora demo active");
+  setTopStatus("info", "New rule pack interview");
 }
 
-function loadRulePack() {
-  try {
-    var raw = localStorage.getItem(RULE_PACK_STORAGE);
-    if (!raw) return null;
-    return JSON.parse(raw);
-  } catch (e) {
-    return null;
+function editRulePack(id) {
+  var pack = getRulePackById(id);
+  if (!pack) {
+    setTopStatus("warn", "Pack not found");
+    return;
   }
+  RULE_STUDIO.editingPackId = pack.id;
+  RULE_STUDIO.answers = Object.assign(emptyRuleAnswers(), pack.answers || {});
+  RULE_STUDIO.step = 0;
+  fillDraftTextareas(pack.drafts || {});
+  var nameEl = document.getElementById("rules-pack-name");
+  if (nameEl) nameEl.value = pack.name || defaultRulePackName(pack.answers);
+  RULE_STUDIO.phase = "draft";
+  renderRuleStudio();
+  setTopStatus("info", "Editing: " + (pack.name || id));
 }
 
-function saveRulePack(pack) {
-  localStorage.setItem(RULE_PACK_STORAGE, JSON.stringify(pack));
+function deleteRulePack(id) {
+  var pack = getRulePackById(id);
+  if (!pack) return;
+  if (!confirm('Delete saved pack "' + (pack.name || id) + '"? This cannot be undone.')) return;
+  var lib = loadRuleLibrary();
+  lib.packs = (lib.packs || []).filter(function (p) { return p.id !== id; });
+  if (lib.activePackId === id) {
+    lib.activePackId = lib.packs[0] ? lib.packs[0].id : null;
+    if (!lib.activePackId) lib.activeSource = "aurora";
+  }
+  saveRuleLibrary(lib);
+  if (RULE_STUDIO.editingPackId === id) {
+    RULE_STUDIO.editingPackId = null;
+    RULE_STUDIO.phase = "library";
+  }
+  renderRuleStudio();
+  setTopStatus("warn", "Pack deleted");
+}
+
+function setActiveRulePackId(id) {
+  var lib = loadRuleLibrary();
+  if (!id || !getRulePackById(id)) return;
+  lib.activePackId = id;
+  saveRuleLibrary(lib);
+  updateRulesActiveBanner();
+  renderRuleLibraryList();
+}
+
+function setRulesSource(source) {
+  var lib = loadRuleLibrary();
+  if (source === "custom") {
+    if (!lib.packs.length) {
+      updateRulesActiveBanner();
+      setTopStatus("warn", "Save a pack first");
+      return;
+    }
+    if (!lib.activePackId || !getRulePackById(lib.activePackId)) {
+      lib.activePackId = lib.packs[0].id;
+    }
+    lib.activeSource = "custom";
+  } else {
+    lib.activeSource = "aurora";
+  }
+  saveRuleLibrary(lib);
+  updateRulesActiveBanner();
+  renderRuleLibraryList();
+  setTopStatus(
+    lib.activeSource === "custom" ? "ok" : "info",
+    lib.activeSource === "custom" ? "Work using your saved pack" : "Work using Aurora demo rules"
+  );
+}
+
+function clearRulePack() {
+  // kept for compatibility — clears entire library
+  if (!confirm("Delete ALL saved rule packs from this browser?")) return;
+  saveRuleLibrary(emptyRuleLibrary());
+  RULE_STUDIO.step = 0;
+  RULE_STUDIO.answers = emptyRuleAnswers();
+  RULE_STUDIO.phase = "library";
+  RULE_STUDIO.editingPackId = null;
+  renderRuleStudio();
+  setTopStatus("warn", "All custom packs cleared — Aurora demo active");
 }
 
 function bulletize(text) {
@@ -4837,15 +6827,16 @@ function buildRuleDraftsFromAnswers(a) {
 }
 
 function customRulesAreLive() {
-  var pack = loadRulePack();
-  return !!(pack && pack.status === "approved" && pack.useCustom);
+  var lib = loadRuleLibrary();
+  if (lib.activeSource !== "custom" || !lib.activePackId) return false;
+  return !!getRulePackById(lib.activePackId);
 }
 
 function getActivePolicies() {
   var out = {};
   Object.keys(POLICIES).forEach(function (k) { out[k] = POLICIES[k]; });
   var pack = loadRulePack();
-  if (pack && pack.status === "approved" && pack.useCustom && pack.drafts) {
+  if (pack && pack.useCustom && pack.drafts) {
     if (pack.drafts.priority) out["priority_rules.md"] = pack.drafts.priority;
     if (pack.drafts.delegation) out["delegation_rules.md"] = pack.drafts.delegation;
     if (pack.drafts.escalation) out["escalation_rules.md"] = pack.drafts.escalation;
@@ -4855,7 +6846,7 @@ function getActivePolicies() {
 }
 
 function getActiveSystemPrompt() {
-  var base = SYSTEM_PROMPT;
+  var base = realClockPromptBlock() + "\n" + SYSTEM_PROMPT;
   if (!customRulesAreLive()) return base;
   var pack = loadRulePack();
   var a = (pack && pack.answers) || {};
@@ -4871,7 +6862,7 @@ function getActiveSystemPrompt() {
 }
 
 function getActiveReviewerPrompt() {
-  var base = REVIEWER_SYSTEM_PROMPT;
+  var base = realClockPromptBlock() + "\n" + REVIEWER_SYSTEM_PROMPT;
   if (!customRulesAreLive()) return base;
   return (
     base +
@@ -4883,35 +6874,126 @@ function updateRulesActiveBanner() {
   var el = document.getElementById("rules-active-banner");
   var meta = document.getElementById("top-meta");
   var live = customRulesAreLive();
-  var pack = loadRulePack();
+  var lib = loadRuleLibrary();
+  var pack = live ? getRulePackById(lib.activePackId) : null;
   if (el) {
-    el.textContent = live
-      ? "Work is using your approved rules for " +
+    el.textContent = live && pack
+      ? "Work is using saved pack “" + (pack.name || pack.id) + "” for " +
         ((pack.answers && pack.answers.userName) || "the operator") +
         ". Switch back to Aurora demo anytime."
-      : "Work defaults to Aurora demo rules (Ren). Approve a pack, then choose “My approved rules” to try them on Work.";
+      : "Work defaults to Aurora demo rules (Ren). Save packs below, then choose “My saved pack” and pick a version.";
   }
   if (meta) {
+    var clock = formatAgentNow();
     var base =
-      "Morning triage for Ren · scenario clock 11 May 2026 · Liquid Glass theme";
-    meta.textContent = live
-      ? "Custom rules live · scenario clock 11 May 2026 · Liquid Glass theme"
+      "Inbox triage · real clock " + clock.date + " " + clock.time + " · Liquid Glass theme";
+    meta.textContent = live && pack
+      ? ("Pack: " + (pack.name || "custom") + " · real clock " + clock.date + " " + clock.time)
       : base;
   }
   var aurora = document.getElementById("rules-source-aurora");
   var custom = document.getElementById("rules-source-custom");
   var hint = document.getElementById("rules-source-hint");
-  var approved = !!(pack && pack.status === "approved");
+  var sel = document.getElementById("rules-active-pack");
+  var hasPacks = !!(lib.packs && lib.packs.length);
   if (aurora) aurora.checked = !live;
   if (custom) {
     custom.checked = live;
-    custom.disabled = !approved;
+    custom.disabled = !hasPacks;
+  }
+  if (sel) {
+    sel.innerHTML = "";
+    if (!hasPacks) {
+      var emptyOpt = document.createElement("option");
+      emptyOpt.value = "";
+      emptyOpt.textContent = "— none saved —";
+      sel.appendChild(emptyOpt);
+      sel.disabled = true;
+    } else {
+      sel.disabled = false;
+      lib.packs.forEach(function (p) {
+        var opt = document.createElement("option");
+        opt.value = p.id;
+        opt.textContent = p.name || p.id;
+        if (p.id === lib.activePackId) opt.selected = true;
+        sel.appendChild(opt);
+      });
+      if (!lib.activePackId && lib.packs[0]) {
+        sel.value = lib.packs[0].id;
+      }
+    }
   }
   if (hint) {
-    hint.textContent = approved
-      ? (live ? "Custom pack is active on Work." : "Approved pack ready — select “My approved rules” to use it.")
-      : "Approve a pack below before switching.";
+    if (!hasPacks) {
+      hint.textContent = "Save a pack below, then select it here.";
+    } else if (live && pack) {
+      hint.textContent = "Active on Work: " + (pack.name || pack.id);
+    } else {
+      hint.textContent = "Packs ready — select “My saved pack” and choose a version.";
+    }
   }
+}
+
+function renderRuleLibraryList() {
+  var listEl = document.getElementById("rules-library-list");
+  var emptyEl = document.getElementById("rules-library-empty");
+  if (!listEl) return;
+  var lib = loadRuleLibrary();
+  var packs = lib.packs || [];
+  listEl.innerHTML = "";
+  if (!packs.length) {
+    listEl.hidden = true;
+    if (emptyEl) emptyEl.hidden = false;
+    return;
+  }
+  if (emptyEl) emptyEl.hidden = true;
+  listEl.hidden = false;
+  packs.forEach(function (p) {
+    var row = document.createElement("div");
+    row.className = "row" + (p.id === lib.activePackId && lib.activeSource === "custom" ? " active-pack" : "");
+    var left = document.createElement("div");
+    var when = p.updatedAt || p.createdAt || "";
+    left.innerHTML =
+      "<strong>" + escapeHtml(p.name || p.id) + "</strong>" +
+      (p.id === lib.activePackId && lib.activeSource === "custom"
+        ? " <span class='badge ok'>active on Work</span>"
+        : (p.id === lib.activePackId ? " <span class='badge info'>selected</span>" : "")) +
+      "<br><span class='muted'>" +
+      escapeHtml(((p.answers && p.answers.userName) || "?") + " · " + ((p.answers && p.answers.orgName) || "?")) +
+      (when ? (" · updated " + escapeHtml(new Date(when).toLocaleString())) : "") +
+      "</span>";
+    var actions = document.createElement("div");
+    actions.className = "rules-library-actions";
+    var useBtn = document.createElement("button");
+    useBtn.type = "button";
+    useBtn.className = "btn" + (p.id === lib.activePackId && lib.activeSource === "custom" ? " primary" : "");
+    useBtn.textContent = p.id === lib.activePackId && lib.activeSource === "custom" ? "In use" : "Use on Work";
+    useBtn.addEventListener("click", function () {
+      var L = loadRuleLibrary();
+      L.activePackId = p.id;
+      L.activeSource = "custom";
+      saveRuleLibrary(L);
+      updateRulesActiveBanner();
+      renderRuleLibraryList();
+      setTopStatus("ok", "Work using “" + (p.name || p.id) + "”");
+    });
+    var editBtn = document.createElement("button");
+    editBtn.type = "button";
+    editBtn.className = "btn";
+    editBtn.textContent = "Edit";
+    editBtn.addEventListener("click", function () { editRulePack(p.id); });
+    var delBtn = document.createElement("button");
+    delBtn.type = "button";
+    delBtn.className = "btn";
+    delBtn.textContent = "Delete";
+    delBtn.addEventListener("click", function () { deleteRulePack(p.id); });
+    actions.appendChild(useBtn);
+    actions.appendChild(editBtn);
+    actions.appendChild(delBtn);
+    row.appendChild(left);
+    row.appendChild(actions);
+    listEl.appendChild(row);
+  });
 }
 
 function captureRuleStepFields() {
@@ -4980,13 +7062,23 @@ function renderRuleStep() {
 
 function showRulePhase(phase) {
   RULE_STUDIO.phase = phase;
+  var libCard = document.getElementById("rules-library-card");
   var wiz = document.getElementById("rules-wizard-card");
   var draft = document.getElementById("rules-draft-card");
-  var appr = document.getElementById("rules-approved-card");
+  if (libCard) libCard.hidden = phase !== "library";
   if (wiz) wiz.hidden = phase !== "interview";
   if (draft) draft.hidden = phase !== "draft";
-  if (appr) appr.hidden = phase !== "approved";
-  if (phase === "draft") updateApproveRulesButton();
+  if (phase === "draft") {
+    updateApproveRulesButton();
+    var nameEl = document.getElementById("rules-pack-name");
+    var approve = document.getElementById("rules-approve-btn");
+    if (nameEl && !String(nameEl.value || "").trim()) {
+      nameEl.value = defaultRulePackName(RULE_STUDIO.answers);
+    }
+    if (approve) {
+      approve.textContent = RULE_STUDIO.editingPackId ? "Update pack" : "Save as new pack";
+    }
+  }
 }
 
 function fillDraftTextareas(drafts) {
@@ -5012,45 +7104,34 @@ function readDraftTextareas() {
 }
 
 function renderRuleStudio() {
-  var pack = loadRulePack();
   updateRulesActiveBanner();
-  if (pack && pack.status === "approved" && RULE_STUDIO.phase !== "draft" && RULE_STUDIO.phase !== "interview") {
-    RULE_STUDIO.phase = "approved";
-    RULE_STUDIO.answers = Object.assign(emptyRuleAnswers(), pack.answers || {});
-  }
-  if (RULE_STUDIO.phase === "approved" && pack && pack.status === "approved") {
-    showRulePhase("approved");
-    var meta = document.getElementById("rules-approved-meta");
-    if (meta) {
-      meta.textContent =
-        "Approved for " +
-        ((pack.answers && pack.answers.userName) || "?") +
-        " · " +
-        (pack.approvedAt ? new Date(pack.approvedAt).toLocaleString() : "saved") +
-        (pack.useCustom ? " · currently active on Work" : " · not active on Work yet");
-    }
-    return;
-  }
+  renderRuleLibraryList();
   if (RULE_STUDIO.phase === "draft") {
     showRulePhase("draft");
     updateApproveRulesButton();
     return;
   }
-  showRulePhase("interview");
-  renderRuleStep();
+  if (RULE_STUDIO.phase === "interview") {
+    showRulePhase("interview");
+    renderRuleStep();
+    return;
+  }
+  RULE_STUDIO.phase = "library";
+  showRulePhase("library");
 }
 
 function initRuleStudio() {
-  var pack = loadRulePack();
-  if (pack && pack.answers) {
-    RULE_STUDIO.answers = Object.assign(emptyRuleAnswers(), pack.answers);
-  }
-  if (pack && pack.status === "approved") {
-    RULE_STUDIO.phase = "approved";
+  var lib = loadRuleLibrary();
+  RULE_STUDIO.phase = "library";
+  RULE_STUDIO.editingPackId = null;
+  if (lib.packs && lib.packs[0] && lib.packs[0].answers) {
+    RULE_STUDIO.answers = Object.assign(emptyRuleAnswers(), lib.packs[0].answers);
   }
   var next = document.getElementById("rules-next-btn");
   var back = document.getElementById("rules-back-btn");
   var restart = document.getElementById("rules-restart-btn");
+  var cancelEdit = document.getElementById("rules-cancel-edit-btn");
+  var newBtn = document.getElementById("rules-new-btn");
   if (next) {
     next.addEventListener("click", function () {
       captureRuleStepFields();
@@ -5080,13 +7161,23 @@ function initRuleStudio() {
       renderRuleStudio();
     });
   }
+  if (cancelEdit) {
+    cancelEdit.addEventListener("click", function () {
+      RULE_STUDIO.editingPackId = null;
+      RULE_STUDIO.phase = "library";
+      renderRuleStudio();
+    });
+  }
+  if (newBtn) newBtn.addEventListener("click", startNewRulePack);
+
   var approve = document.getElementById("rules-approve-btn");
   var discard = document.getElementById("rules-discard-btn");
   var editAns = document.getElementById("rules-edit-interview-btn");
   if (approve) approve.addEventListener("click", approveRulePack);
   if (discard) {
     discard.addEventListener("click", function () {
-      RULE_STUDIO.phase = "interview";
+      RULE_STUDIO.editingPackId = null;
+      RULE_STUDIO.phase = "library";
       RULE_STUDIO.step = 0;
       renderRuleStudio();
     });
@@ -5098,37 +7189,31 @@ function initRuleStudio() {
       renderRuleStudio();
     });
   }
-  var revise = document.getElementById("rules-revise-btn");
-  var clearBtn = document.getElementById("rules-clear-btn");
-  if (revise) {
-    revise.addEventListener("click", function () {
-      RULE_STUDIO.phase = "interview";
-      RULE_STUDIO.step = 0;
-      renderRuleStudio();
-    });
-  }
-  if (clearBtn) clearBtn.addEventListener("click", clearRulePack);
 
   function onSourceChange() {
-    var packNow = loadRulePack();
-    if (!packNow || packNow.status !== "approved") {
-      updateRulesActiveBanner();
-      return;
-    }
     var custom = document.getElementById("rules-source-custom");
-    packNow.useCustom = !!(custom && custom.checked);
-    saveRulePack(packNow);
-    updateRulesActiveBanner();
-    setTopStatus(
-      packNow.useCustom ? "ok" : "info",
-      packNow.useCustom ? "Work using your approved rules" : "Work using Aurora demo rules"
-    );
+    setRulesSource(custom && custom.checked ? "custom" : "aurora");
   }
   var aurora = document.getElementById("rules-source-aurora");
   var custom = document.getElementById("rules-source-custom");
   if (aurora) aurora.addEventListener("change", onSourceChange);
   if (custom) custom.addEventListener("change", onSourceChange);
+
+  var packSel = document.getElementById("rules-active-pack");
+  if (packSel) {
+    packSel.addEventListener("change", function () {
+      if (!packSel.value) return;
+      setActiveRulePackId(packSel.value);
+      var L = loadRuleLibrary();
+      if (L.activeSource === "custom") {
+        setTopStatus("ok", "Active pack updated");
+      } else {
+        setTopStatus("info", "Pack selected — turn on “My saved pack” to use on Work");
+      }
+    });
+  }
   updateRulesActiveBanner();
+  renderRuleStudio();
 }
 
 // ---- Build the context message sent to the agent for one email ----
@@ -5139,7 +7224,7 @@ function buildUserMessage(em) {
     return "--- " + name + " ---\n" + policies[name];
   }).join("\n\n");
 
-  var sameSenderOthers = EMAILS.filter(function (other) {
+  var sameSenderOthers = getActiveEmails().filter(function (other) {
     return other.sender_id === em.sender_id && other.email_id !== em.email_id;
   }).map(function (other) {
     return {
@@ -5153,30 +7238,37 @@ function buildUserMessage(em) {
 
   var sameSenderBlock = sameSenderOthers.length
     ? JSON.stringify(sameSenderOthers, null, 2)
-    : "(none — this is the only morning email from this sender)";
+    : "(none — this is the only email from this sender in the loaded inbox window)";
 
   var liveNote = customRulesAreLive()
     ? "RULE SOURCE: operator-approved custom rule pack (see policy files below).\n\n"
     : "RULE SOURCE: Aurora demo policies for Ren.\n\n";
 
+  var gmailNote = isGmailEmail(em)
+    ? "MAIL SOURCE: live Gmail message (real mailbox, last-7-days sync window). Apply the same triage policies. " +
+      "Do not invent Aurora record IDs that are not in context. " +
+      "Score urgency using REAL CLOCK below and this message's received_at / body deadlines.\n\n"
+    : "MAIL SOURCE: demo synthetic inbox (story emails may use May 2026 dates). " +
+      "Still score urgency using REAL CLOCK below — past demo deadlines may correctly look overdue.\n\n";
+
   return (
     "Triage the following email according to your instructions. Use ONLY the context below.\n\n" +
     liveNote +
-    "SCENARIO CLOCK (authoritative):\n" +
-    "today / now / this morning = " + SCENARIO_NOW_LABEL + "\n" +
-    "scenario_date = " + SCENARIO_NOW + "\n" +
-    "Ignore the real-world calendar. Score urgency and conflicts relative to this date only.\n\n" +
+    gmailNote +
+    realClockPromptBlock() + "\n" +
     "EMAIL TO TRIAGE:\n" +
     "email_id: " + em.email_id + "\n" +
+    (isGmailEmail(em) ? ("gmail_id: " + (em.gmail_id || "") + "\n") : "") +
     "received_at: " + em.received_at + "\n" +
     "subject: " + em.subject + "\n" +
     "attachments present: " + (em.attachments ? em.attachments : "(none)") + "\n" +
     "body:\n" + em.body + "\n\n" +
-    "OTHER MORNING EMAILS FROM THE SAME SENDER (for duplicate / related detection only):\n" +
+    "OTHER EMAILS FROM THE SAME SENDER (loaded inbox window — for duplicate / related detection only):\n" +
     sameSenderBlock + "\n\n" +
     "LINKED SENDER RECORD:\n" + JSON.stringify(s, null, 2) + "\n\n" +
     "EMPLOYEE DIRECTORY (for routing):\n" + JSON.stringify(EMPLOYEES, null, 2) + "\n\n" +
-    "REN'S CALENDAR (for conflict checks):\n" + JSON.stringify(CALENDAR, null, 2) + "\n\n" +
+    "REN'S CALENDAR (synthetic Aurora rows — for conflict checks when dates appear in the email):\n" +
+    JSON.stringify(CALENDAR, null, 2) + "\n\n" +
     "FLIGHT OPTIONS (for prepared travel actions):\n" + JSON.stringify(FLIGHTS, null, 2) + "\n\n" +
     "POLICY AND REFERENCE FILES:\n" + policyText
   );
@@ -5188,7 +7280,7 @@ function buildChatContextBlock(focusEmailId) {
     return "--- " + name + " ---\n" + policies[name];
   }).join("\n\n");
 
-  var inboxIndex = EMAILS.map(function (e) {
+  var inboxIndex = getActiveEmails().map(function (e) {
     var s = senderById(e.sender_id) || {};
     return {
       email_id: e.email_id,
@@ -5201,21 +7293,19 @@ function buildChatContextBlock(focusEmailId) {
   });
 
   var parts = [
-    "SCENARIO CLOCK (authoritative):",
-    "today / now / this morning = " + SCENARIO_NOW_LABEL,
-    "scenario_date = " + SCENARIO_NOW,
+    realClockPromptBlock().trim(),
     "",
-    "MORNING INBOX INDEX:",
+    "INBOX INDEX (currently loaded source):",
     JSON.stringify(inboxIndex, null, 2)
   ];
 
   var em = focusEmailId
-    ? EMAILS.find(function (e) { return e.email_id === focusEmailId; })
+    ? getActiveEmails().find(function (e) { return e.email_id === focusEmailId; })
     : null;
 
   if (em) {
     var s = senderById(em.sender_id) || {};
-    var sameSenderOthers = EMAILS.filter(function (other) {
+    var sameSenderOthers = getActiveEmails().filter(function (other) {
       return other.sender_id === em.sender_id && other.email_id !== em.email_id;
     }).map(function (other) {
       return {
@@ -5236,7 +7326,7 @@ function buildChatContextBlock(focusEmailId) {
       "body:",
       em.body,
       "",
-      "OTHER MORNING EMAILS FROM THE SAME SENDER:",
+      "OTHER EMAILS FROM THE SAME SENDER (loaded inbox window):",
       sameSenderOthers.length ? JSON.stringify(sameSenderOthers, null, 2) : "(none)",
       "",
       "LINKED SENDER RECORD:",
@@ -5359,7 +7449,7 @@ async function sendGlobalChatMessage() {
   if (!getApiKey()) {
     GLOBAL_CHAT.messages.push({
       role: "error",
-      content: "Save a Kimi worker key in Settings first, then try again."
+      content: "Save a DeepSeek worker key in Settings first, then try again."
     });
     renderGlobalChatThread();
     setGlobalChatOpen(true);
@@ -5376,7 +7466,7 @@ async function sendGlobalChatMessage() {
   renderGlobalChatThread();
 
   var context = buildChatContextBlock(GLOBAL_CHAT.focusId);
-  var system = CHAT_SYSTEM_PROMPT + "\n\nCONTEXT BLOCK:\n" + context;
+  var system = realClockPromptBlock() + "\n" + CHAT_SYSTEM_PROMPT + "\n\nCONTEXT BLOCK:\n" + context;
   var apiMessages = GLOBAL_CHAT.messages
     .filter(function (m) { return m.role === "user" || m.role === "assistant"; })
     .map(function (m) { return { role: m.role, content: m.content }; });
@@ -5901,7 +7991,7 @@ function initTracesControls() {
 /**
  * Shared model call. Returns { ok, text, errorHtml }.
  * opts.forReviewer → OpenAI Chat Completions via proxy /openai (separate key + model).
- * Otherwise → worker provider (Kimi Anthropic-compatible messages).
+ * Otherwise → worker provider (DeepSeek Anthropic-compatible messages).
  * opts.emailId / opts.role / opts.parentId / opts.sessionId → local Trace + Laminar metadata.
  */
 async function callMessagesApi(systemPrompt, userContent, maxTokens, opts) {
@@ -5926,7 +8016,7 @@ async function callMessagesApi(systemPrompt, userContent, maxTokens, opts) {
       text: "",
       errorHtml: forReviewer
         ? "<div class='error-note'>No OpenAI key for the reviewer. Paste it in Settings → Reviewer API key, click Save OpenAI key, then Run again.</div>"
-        : "<div class='error-note'>No Kimi key saved yet. Paste your key in Settings (left), click Save key, then Run again.</div>"
+        : "<div class='error-note'>No DeepSeek key saved yet. Paste your key in Settings (left), click Save key, then Run again.</div>"
     };
     recordApiTrace(traceMeta, missing);
     return missing;
@@ -5997,7 +8087,7 @@ async function callMessagesApi(systemPrompt, userContent, maxTokens, opts) {
     if (resp.status === 401) {
       hint = forReviewer
         ? "Your OpenAI key looks invalid. Re-check it in Settings."
-        : "Your Kimi key looks invalid. Re-check it in Settings.";
+        : "Your DeepSeek key looks invalid. Re-check it in Settings.";
     } else if (resp.status === 400) hint = "The request was rejected. Often this means no credit on the key, a bad model id, or a bad request.";
     else if (resp.status === 429) hint = "Rate limited or out of credit.";
     else hint = "The API returned an error.";
@@ -6049,23 +8139,354 @@ async function callMessagesApi(systemPrompt, userContent, maxTokens, opts) {
   return okResult;
 }
 
+// ---- Jev triage gate (TypeSafe System One) ----
+// Jev returns typed judgments, not text. Code owns the routing policy:
+// reply needed AND no refuse-trigger → hand off to the DeepSeek worker; otherwise finish here.
+var JEV_REFUSE_TRIGGERS = ["low_confidence", "anger_legal", "out_of_policy", "high_stakes", "academic_sensitive"];
+var JEV_TRIGGER_LABELS = {
+  missing_data: "Missing data",
+  low_confidence: "Low confidence",
+  anger_legal: "Anger or legal language",
+  out_of_policy: "Out-of-policy request",
+  high_stakes: "High stakes",
+  academic_sensitive: "Academic-sensitive"
+};
+
+function clipForJev(text) {
+  var t = String(text || "");
+  return t.length > JEV_STATE_BODY_MAX ? t.slice(0, JEV_STATE_BODY_MAX) + " …[truncated]" : t;
+}
+
+function buildJevState(em) {
+  var policies = getActivePolicies();
+  var s = senderById(em.sender_id) || {};
+  var sameSender = getActiveEmails().filter(function (other) {
+    return other.sender_id === em.sender_id && other.email_id !== em.email_id;
+  }).slice(0, 5).map(function (other) {
+    return {
+      email_id: other.email_id,
+      received_at: other.received_at,
+      subject: other.subject,
+      body: clipForJev(other.body).slice(0, 1500)
+    };
+  });
+  return {
+    real_clock: realClockPromptBlock().trim(),
+    operator: customRulesAreLive()
+      ? "Operator-approved custom rule pack is active; follow `policies` over any default wording."
+      : "Ren — founder-CEO of Aurora Materials (fictional) and university professor.",
+    email: {
+      email_id: em.email_id,
+      received_at: em.received_at,
+      subject: em.subject,
+      attachments: em.attachments ? em.attachments : "(none)",
+      body: clipForJev(em.body)
+    },
+    sender: s,
+    same_sender_emails: sameSender,
+    policies: {
+      priority_rules: policies["priority_rules.md"] || "",
+      escalation_rules: policies["escalation_rules.md"] || ""
+    }
+  };
+}
+
+function buildJevQuestions() {
+  return {
+    priority: {
+      type: "choice",
+      instructions:
+        "Which priority tier should `email` get? Apply `policies.priority_rules` (it overrides the summaries below if they differ). " +
+        "Judge deadlines against `real_clock`. Surface tone does not lower priority; urgent-sounding promotions are still low.",
+      criteria: {
+        P0: "Act this morning and needs the operator: approvals only they can grant, key account with a near-term deadline, a hard deadline within about 48 hours with real consequence, investor/board same-week deadline, imminent trip, or any escalation trigger in `policies.escalation_rules`.",
+        P1: "Important but not same-hour: non-urgent customer or partner business, collaboration without a deadline, small approvals, FYI reports, distant-deadline opportunities.",
+        P2: "No decision needed: newsletters, cold sales, mass promotions, automated notifications, routine FYI or polls."
+      }
+    },
+    needs_reply: {
+      type: "noul",
+      instructions:
+        "Does the sender of `email` expect a written response (an answer, confirmation, information, a decision, or a polite decline)? " +
+        "Judge only whether a response is expected, not whether drafting it is allowed. " +
+        "If `email` is a later near-identical copy of an earlier message in `same_sender_emails`, no response is expected for this copy.",
+      criteria: {
+        "true": "The sender asks a question, requests something, proposes a date or meeting, or otherwise waits for a reply.",
+        "false": "Newsletter, promotion, automated notification, pure FYI, or a later duplicate copy; no reply is expected."
+      }
+    },
+    escalation: {
+      type: "choice",
+      instructions:
+        "Which escalation trigger from `policies.escalation_rules` applies to `email`? If several apply, pick the most serious one.",
+      criteria: {
+        none: "No escalation trigger applies.",
+        missing_data: "The body claims an attachment but `email.attachments` is (none), or cites an order, contract, or record ID that is not in the provided context. A listed attachment filename counts as present. Requests for internal figures the operator must supply are not missing data.",
+        low_confidence: "The email is garbled, ambiguous, or impossible to classify confidently.",
+        anger_legal: "Legal threat, alleged breach, or hostile or abusive language.",
+        out_of_policy: "Asks to approve a payment or seal outside limits, or to bypass a required process.",
+        high_stakes: "An explicitly stated money commitment of 50,000 RMB or more, an investor/board decision, or a binding partnership or contract commitment. An investor simply asking for metrics is not high stakes.",
+        academic_sensitive: "A student matter touching grades, misconduct, disputes, or recommendation letters."
+      }
+    },
+    domain: {
+      type: "choice",
+      instructions: "Which side of the operator's work does `email` belong to?",
+      criteria: {
+        Company: "The company business: customers, suppliers, investors, partners, internal team, travel for the company, or vendor/noise mail.",
+        University: "The university role: students, academic administration, research collaboration, teaching."
+      }
+    },
+    category: {
+      type: "choice",
+      instructions: "Which category best describes `email`?",
+      criteria: {
+        "Customer": "A customer or prospective customer of the company.",
+        "Supplier": "A supplier, vendor, or logistics provider the company buys from.",
+        "Investor/Board": "An investor or board member.",
+        "Partner": "A business or research partner (not a customer or supplier).",
+        "Internal/Lab": "An employee, the internal team, or lab operations.",
+        "Travel/Meeting": "Travel bookings, meeting logistics, or event invitations.",
+        "University-Student": "A student writing about their studies or supervision.",
+        "University-Admin": "University administration, committees, or academic services.",
+        "Noise": "Newsletters, promotions, cold sales, or automated notifications.",
+        "Other": "None of the above fits."
+      }
+    }
+  };
+}
+
+function jevConfidenceLabel(c) {
+  if (typeof c !== "number") return "Medium";
+  if (c >= 0.75) return "High";
+  if (c >= 0.5) return "Medium";
+  return "Low";
+}
+
+function formatJevProbs(probs) {
+  if (!probs) return "";
+  return Object.keys(probs).map(function (k) {
+    return k + " " + Math.round(Number(probs[k] || 0) * 100) + "%";
+  }).join(" · ");
+}
+
+async function callJev(em, opts) {
+  opts = opts || {};
+  var state = buildJevState(em);
+  var questions = buildJevQuestions();
+  var traceMeta = {
+    id: newTraceId(),
+    t0: Date.now(),
+    emailId: em.email_id,
+    role: "jev",
+    parentId: opts.parentId || "",
+    sessionId: opts.sessionId || "",
+    model: JEV_MODEL,
+    systemPrompt: JSON.stringify(questions, null, 2),
+    userContent: JSON.stringify(state, null, 2)
+  };
+  function fail(html) {
+    var out = { ok: false, text: "", errorHtml: html };
+    recordApiTrace(traceMeta, out);
+    return out;
+  }
+
+  var jevHeaders = {
+    "content-type": "application/json",
+    "authorization": "Bearer " + getJevKey(),
+    "x-aurora-email-id": String(em.email_id || ""),
+    "x-aurora-role": "jev"
+  };
+  if (opts.sessionId) jevHeaders["x-aurora-session-id"] = String(opts.sessionId);
+  if (getLmnrKey()) jevHeaders["x-lmnr-project-api-key"] = getLmnrKey();
+
+  var resp = null;
+  for (var attempt = 0; attempt < 2; attempt++) {
+    try {
+      resp = await fetch(JEV_API_URL, {
+        method: "POST",
+        headers: jevHeaders,
+        body: JSON.stringify({ state: state, model: JEV_MODEL, questions: questions })
+      });
+    } catch (networkErr) {
+      return fail(
+        "<div class='error-note'><strong>Could not reach Jev.</strong> Make sure the local proxy is running " +
+        "(<code>node proxy.js</code>, restarted after this update). <span class='muted'>(" +
+        escapeHtml(String(networkErr)) + ")</span></div>"
+      );
+    }
+    if ((resp.status === 429 || resp.status === 529) && attempt === 0) {
+      await new Promise(function (r) { setTimeout(r, 1500); });
+      continue;
+    }
+    break;
+  }
+
+  if (!resp.ok) {
+    var detail = "";
+    try { detail = JSON.stringify(await resp.json(), null, 2); } catch (e) { detail = ""; }
+    var hint = resp.status === 401 ? "Your TypeSafe key looks invalid. Re-check it in Settings."
+      : resp.status === 422 ? "Jev rejected the request format."
+      : resp.status === 429 ? "Jev rate limit reached. Wait a moment and run again."
+      : resp.status === 529 ? "TypeSafe is temporarily overloaded. Try again shortly."
+      : resp.status === 502 ? "The proxy could not reach TypeSafe."
+      : "Jev returned an error.";
+    return fail(
+      "<div class='error-note'>Jev API error (" + resp.status + "): " + hint +
+      (detail ? "\n\n" + escapeHtml(detail) : "") + "</div>"
+    );
+  }
+
+  var data;
+  try { data = await resp.json(); } catch (e) {
+    return fail("<div class='error-note'>Jev answered, but the response was not readable JSON.</div>");
+  }
+  var a = (data && data.answers) || {};
+  if (!a.priority || !a.needs_reply || !a.escalation) {
+    return fail(
+      "<div class='error-note'>Jev output did not match the expected answers.\n\n" +
+      escapeHtml(JSON.stringify(data, null, 2)) + "</div>"
+    );
+  }
+
+  var priority = normalizePriorityTier(a.priority.choice) || "P1";
+  var replyProb = Number(a.needs_reply.noul || 0);
+  var trigger = a.escalation.choice || "none";
+  var refuse = JEV_REFUSE_TRIGGERS.indexOf(trigger) !== -1;
+  var result = {
+    ok: true,
+    text: JSON.stringify(data.answers, null, 2),
+    errorHtml: "",
+    model: data.model || JEV_MODEL,
+    priority: priority,
+    priorityConfidence: a.priority.confidence,
+    priorityProbs: a.priority.probabilities,
+    replyProb: replyProb,
+    trigger: trigger,
+    triggerProb: a.escalation.probabilities ? a.escalation.probabilities[trigger] : null,
+    refuse: refuse,
+    handOff: replyProb >= JEV_REPLY_THRESHOLD && !refuse,
+    domain: (a.domain && a.domain.choice) || "",
+    category: (a.category && a.category.choice) || ""
+  };
+  traceMeta.model = result.model;
+  recordApiTrace(traceMeta, result);
+  result.traceId = traceMeta.id;
+  return result;
+}
+
+function jevDecisionHtml(jev) {
+  var route = jev.handOff
+    ? "Reply needed → handed to DeepSeek worker"
+    : (jev.refuse ? "Escalate to operator — no draft" : "No reply needed — DeepSeek not called");
+  var routeClass = jev.handOff ? "info" : (jev.refuse ? "danger" : "neutral");
+  return (
+    "<div class='decision-badges'>" +
+    "<span class='badge info'>Jev: " + escapeHtml(jev.priority) + "</span> " +
+    "<span class='badge " + routeClass + "'>" + escapeHtml(route) + "</span>" +
+    "</div>" +
+    "<p class='muted' style='margin-bottom: var(--sp-3);'>" +
+    "Priority " + escapeHtml(formatJevProbs(jev.priorityProbs)) +
+    " · reply expected " + Math.round(jev.replyProb * 100) + "%" +
+    " · trigger " + escapeHtml(jev.trigger) +
+    " · " + escapeHtml(jev.model) +
+    "</p>"
+  );
+}
+
+function buildJevOnlyText(em, jev) {
+  var s = senderById(em.sender_id) || {};
+  var triggerLabel = JEV_TRIGGER_LABELS[jev.trigger] || "";
+  var escalation = jev.trigger === "none"
+    ? "none"
+    : triggerLabel + " (Jev, " + Math.round(Number(jev.triggerProb || 0) * 100) + "%)";
+  return [
+    "Priority: " + jev.priority,
+    "Domain: " + (jev.domain || "Company"),
+    "Category: " + (jev.category || "Other"),
+    "From: " + [s.name, s.org].filter(Boolean).join(", "),
+    "Summary: Subject \"" + (em.subject || "") + "\" — triaged by Jev; no reply drafted.",
+    "Urgency reason: Jev priority " + jev.priority + " (" + formatJevProbs(jev.priorityProbs) + ").",
+    "Recommended route: " + (jev.refuse
+      ? "Ren — escalated by Jev, handle personally"
+      : "Ren — no reply expected; dismiss or archive after review"),
+    "Inbox relationship: not checked (no reply drafted)",
+    "Draft reply: " + (jev.refuse ? "none - escalated" : "none - no reply needed"),
+    "Prepared action: none",
+    "Flag: " + (jev.refuse ? "REFUSED-ESCALATE" : "Needs approval"),
+    "Escalation: " + escalation,
+    "Confidence: " + jevConfidenceLabel(jev.priorityConfidence),
+    "Citations: priority_rules.md; escalation_rules.md; " + em.email_id +
+      (em.sender_id ? "; SENDERS " + em.sender_id : "")
+  ].join("\n");
+}
+
+function jevHandoffBlock(jev) {
+  return (
+    "\n\nTRIAGE GATE (decided by Jev, TypeSafe — authoritative for priority):\n" +
+    "Priority: " + jev.priority + " — output exactly this tier and explain it in Urgency reason.\n" +
+    "Reply expected: yes (" + Math.round(jev.replyProb * 100) + "%). You were handed this email to draft the reply.\n" +
+    "Jev escalation read: " + jev.trigger + ". Still apply all your RULES and ESCALATION triggers yourself."
+  );
+}
+
+function forceJevPriority(text, priority) {
+  if (/^Priority:.*$/m.test(text)) return text.replace(/^Priority:.*$/m, "Priority: " + priority);
+  return "Priority: " + priority + "\n" + text;
+}
+
 async function runAgent(em, sessionId, parentTraceId) {
   if (!getApiKey()) {
     setTopStatus("warn", "Add API key");
     refreshKeyStatus();
   }
-  setTopStatus("info", "Worker running");
-  var api = await callMessagesApi(getActiveSystemPrompt(), buildUserMessage(em), 2048, {
-    emailId: em.email_id,
-    role: "worker",
-    sessionId: sessionId || "",
-    parentId: parentTraceId || ""
-  });
+
+  var jev = null;
+  var jevNoteHtml = "";
+  if (getJevKey()) {
+    setTopStatus("info", "Jev triaging");
+    jev = await callJev(em, { sessionId: sessionId || "", parentId: parentTraceId || "" });
+    if (!jev.ok) {
+      jevNoteHtml = jev.errorHtml + "<p class='muted'>Falling back: DeepSeek decided priority for this run.</p>";
+      jev = null;
+    }
+  } else {
+    jevNoteHtml = "<p class='muted'>No Jev key — DeepSeek decided priority. Add a TypeSafe key in Settings to use Jev triage.</p>";
+  }
+
+  if (jev && !jev.handOff) {
+    var gated = buildAgentOutput(buildJevOnlyText(em, jev));
+    gated.html = jevDecisionHtml(jev) + gated.html.replace(/Worker: /g, "Jev: ");
+    if (gated.result) gated.result.traceId = jev.traceId || "";
+    gated.traceId = jev.traceId || "";
+    gated.sessionId = sessionId || "";
+    gated.parentTraceId = parentTraceId || "";
+    setTopStatus(
+      gated.result && gated.result.status.refused ? "danger" : "ok",
+      "Jev: " + jev.priority + (jev.refuse ? " · escalate" : " · no reply")
+    );
+    return gated;
+  }
+
+  setTopStatus("info", jev ? "Jev → DeepSeek drafting" : "Worker running");
+  var api = await callMessagesApi(
+    getActiveSystemPrompt(),
+    buildUserMessage(em) + (jev ? jevHandoffBlock(jev) : ""),
+    2048,
+    {
+      emailId: em.email_id,
+      role: "worker",
+      sessionId: sessionId || "",
+      parentId: parentTraceId || ""
+    }
+  );
+  var prefixHtml = jev ? jevDecisionHtml(jev) : jevNoteHtml;
   if (!api.ok) {
     setTopStatus("danger", /proxy|reach/i.test(api.errorHtml) ? "Offline / proxy" : "API error");
-    return { result: null, html: api.errorHtml, sessionId: sessionId || "", parentTraceId: parentTraceId || "" };
+    return { result: null, html: prefixHtml + api.errorHtml, sessionId: sessionId || "", parentTraceId: parentTraceId || "" };
   }
-  var built = buildAgentOutput(api.text);
+  var built = buildAgentOutput(jev ? forceJevPriority(api.text, jev.priority) : api.text);
+  built.html = prefixHtml + built.html;
   if (built.result) built.result.traceId = api.traceId || "";
   built.traceId = api.traceId || "";
   built.sessionId = sessionId || "";
@@ -6114,7 +8535,9 @@ async function runReviewerAgent(em, workerResult, sessionId, parentTraceId) {
 }
 
 function senderById(id) {
-  return SENDERS.find(function (s) { return s.sender_id === id; });
+  return SENDERS.find(function (s) { return s.sender_id === id; }) ||
+    GMAIL_SENDERS[id] ||
+    null;
 }
 
 var CASE_VIEWS = [];
@@ -6149,6 +8572,10 @@ function setPriorityChip(el, priority, show) {
 
 function updateCaseCardBadge(view) {
   if (!view || !view.card) return;
+  view.card.style.display = viewMatchesPriorityFilter(view) ? "" : "none";
+  refreshPriorityFilterEmptyState();
+  refreshSelectionUi();
+  snapshotViewState(view);
 
   var flagged = isEscalatedOutcome(view);
   view.card.classList.toggle("flagged", flagged);
@@ -6347,13 +8774,15 @@ function paintWorkArea(view) {
   stage4.appendChild(citePane);
   stage4.appendChild(draftPane);
 
-  // 5 REVIEW AGENT (Path B4) — before human gate
+  // 5 REVIEW AGENT (Path B4) — optional; manual by default
   var stage5 = document.createElement("div");
   stage5.className = "stage-block";
   var reviewerLabel = document.createElement("div");
   reviewerLabel.className = "stage";
   reviewerLabel.setAttribute("data-n", "5");
-  reviewerLabel.textContent = "Review agent";
+  reviewerLabel.textContent = isReviewerAuto()
+    ? "Review agent (auto)"
+    : "Review agent (manual)";
   var reviewerOut = document.createElement("div");
   reviewerOut.id = "reviewer-out";
   if (view.reviewerHtml) {
@@ -6362,12 +8791,35 @@ function paintWorkArea(view) {
     reviewerOut.innerHTML = reviewerThinkingHtml();
   } else if (view.busy && view.busyPhase === "worker") {
     reviewerOut.innerHTML = "<p class='muted'>Waits until the worker finishes…</p>";
+  } else if (view.result && !view.reviewerHtml) {
+    reviewerOut.innerHTML = isReviewerAuto()
+      ? "<p class='muted'>Reviewer did not return output for this run.</p>"
+      : "<p class='muted'>Optional second opinion. Click <strong>Run reviewer</strong> when you want OpenAI to critique the worker. Human gate does not wait for it.</p>";
   } else {
-    reviewerOut.innerHTML =
-      "<p class='muted'>An independent reviewer critiques the worker against policies before you decide.</p>";
+    reviewerOut.innerHTML = isReviewerAuto()
+      ? "<p class='muted'>Auto mode: reviewer runs after the worker (needs OpenAI key).</p>"
+      : "<p class='muted'>Manual mode (default): reviewer stays off until you click Run reviewer.</p>";
   }
   stage5.appendChild(reviewerLabel);
   stage5.appendChild(reviewerOut);
+  if (view.result && !view.busy && !view.humanDone) {
+    var revActions = document.createElement("div");
+    revActions.className = "row-actions";
+    revActions.style.marginTop = "var(--sp-2)";
+    var revBtn = document.createElement("button");
+    revBtn.type = "button";
+    revBtn.className = "btn";
+    revBtn.textContent = view.reviewer ? "Re-run reviewer" : "Run reviewer";
+    revBtn.addEventListener("click", function () { runReviewerForView(view); });
+    revActions.appendChild(revBtn);
+    if (!getOpenAiKey()) {
+      var tip = document.createElement("span");
+      tip.className = "muted";
+      tip.textContent = "Needs OpenAI key in Settings.";
+      revActions.appendChild(tip);
+    }
+    stage5.appendChild(revActions);
+  }
 
   // 6 HUMAN REVIEW — gate + permanent boundary sentence
   var stage6 = document.createElement("div");
@@ -6386,12 +8838,15 @@ function paintWorkArea(view) {
   stage6.appendChild(boundaryAlways);
 
   var reviewerDone = !view.busy && (view.reviewer || view.reviewerHtml);
+  var gateReady = !view.busy && !!view.result && (
+    !isReviewerAuto() || reviewerDone
+  );
   if (view.busy) {
     gate.innerHTML =
       "<p class='muted'>Waiting for " +
       (view.busyPhase === "reviewer" ? "reviewer" : "worker") +
-      "… You can browse other messages; the human gate opens after both agents finish.</p>";
-  } else if (view.result && reviewerDone && !view.humanDone) {
+      "… You can browse other messages; the human gate opens when this step finishes.</p>";
+  } else if (gateReady && !view.humanDone) {
     attachHumanGate(em, draftBox, view.result, gate);
   } else if (view.humanDone) {
     var doneClass = (/^Escalated/i.test(view.humanDone) || /^Taken personally/i.test(view.humanDone) || /^Acknowledged/i.test(view.humanDone))
@@ -6404,8 +8859,9 @@ function paintWorkArea(view) {
   } else if (view.resultHtml && !view.result) {
     gate.innerHTML = "<div class='error-note'>No human gate — worker did not produce a usable result.</div>";
   } else {
-    gate.innerHTML =
-      "<p class='muted'>Approve / Edit / Escalate appear here after worker + reviewer finish.</p>";
+    gate.innerHTML = isReviewerAuto()
+      ? "<p class='muted'>Approve / Edit / Escalate appear here after worker + reviewer finish.</p>"
+      : "<p class='muted'>Approve / Edit / Escalate appear here after the worker finishes. Reviewer is optional.</p>";
   }
 
   view.runBtn = runBtn;
@@ -6485,9 +8941,30 @@ async function runOneCaseView(view, opts) {
   persistPriorityForMatrix(view.em.email_id, pack.result);
   view.editedDraft = getField(pack.result.fields, "Draft reply");
   syncMailboxDraft(view.em, view.editedDraft);
+
+  // Path B4 — reviewer: auto after worker, or wait for manual trigger
+  if (!isReviewerAuto()) {
+    finishTriageTrace(parentTraceId, {
+      ok: true,
+      summary: "Worker done; reviewer skipped (manual mode — click Run reviewer to critique)"
+    });
+    view.busy = false;
+    view.busyPhase = null;
+    view.reviewer = null;
+    view.reviewerHtml = "";
+    appendRunLog(
+      view.em.email_id,
+      decisionSummary(pack.result),
+      "awaiting human review (reviewer manual)"
+    );
+    updateCaseCardBadge(view);
+    refreshViewIfSelected(view);
+    setTopStatus("ok", "Worker done — Run reviewer optional");
+    return { kind: pack.result.status.refused ? "refused" : "ok", result: pack.result };
+  }
+
   appendRunLog(view.em.email_id, decisionSummary(pack.result), "worker done — reviewer running");
 
-  // Path B4 — reviewer after worker, before human gate
   view.busyPhase = "reviewer";
   view.reviewerHtml = reviewerThinkingHtml();
   updateCaseCardBadge(view);
@@ -6531,6 +9008,62 @@ async function runOneCaseView(view, opts) {
   updateCaseCardBadge(view);
   refreshViewIfSelected(view);
   return { kind: pack.result.status.refused ? "refused" : "ok", result: pack.result };
+}
+
+async function runReviewerForView(view) {
+  if (!view || view.busy) return;
+  if (!view.result) {
+    setTopStatus("warn", "Run worker first");
+    return;
+  }
+  if (!getOpenAiKey()) {
+    setTopStatus("warn", "Add OpenAI reviewer key");
+    refreshKeyStatus();
+    return;
+  }
+  var runId = view.runId || 0;
+  view.busy = true;
+  view.busyPhase = "reviewer";
+  view.reviewerHtml = reviewerThinkingHtml();
+  updateCaseCardBadge(view);
+  refreshViewIfSelected(view);
+  setTopStatus("info", "Reviewer running");
+
+  var sessionId = view.sessionId || newLmnrSessionId(view.em.email_id);
+  var parentTraceId = view.parentTraceId || beginTriageTrace(view.em.email_id, sessionId);
+  view.sessionId = sessionId;
+  view.parentTraceId = parentTraceId;
+
+  var revPack;
+  try {
+    revPack = await runReviewerAgent(view.em, view.result, sessionId, parentTraceId);
+  } catch (err) {
+    revPack = {
+      result: null,
+      html: "<div class='error-note'>Reviewer error: " + escapeHtml(String(err)) + "</div>"
+    };
+  }
+
+  if (view.runId !== runId) return;
+
+  view.busy = false;
+  view.busyPhase = null;
+  view.reviewer = revPack.result;
+  view.reviewerHtml = revPack.html || "";
+  var revLine = revPack.result
+    ? ("reviewer: " + revPack.result.verdict)
+    : "reviewer: unavailable";
+  appendRunLog(
+    view.em.email_id,
+    decisionSummary(view.result) + " · " + revLine,
+    "reviewer finished (manual)"
+  );
+  updateCaseCardBadge(view);
+  refreshViewIfSelected(view);
+  setTopStatus(
+    revPack.result ? "ok" : "warn",
+    revPack.result ? ("Reviewer: " + revPack.result.verdict) : "Reviewer unavailable"
+  );
 }
 
 async function runAllCases(opts) {
@@ -6680,7 +9213,7 @@ function startRunAllAuto() {
   if (!getApiKey()) {
     setTopStatus("warn", "Add API key");
     refreshKeyStatus();
-    alert("Save a Kimi worker key in Settings before starting automatic Run All.");
+    alert("Save a DeepSeek worker key in Settings before starting automatic Run All.");
     return;
   }
   RUN_ALL_STATE.autoOn = true;
@@ -6755,9 +9288,166 @@ function initRunAllControls() {
   syncRunAllControlsUi();
 }
 
+// ---- Inbox persistence (IndexedDB) — loaded mail + agent/human results survive a browser refresh ----
+// IndexedDB instead of localStorage: Gmail bodies + agent output can exceed the ~5 MB localStorage quota.
+var INBOX_DB_NAME = "aurora_inbox_db";
+var INBOX_DB_STORE = "kv";
+var INBOX_SNAPSHOT_KEY = "inbox_snapshot_v1";
+var VIEW_STATE_CACHE = {}; // email_id → saved agent + human state (kept across re-renders and refreshes)
+var INBOX_RESTORED = false; // no saves until the saved snapshot has been read, so startup can't overwrite it
+var GMAIL_LOADED_AT = "";
+var inboxSaveTimer = null;
+var inboxDbPromise = null;
+
+function openInboxDb() {
+  if (inboxDbPromise) return inboxDbPromise;
+  inboxDbPromise = new Promise(function (resolve) {
+    if (!window.indexedDB) { resolve(null); return; }
+    var req;
+    try { req = indexedDB.open(INBOX_DB_NAME, 1); } catch (e) { resolve(null); return; }
+    req.onupgradeneeded = function () {
+      if (!req.result.objectStoreNames.contains(INBOX_DB_STORE)) req.result.createObjectStore(INBOX_DB_STORE);
+    };
+    req.onsuccess = function () { resolve(req.result); };
+    req.onerror = function () { resolve(null); };
+  });
+  return inboxDbPromise;
+}
+
+async function inboxDbGet(key) {
+  var db = await openInboxDb();
+  if (!db) return null;
+  return new Promise(function (resolve) {
+    try {
+      var req = db.transaction(INBOX_DB_STORE, "readonly").objectStore(INBOX_DB_STORE).get(key);
+      req.onsuccess = function () { resolve(req.result || null); };
+      req.onerror = function () { resolve(null); };
+    } catch (e) { resolve(null); }
+  });
+}
+
+async function inboxDbPut(key, value) {
+  var db = await openInboxDb();
+  if (!db) return false;
+  return new Promise(function (resolve) {
+    try {
+      var tx = db.transaction(INBOX_DB_STORE, "readwrite");
+      tx.objectStore(INBOX_DB_STORE).put(value, key);
+      tx.oncomplete = function () { resolve(true); };
+      tx.onerror = function () { resolve(false); };
+    } catch (e) { resolve(false); }
+  });
+}
+
+function snapshotViewState(view) {
+  if (!view || !view.em || view.busy) return; // half-finished runs are not saved; last finished state stays
+  VIEW_STATE_CACHE[view.em.email_id] = {
+    result: view.result || null,
+    resultHtml: view.resultHtml || null,
+    reviewer: view.reviewer || null,
+    reviewerHtml: view.reviewerHtml || "",
+    editedDraft: view.editedDraft || "",
+    humanDone: view.humanDone || null,
+    read: !!view.read,
+    parentTraceId: view.parentTraceId || "",
+    sessionId: view.sessionId || ""
+  };
+  scheduleInboxSave();
+}
+
+function restoreViewState(view) {
+  var saved = view && view.em ? VIEW_STATE_CACHE[view.em.email_id] : null;
+  if (!saved) return;
+  view.result = saved.result;
+  view.resultHtml = saved.resultHtml;
+  view.reviewer = saved.reviewer;
+  view.reviewerHtml = saved.reviewerHtml;
+  view.editedDraft = saved.editedDraft;
+  view.humanDone = saved.humanDone;
+  view.read = saved.read;
+  view.parentTraceId = saved.parentTraceId;
+  view.sessionId = saved.sessionId;
+}
+
+function scheduleInboxSave() {
+  if (!INBOX_RESTORED) return;
+  if (inboxSaveTimer) clearTimeout(inboxSaveTimer);
+  inboxSaveTimer = setTimeout(saveInboxSnapshot, 400);
+}
+
+function saveInboxSnapshot() {
+  if (!INBOX_RESTORED) return;
+  inboxSaveTimer = null;
+  var keep = {};
+  EMAILS.forEach(function (em) { keep[em.email_id] = true; });
+  GMAIL_EMAILS.forEach(function (em) { keep[em.email_id] = true; });
+  Object.keys(VIEW_STATE_CACHE).forEach(function (id) {
+    if (!keep[id]) delete VIEW_STATE_CACHE[id];
+  });
+  inboxDbPut(INBOX_SNAPSHOT_KEY, {
+    version: 1,
+    saved_at: new Date().toISOString(),
+    inbox_source: INBOX_SOURCE,
+    gmail_loaded_at: GMAIL_LOADED_AT,
+    gmail_emails: GMAIL_EMAILS,
+    gmail_noise_emails: GMAIL_NOISE_EMAILS,
+    gmail_senders: GMAIL_SENDERS,
+    demo_noise_deleted: DEMO_NOISE_DELETED,
+    view_state: VIEW_STATE_CACHE,
+    selected_email_id: selectedView && selectedView.em ? selectedView.em.email_id : "",
+    priority_filter: INBOX_PRIORITY_FILTER
+  });
+}
+
+async function restoreInboxSnapshot() {
+  var snap = await inboxDbGet(INBOX_SNAPSHOT_KEY);
+  if (!snap || snap.version !== 1) {
+    INBOX_RESTORED = true;
+    scheduleInboxSave();
+    return;
+  }
+  VIEW_STATE_CACHE = snap.view_state || {};
+  if (Array.isArray(snap.gmail_emails)) GMAIL_EMAILS = snap.gmail_emails;
+  if (Array.isArray(snap.gmail_noise_emails)) GMAIL_NOISE_EMAILS = snap.gmail_noise_emails;
+  if (snap.gmail_senders) GMAIL_SENDERS = snap.gmail_senders;
+  if (snap.demo_noise_deleted) DEMO_NOISE_DELETED = snap.demo_noise_deleted;
+  GMAIL_LOADED_AT = snap.gmail_loaded_at || "";
+  INBOX_SOURCE = snap.inbox_source === "demo" ? "demo" : "gmail";
+  if (/^(all|P0|P1|P2|none)$/.test(snap.priority_filter || "")) INBOX_PRIORITY_FILTER = snap.priority_filter;
+  var prioSel = document.getElementById("inbox-priority-filter");
+  if (prioSel) prioSel.value = INBOX_PRIORITY_FILTER;
+  INBOX_RESTORED = true;
+
+  render();
+  syncInboxListViewUi();
+
+  var statusEl = document.getElementById("gmail-inbox-status");
+  if (statusEl && INBOX_SOURCE === "gmail" && GMAIL_EMAILS.length) {
+    statusEl.hidden = false;
+    statusEl.textContent =
+      "Restored " + GMAIL_EMAILS.length + " triage · " + GMAIL_NOISE_EMAILS.length +
+      " spam/ads saved in this browser" +
+      (GMAIL_LOADED_AT ? " (loaded " + new Date(GMAIL_LOADED_AT).toLocaleString() + ")" : "") +
+      ". Click Refresh Gmail for new mail.";
+  }
+
+  var workView = document.getElementById("work-view");
+  var onWork = !workView || !workView.hidden;
+  var again = snap.selected_email_id && CASE_VIEWS.find(function (v) {
+    return v.em.email_id === snap.selected_email_id;
+  });
+  if (again && onWork) selectCase(again);
+}
+
+window.addEventListener("pagehide", function () {
+  if (inboxSaveTimer) { clearTimeout(inboxSaveTimer); saveInboxSnapshot(); }
+});
+
 function render() {
+  var activeEmails = getActiveEmails();
   document.getElementById("summary").textContent =
-    "World: " + EMAILS.length + " emails · " + SENDERS.length + " senders · " +
+    (INBOX_SOURCE === "gmail" ? "Gmail live · " : "World: ") +
+    activeEmails.length + " emails · " + SENDERS.length + " demo senders · " +
     EMPLOYEES.length + " employees · " + CALENDAR.length + " calendar · " +
     FLIGHTS.length + " flights · " + EVAL_CASES.length + " evals";
 
@@ -6772,7 +9462,21 @@ function render() {
   CASE_VIEWS = [];
   var list = document.getElementById("case-list");
   list.innerHTML = "";
-  EMAILS.forEach(function (em) {
+  if (INBOX_SOURCE === "gmail" && !activeEmails.length) {
+    var empty = document.createElement("p");
+    empty.className = "muted";
+    empty.style.padding = "var(--sp-4)";
+    empty.textContent = getGoogleAccessToken()
+      ? "No Gmail messages loaded yet. Click Load Gmail."
+      : "Connect Google in Settings, then Load Gmail.";
+    list.appendChild(empty);
+  }
+  var liveIds = {};
+  activeEmails.forEach(function (em) { liveIds[em.email_id] = true; });
+  Object.keys(SELECTED_EMAIL_IDS).forEach(function (id) {
+    if (!liveIds[id]) delete SELECTED_EMAIL_IDS[id];
+  });
+  activeEmails.forEach(function (em) {
     var s = senderById(em.sender_id) || {};
     var preview = String(em.body || "").replace(/\s+/g, " ").trim().slice(0, 90);
     if ((em.body || "").length > 90) preview += "…";
@@ -6782,7 +9486,8 @@ function render() {
     card.tabIndex = 0;
     card.innerHTML =
       "<div class='mail-row-top'>" +
-      "<div class='from'>" + escapeHtml(s.name || "Unknown") + "</div>" +
+      "<div class='from'><input type='checkbox' class='mail-select' aria-label='Select email from " +
+      escapeHtml(s.name || "Unknown") + "'>" + escapeHtml(s.name || "Unknown") + "</div>" +
       "<span class='prio' hidden></span>" +
       "</div>" +
       "<div class='mail-main'>" +
@@ -6801,11 +9506,8 @@ function render() {
     badgeEl.hidden = true;
     badgeEl.textContent = "";
     statusRow.appendChild(prioEl);
-    // move prio into status row for list alignment; clone reference already set
     statusRow.appendChild(readStateEl);
     statusRow.appendChild(badgeEl);
-    // Remove leftover empty prio from mail-row-top if still there - we moved the node
-    // prioEl was in mail-row-top; appendChild moves it to statusRow. Good.
 
     var view = {
       em: em,
@@ -6818,7 +9520,16 @@ function render() {
       humanDone: null,
       read: false
     };
+    restoreViewState(view);
     CASE_VIEWS.push(view);
+    view.selectBox = card.querySelector(".mail-select");
+    setEmailSelected(view, !!SELECTED_EMAIL_IDS[em.email_id]);
+    view.selectBox.addEventListener("click", function (e) { e.stopPropagation(); });
+    view.selectBox.addEventListener("keydown", function (e) { e.stopPropagation(); });
+    view.selectBox.addEventListener("change", function () {
+      setEmailSelected(view, view.selectBox.checked);
+      refreshSelectionUi();
+    });
     card.addEventListener("click", function () { selectCase(view); });
     card.addEventListener("keydown", function (e) {
       if (e.key === "Enter" || e.key === " ") {
@@ -6831,29 +9542,42 @@ function render() {
   });
 
   var chips = document.getElementById("demo-chips");
-  chips.innerHTML = "";
-  DEMO_CHIPS.forEach(function (demo) {
-    var chip = document.createElement("button");
-    chip.type = "button";
-    chip.className = "chip";
-    chip.textContent = demo.label;
-    chip.title = demo.email_id;
-    chip.addEventListener("click", function (e) {
-      e.stopPropagation();
-      var view = CASE_VIEWS.find(function (v) { return v.em.email_id === demo.email_id; });
-      if (view) selectCase(view);
-    });
-    chips.appendChild(chip);
-  });
+  if (chips) {
+    chips.innerHTML = "";
+    if (INBOX_SOURCE === "demo") {
+      DEMO_CHIPS.forEach(function (demo) {
+        var chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "chip";
+        chip.textContent = demo.label;
+        chip.title = demo.email_id;
+        chip.addEventListener("click", function (e) {
+          e.stopPropagation();
+          var view = CASE_VIEWS.find(function (v) { return v.em.email_id === demo.email_id; });
+          if (view) selectCase(view);
+        });
+        chips.appendChild(chip);
+      });
+    }
+  }
 
-  document.getElementById("run-all-btn").onclick = function () { onRunAllPrimaryClick(); };
+  var runAllBtn = document.getElementById("run-all-btn");
+  if (runAllBtn) runAllBtn.onclick = function () { onRunAllPrimaryClick(); };
+  syncInboxSourceUi();
+  renderNoiseList();
   paintWelcome();
+  refreshSelectionUi();
+  scheduleInboxSave();
 }
 
 initSettings();
+initPriorityFilter();
+initInboxSourceControls();
+initReviewerModeControls();
 initViewTabs();
 initEvalsResetButton();
 initTracesControls();
+initJobBoardControls();
 initMatrixControls();
 initRuleStudio();
 initSessionToggle();
@@ -6862,6 +9586,7 @@ initGlobalChat();
 initRunAllControls();
 renderRunLog();
 render();
+restoreInboxSnapshot();
 loadEvalResults();
 loadImprovementRecord();
 renderEvalsTable();
@@ -6870,6 +9595,7 @@ renderEvalsTable();
   if (hash === "matrix" || hash === "priority-matrix") setMainView("matrix");
   else if (hash === "evals") setMainView("evals");
   else if (hash === "traces" || hash === "trace") setMainView("traces");
+  else if (hash === "jobs" || hash === "job-board" || hash === "jobboard") setMainView("jobs");
   else if (hash === "rules" || hash === "rule-builder") setMainView("rules");
   else setMainView("work");
 })();
