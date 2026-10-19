@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Aurora Inbox · 产品设计作品集</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="shell case">
+    <header class="top">
+      <a href="index.html">作品集</a>
+      <nav>
+        <a href="powernano.html">01 用研专员</a>
+        <a href="feature-store.html">02 Feature Store</a>
+        <a href="aurora.html" aria-current="page">03 Aurora</a>
+      </nav>
+    </header>
+    <p class="kicker">03 · 可运行原型 · 合成收件</p>
+    <h1>Aurora Inbox</h1>
+    <p class="problem">创始人 Ren 的早晨，信很多，风险不一样。代理可以分优先级和起草，但不能在人点之前把信发出去。</p>
+    <dl class="meta">
+      <div><span>用户</span><strong>创始人 Ren</strong></div>
+      <div><span>场景</span><strong>早晨处理收件</strong></div>
+      <div><span>守住的边界</span><strong>法务与付款不自动处理</strong></div>
+      <div><span>状态</span><strong>合成数据，可运行</strong></div>
+    </dl>
+
+    <h2>用户画像</h2>
+    <figure class="diagram">
+      <svg viewBox="0 0 920 210" role="img" aria-label="Ren 的用户画像">
+        <circle cx="64" cy="78" r="28" fill="none" stroke="#161513" stroke-width="1.5"/>
+        <text x="64" y="84" text-anchor="middle" font-family="Palatino Linotype, Georgia, serif" font-size="16">Ren</text>
+        <text x="112" y="62" font-family="Palatino Linotype, Georgia, serif" font-size="26">Ren · 创始人</text>
+        <text x="112" y="90" fill="#5f5a53" font-size="15">固态电池公司 Aurora Materials，早晨要清掉收件箱</text>
+        <line x1="112" y1="112" x2="880" y2="112" stroke="#d9d3c8"/>
+        <text x="112" y="146" font-size="13" fill="#5f5a53">要完成</text>
+        <text x="112" y="170" font-size="16">分清哪封该回、哪封该升级，并且自己点过才算发出</text>
+        <text x="560" y="146" font-size="13" fill="#5f5a53">卡住</text>
+        <text x="560" y="170" font-size="16">追单、缺附件、法务投诉、付款请求混在一起</text>
+      </svg>
+      <figcaption>有些信应该有草稿。提到律师、赔偿或绕过审批去付款的信，一旦自动起草，就会把公司卷进去。</figcaption>
+    </figure>
+
+    <h2>流程</h2>
+    <figure class="diagram">
+      <svg viewBox="0 0 920 200" role="img" aria-label="从打开一封信到人放行的流程">
+        <defs>
+          <marker id="arr2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#161513"/></marker>
+        </defs>
+        <g font-size="14" text-anchor="middle">
+          <rect x="20" y="36" width="130" height="46" fill="none" stroke="#161513"/>
+          <text x="85" y="64">打开一封信</text>
+          <rect x="190" y="36" width="150" height="46" fill="none" stroke="#161513"/>
+          <text x="265" y="64">读信与上下文</text>
+          <rect x="380" y="36" width="120" height="46" fill="none" stroke="#161513"/>
+          <text x="440" y="64">Run agent</text>
+          <rect x="540" y="24" width="150" height="36" fill="none" stroke="#161513"/>
+          <text x="615" y="47">Approve / Edit</text>
+          <rect x="540" y="72" width="150" height="36" fill="none" stroke="#161513"/>
+          <text x="615" y="95">Escalate</text>
+          <rect x="740" y="36" width="150" height="46" fill="none" stroke="#161513"/>
+          <text x="815" y="64">对照 Evals</text>
+        </g>
+        <path d="M150 59 H190" stroke="#161513" marker-end="url(#arr2)"/>
+        <path d="M340 59 H380" stroke="#161513" marker-end="url(#arr2)"/>
+        <path d="M500 59 H540" stroke="#161513" marker-end="url(#arr2)"/>
+        <path d="M500 59 V90 H540" stroke="#161513" fill="none" marker-end="url(#arr2)"/>
+        <path d="M690 42 H740 V59" stroke="#161513" fill="none" marker-end="url(#arr2)"/>
+        <path d="M690 90 H730 V82" stroke="#161513" fill="none"/>
+        <text x="460" y="150" text-anchor="middle" font-size="14" fill="#5f5a53">E-03 法务投诉：不自动回复。E-05 付款：不准备付款动作。</text>
+        <text x="460" y="174" text-anchor="middle" font-size="14" fill="#5f5a53">E-02 缺附件：不编造条款。E-04 日程冲突：不自动接受。</text>
+      </svg>
+      <figcaption>一次只处理一封。同一发件人的其他早晨邮件只作为上下文。代理还没跑时，界面不预先放草稿。</figcaption>
+    </figure>
+
+    <blockquote>完成的定义是人的动作。Approve、Edit、Escalate 之前，回复都不算发出。</blockquote>
+    <div class="measure">
+      <p>Reviewer 默认手动。Run All 按顺序演示，不是并行发出。验收和收件箱在同一个产品里：每一行写着预期行为。还没点 Run 时，Actual 写明还没有运行结果。</p>
+    </div>
+
+    <h2>界面结果</h2>
+    <figure>
+      <img src="shots/aurora-inbox.png" alt="合成收件箱" />
+      <figcaption>运行方式放在列表前面。Inbox 选在 Demo (synthetic)，不连接真实邮箱。</figcaption>
+    </figure>
+    <figure>
+      <img src="shots/aurora-boundary.png" alt="打开 Defective batch 后的阅读页" />
+      <figcaption>点开质量投诉后先是信件，再是已知发件人。信里写到设备损坏、律师和赔偿。这一屏还没有草稿。</figcaption>
+    </figure>
+    <figure>
+      <video id="aurora-open-clip" src="shots/aurora-open.webm" autoplay muted loop playsinline controls></video>
+      <figcaption>收件箱停在 Demo。点开 Defective batch 之后，右侧先是信件，再是已知发件人。这一步还没有草稿。</figcaption>
+    </figure>
+    <figure>
+      <img src="shots/aurora-evals.png" alt="评估记分板" />
+      <figcaption>Pass、Needs work、Fail 和已跑案例数分开计数。没跑过的行写着还没有 Actual。</figcaption>
+    </figure>
+    <p class="note">公司和邮件都是合成的。要看到 Actual，需要在设置里保存密钥后再对某一行点 Run。密钥只留在这台浏览器里。</p>
+    <p><a class="live" href="../index.html">打开 Aurora 原型 →</a></p>
+    <footer>回到 <a href="index.html">作品集首页</a></footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Feature Store · 产品设计作品集</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="shell case">
+    <header class="top">
+      <a href="index.html">作品集</a>
+      <nav>
+        <a href="powernano.html">01 用研专员</a>
+        <a href="feature-store.html" aria-current="page">02 Feature Store</a>
+        <a href="aurora.html">03 Aurora</a>
+      </nav>
+    </header>
+    <p class="kicker">02 · OpenShift AI 体验原型</p>
+    <h1>Feature Store</h1>
+    <p class="problem">特征库是模型从实验做到上线时共用的目录。人要先判断一个特征还能不能用；当真值可疑时，还要能从服务追回数据源。</p>
+    <dl class="meta">
+      <div><span>用户</span><strong>三类专家共用一个库</strong></div>
+      <div><span>场景</span><strong>找特征，并追上游</strong></div>
+      <div><span>守住的边界</span><strong>过期分布不能看起来像现在</strong></div>
+      <div><span>状态</span><strong>体验原型</strong></div>
+    </dl>
+
+    <h2>用户画像</h2>
+    <figure class="diagram">
+      <svg viewBox="0 0 920 250" role="img" aria-label="三类用户画像">
+        <line x1="306" y1="24" x2="306" y2="210" stroke="#d9d3c8"/>
+        <line x1="612" y1="24" x2="612" y2="210" stroke="#d9d3c8"/>
+        <g font-size="14">
+          <text x="24" y="48" font-family="Palatino Linotype, Georgia, serif" font-size="22">数据科学家</text>
+          <text x="24" y="78" fill="#5f5a53" font-size="13">要完成</text>
+          <text x="24" y="100">复用已有特征，少重写一遍</text>
+          <text x="24" y="132" fill="#5f5a53" font-size="13">卡住</text>
+          <text x="24" y="154">已有特征看不见，只能重写</text>
+          <text x="330" y="48" font-family="Palatino Linotype, Georgia, serif" font-size="22">机器学习工程师</text>
+          <text x="330" y="78" fill="#5f5a53" font-size="13">要完成</text>
+          <text x="330" y="100">确认训练和服务用的是同一分布</text>
+          <text x="330" y="132" fill="#5f5a53" font-size="13">卡住</text>
+          <text x="330" y="154">漂移往往到推理才暴露</text>
+          <text x="636" y="48" font-family="Palatino Linotype, Georgia, serif" font-size="22">数据工程师</text>
+          <text x="636" y="78" fill="#5f5a53" font-size="13">要完成</text>
+          <text x="636" y="100">从坏掉的特征追回数据源</text>
+          <text x="636" y="132" fill="#5f5a53" font-size="13">卡住</text>
+          <text x="636" y="154">看不出上游断在哪一段</text>
+        </g>
+      </svg>
+      <figcaption>三个人进的是同一个特征库。列表负责「还能不能用」，血缘负责「从哪来、被谁用」。</figcaption>
+    </figure>
+
+    <h2>两条流程</h2>
+    <figure class="diagram">
+      <svg viewBox="0 0 920 210" role="img" aria-label="找特征与追血缘两条流程">
+        <defs>
+          <marker id="arr3" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#161513"/></marker>
+        </defs>
+        <text x="24" y="28" font-size="13" fill="#5f5a53">判断还能不能用</text>
+        <g font-size="14" text-anchor="middle">
+          <rect x="24" y="44" width="150" height="42" fill="none" stroke="#161513"/>
+          <text x="99" y="70">总览 · Metrics</text>
+          <rect x="214" y="44" width="170" height="42" fill="none" stroke="#161513"/>
+          <text x="299" y="70">可观测特征列表</text>
+          <rect x="424" y="44" width="170" height="42" fill="none" stroke="#161513"/>
+          <text x="509" y="70">监控详情</text>
+        </g>
+        <path d="M174 65 H214" stroke="#161513" marker-end="url(#arr3)"/>
+        <path d="M384 65 H424" stroke="#161513" marker-end="url(#arr3)"/>
+        <text x="24" y="124" font-size="13" fill="#5f5a53">上游坏了，追回来</text>
+        <g font-size="14" text-anchor="middle">
+          <rect x="24" y="140" width="150" height="42" fill="none" stroke="#161513"/>
+          <text x="99" y="166">选定一个特征库</text>
+          <rect x="214" y="140" width="130" height="42" fill="none" stroke="#161513"/>
+          <text x="279" y="166">Lineage</text>
+          <rect x="384" y="140" width="420" height="42" fill="none" stroke="#161513"/>
+          <text x="594" y="166">实体 → 数据源 → 特征视图 → 特征服务</text>
+        </g>
+        <path d="M174 161 H214" stroke="#161513" marker-end="url(#arr3)"/>
+        <path d="M344 161 H384" stroke="#161513" marker-end="url(#arr3)"/>
+      </svg>
+      <figcaption>血缘按一个特征库来画。选「全部特征库」时图是空的，因为把无关流水线画在一起，数据工程师无法判断断在哪一段。</figcaption>
+    </figure>
+
+    <blockquote>打开一个特征，先看到分布和新鲜度。值可疑时，换到血缘，从服务追回实体和数据源。</blockquote>
+    <div class="measure">
+      <p>列表做成两种视图。可观测视图用来判断能不能用：空值比例、多久没更新、分布形状。元数据视图用来查类型和标签。默认是前者。详情第一屏是 Monitoring，并单独标出 Last calculated，避免把几天前的分布当成现在。</p>
+      <p>血缘图回答数据工程师的问题：这个特征视图吃的是哪个数据源，服务又用了哪些视图。图按 Entity、Data source、Feature view、Feature service 连接。界面使用 PatternFly，顶栏标明这是 RHOAI 3.4 的体验稿，数据是欺诈检测等示例库。</p>
+    </div>
+
+    <h2>界面结果</h2>
+    <figure>
+      <img src="shots/rhoai-overview.png" alt="Feature store 总览的数量" />
+      <figcaption>Metrics 回答库里有什么：实体、数据源、数据集、特征、视图和服务各有多少，并能直接进去。</figcaption>
+    </figure>
+    <figure>
+      <img src="shots/rhoai-features.png" alt="带分布缩略图的特征列表" />
+      <figcaption>特征列表默认是 Observability View。扫描时就能看到空值、新鲜度和分布，不必先点进每一行。</figcaption>
+    </figure>
+    <figure>
+      <img src="shots/rhoai-monitoring.png" alt="credit_card_due 的监控页" />
+      <figcaption>credit_card_due 打开就是分布和统计量。时间范围可以改，计算时间单独写明。</figcaption>
+    </figure>
+    <figure>
+      <img src="shots/rhoai-lineage.png" alt="Feature store 的 Lineage 页" />
+      <figcaption>选定 Fraud detection 之后，Lineage 画出这条库自己的关系：实体 Transaction、Driver 连到批式、流式和请求数据源，再汇入带有 13 个特征的特征视图，最后接到特征服务。数据工程师排障时沿这张图往回找，而不是在四张列表之间来回对名字。</figcaption>
+    </figure>
+    <figure>
+      <video id="fs-lineage-appear-clip" src="shots/fs-lineage-appear.webm" autoplay muted loop playsinline controls></video>
+      <figcaption>还停在 All feature stores 时，Lineage 是空的，提示先选一个特征库。选中 Fraud detection 之后，这张图才画出来。</figcaption>
+    </figure>
+    <figure>
+      <video id="fs-lineage-path-clip" src="shots/fs-lineage-path.webm" autoplay muted loop playsinline controls></video>
+      <figcaption>点中 Entity: Transaction。相连的数据源、特征视图和特征服务被标出来，其余关系变淡。</figcaption>
+    </figure>
+    <p class="note">发给公司以外的人之前，先确认界面和示例数据可以公开。需要打码时，保留「总览 → 可观测列表 → 监控详情」和「选定特征库 → 血缘」这两条。</p>
+    <p><a class="live" href="http://localhost:9000/develop-train/feature-store/overview?featureStore=Fraud%20detection" target="_blank" rel="noopener">打开 Feature Store，并看 Fraud detection 的血缘 →</a></p>
+    <footer>回到 <a href="index.html">作品集首页</a></footer>
+  </div>
+</body>
+</html>
