@@ -2287,7 +2287,7 @@ body {
         <li>Handles Ren’s <strong>morning email triage</strong> for fictional Aurora Materials by default (Demo inbox). Optional <strong>Gmail</strong> mode can read your real inbox and save reply drafts — still never auto-sends. No CRM or dashboards.</li>
         <li>Demo mode: English synthetic emails in this project’s CSV/record shape. Gmail mode: live threads via Gmail API (requires Google Cloud Gmail API + reconnect OAuth). Chinese WeChat and messy free-text outside email are out of scope.</li>
         <li>The agent triages <strong>one email at a time</strong>, with same-sender morning emails included only as context for duplicate/related detection. Run All is sequential demos, not parallel production throughput.</li>
-        <li>Urgency uses the <strong>operator’s real current time</strong> (injected into worker/reviewer/chat prompts). Demo emails may still be dated May 2026 in the story data. Aurora CAL-* / flight rows stay synthetic context. Real Google Calendar create and Gmail draft sync only happen after you Approve with the matching checkbox. Gmail sync loads the last <strong>7 days</strong> of inbox (cap 150).</li>
+        <li>Urgency uses the <strong>operator’s real current time</strong> (injected into worker/reviewer/chat prompts). Demo emails may still be dated May 2026 in the story data. Aurora CAL-* / flight rows stay synthetic context. Real Google Calendar create and Gmail draft sync only happen after you Approve with the matching checkbox. Gmail sync loads the last <strong>14 days</strong> of inbox (cap 150).</li>
         <li>Needs a browser API key (and the local proxy for DeepSeek). <strong>Privacy:</strong> when you Run triage on Gmail messages, email bodies go to the public LLM APIs you configured (DeepSeek/OpenAI). Drafts stay suggestions until Approve — Gmail draft sync writes a draft only, never calls send.</li>
       </ol>
     </div>
@@ -2607,10 +2607,10 @@ const GOOGLE_GMAIL_SCOPES = [
 ].join(" ");
 const GOOGLE_OAUTH_SCOPES = GOOGLE_CALENDAR_SCOPE + " " + GOOGLE_GMAIL_SCOPES;
 const MEETING_TZ = "Asia/Shanghai";
-// Last 7 days of inbox; hard cap avoids huge body fetches to LLM APIs.
+// Last 14 days of inbox; hard cap avoids huge body fetches to LLM APIs.
 const GMAIL_INBOX_MAX = 150;
 const GMAIL_NOISE_MAX = 100;
-const GMAIL_LOOKBACK_QUERY = "newer_than:7d";
+const GMAIL_LOOKBACK_QUERY = "newer_than:14d";
 
 // Demo (synthetic EMAILS) vs live Gmail.
 var INBOX_SOURCE = "gmail"; // "demo" | "gmail"
@@ -3821,9 +3821,9 @@ async function loadGmailInbox() {
   var statusEl = document.getElementById("gmail-inbox-status");
   if (statusEl) {
     statusEl.hidden = false;
-    statusEl.textContent = "Loading last 7 days of Gmail…";
+    statusEl.textContent = "Loading last 14 days of Gmail…";
   }
-  setTopStatus("info", "Loading Gmail (7 days)");
+  setTopStatus("info", "Loading Gmail (14 days)");
 
   var triageQ =
     "in:inbox " + GMAIL_LOOKBACK_QUERY +
@@ -3851,7 +3851,7 @@ async function loadGmailInbox() {
     GMAIL_EMAILS = [];
     GMAIL_NOISE_EMAILS = [];
     GMAIL_LOADED_AT = new Date().toISOString();
-    if (statusEl) statusEl.textContent = "No inbox / spam mail in the last 7 days.";
+    if (statusEl) statusEl.textContent = "No inbox / spam mail in the last 14 days.";
     setTopStatus("warn", "Gmail empty");
     render();
     renderNoiseList();
@@ -3898,7 +3898,7 @@ async function loadGmailInbox() {
   if (statusEl) {
     statusEl.textContent =
       "Loaded " + GMAIL_EMAILS.length + " triage · " + GMAIL_NOISE_EMAILS.length +
-      " spam/ads (last 7 days). Triage sends bodies to DeepSeek/OpenAI.";
+      " spam/ads (last 14 days). Triage sends bodies to DeepSeek/OpenAI.";
   }
   setTopStatus("ok", "Gmail · " + GMAIL_EMAILS.length + " triage · " + GMAIL_NOISE_EMAILS.length + " noise");
   render();
@@ -7245,7 +7245,7 @@ function buildUserMessage(em) {
     : "RULE SOURCE: Aurora demo policies for Ren.\n\n";
 
   var gmailNote = isGmailEmail(em)
-    ? "MAIL SOURCE: live Gmail message (real mailbox, last-7-days sync window). Apply the same triage policies. " +
+    ? "MAIL SOURCE: live Gmail message (real mailbox, last-14-days sync window). Apply the same triage policies. " +
       "Do not invent Aurora record IDs that are not in context. " +
       "Score urgency using REAL CLOCK below and this message's received_at / body deadlines.\n\n"
     : "MAIL SOURCE: demo synthetic inbox (story emails may use May 2026 dates). " +
