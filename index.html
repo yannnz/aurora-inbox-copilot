@@ -2089,6 +2089,62 @@ body {
 .inbox-toolbar .run-cadence-select[hidden],
 .inbox-toolbar .run-mode-select[hidden],
 .inbox-toolbar .run-mode-label[hidden] { display: none !important; }
+
+/* ---- Single-row grouped toolbar (UX pass 1) ---- */
+.inbox-toolrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 0 var(--sp-4);
+}
+.inbox-toolrow .inbox-toolbar {
+  padding-top: 0;
+  flex-wrap: nowrap;
+}
+.inbox-toolrow .inbox-toolbar + .inbox-toolbar {
+  border-left: var(--border-w) solid var(--line);
+  padding-left: var(--sp-3);
+}
+.inbox-pane > .panel-head { display: flex; align-items: center; gap: var(--sp-2); }
+.inbox-pane > .panel-head #open-settings-btn {
+  margin-left: auto;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 500;
+  font-size: var(--fs-0, .75rem);
+  padding: 2px 10px;
+}
+.tool-overflow {
+  padding: 0 var(--sp-4);
+}
+.tool-overflow > summary {
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 12px;
+  margin: var(--sp-1) 0;
+  border-radius: 999px;
+  border: var(--border-w) solid var(--line);
+  background: var(--bg-raise, #fff);
+  font-size: var(--fs-0, .78rem);
+  color: var(--ink-soft, #667085);
+}
+.tool-overflow > summary::-webkit-details-marker { display: none; }
+.tool-overflow[open] > summary {
+  border-color: var(--accent, #1570ef);
+  color: var(--ink);
+}
+.tool-overflow-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-2) 0 var(--sp-3);
+  border-top: var(--border-w) dashed var(--line);
+}
 #run-all-schedule[hidden] { display: none !important; }
 #run-all-btn.is-auto-on {
   background: linear-gradient(145deg, color-mix(in srgb, var(--warn) 70%, #fff), var(--warn));
@@ -2320,46 +2376,15 @@ body {
         <button type="button" class="info-tip-btn" aria-label="About inbox">i</button>
           <span class="info-tip-pop align-end" role="tooltip">Click an email to open Reading · Triage. Run All can be Manual (once) or Automatic on a cadence you choose. Demo chips jump to a known story. Settings (API keys, Google) are folded at the bottom.</span>
       </span>
+      <button type="button" class="btn" id="open-settings-btn" title="打开 Settings · API keys & Google" style="margin-left:auto;min-width:0;">⚙️ Settings</button>
     </div>
     <div class="panel-body inbox-body">
-      <div class="inbox-toolbar" id="run-all-controls">
-        <label class="run-mode-label" for="run-all-mode">Run All</label>
-        <select class="field-input run-mode-select" id="run-all-mode" aria-label="Run All mode">
-          <option value="manual" selected>Manual</option>
-          <option value="auto">Automatic</option>
-        </select>
-        <select class="field-input run-cadence-select" id="run-all-cadence" aria-label="Auto-run cadence" hidden>
-          <option value="120">Every 2 min</option>
-          <option value="300" selected>Every 5 min</option>
-          <option value="600">Every 10 min</option>
-          <option value="1800">Every 30 min</option>
-          <option value="3600">Every 60 min</option>
-          <option value="86400">Daily</option>
-        </select>
-        <button type="button" id="run-all-btn" class="btn primary">Run All</button>
-        <span class="info-tip">
-          <button type="button" class="info-tip-btn" aria-label="About Run All">i</button>
-          <span class="info-tip-pop" role="tooltip">Manual: click Run All once to walk every inbox email. Automatic: starts a schedule that re-runs the full inbox on your chosen cadence (2 min to daily). Progress shows below. Does not auto-Approve — Human review still required.</span>
-        </span>
-      </div>
       <p class="muted" id="run-all-schedule" style="padding: 0 var(--sp-4);" hidden></p>
       <p class="muted" id="run-all-progress" style="padding: 0 var(--sp-4);"></p>
       <p class="muted" id="run-all-summary" style="padding: 0 var(--sp-4);"></p>
-      <div class="inbox-toolbar" id="inbox-source-controls" style="margin-top:0;">
-        <label class="run-mode-label" for="inbox-source">Inbox</label>
-        <select class="field-input run-mode-select" id="inbox-source" aria-label="Inbox source">
-          <option value="gmail" selected>Gmail (live)</option>
-          <option value="demo">Demo (synthetic)</option>
-        </select>
-        <button type="button" id="gmail-refresh-btn" class="btn" hidden>Load Gmail</button>
-        <button type="button" id="gmail-export-btn" class="btn" hidden>Export loaded JSON</button>
-        <span class="info-tip">
-          <button type="button" class="info-tip-btn" aria-label="About inbox source">i</button>
-          <span class="info-tip-pop" role="tooltip">Demo = Aurora synthetic morning. Gmail = your real inbox (read + triage). On Approve, the reply can be saved as a Gmail draft — never auto-sent. Running triage sends message text to DeepSeek/OpenAI.</span>
-        </span>
-      </div>
       <p class="muted" id="gmail-inbox-status" style="padding: 0 var(--sp-4);" hidden></p>
-      <div class="inbox-toolbar" id="inbox-list-view-controls" style="margin-top:0;">
+      <div class="inbox-toolrow">
+      <div class="inbox-toolbar" id="inbox-list-view-controls">
         <button type="button" class="chip active" id="inbox-view-triage" data-view="triage">Triage</button>
         <button type="button" class="chip" id="inbox-view-noise" data-view="noise">Spam &amp; ads <span id="noise-count-badge" class="muted">0</span></button>
         <details class="smart-filter-fold" id="smart-filter-fold">
@@ -2380,9 +2405,42 @@ body {
           <span class="info-tip-pop" role="tooltip">Triage = primary inbox for the agent. Spam &amp; ads = promotions, social, spam folder, and heuristic ad/spam matches — shown separately. Delete all moves them to Gmail Trash (not permanent wipe). Re-Connect Google if trash fails (needs gmail.modify).</span>
         </span>
       </div>
+      <div class="inbox-toolbar" id="inbox-source-controls">
+        <label class="run-mode-label" for="inbox-source">来源</label>
+        <select class="field-input run-mode-select" id="inbox-source" aria-label="Inbox source">
+          <option value="gmail" selected>Gmail (live)</option>
+          <option value="demo">Demo (synthetic)</option>
+        </select>
+        <button type="button" id="gmail-refresh-btn" class="btn" hidden>Load Gmail</button>
+        <button type="button" id="gmail-export-btn" class="btn" hidden>Export loaded JSON</button>
+      </div>
+      <div class="inbox-toolbar" id="run-all-controls">
+        <label class="run-mode-label" for="run-all-mode">Run All</label>
+        <select class="field-input run-mode-select" id="run-all-mode" aria-label="Run All mode">
+          <option value="manual" selected>Manual</option>
+          <option value="auto">Automatic</option>
+        </select>
+        <select class="field-input run-cadence-select" id="run-all-cadence" aria-label="Auto-run cadence" hidden>
+          <option value="120">Every 2 min</option>
+          <option value="300" selected>Every 5 min</option>
+          <option value="600">Every 10 min</option>
+          <option value="1800">Every 30 min</option>
+          <option value="3600">Every 60 min</option>
+          <option value="86400">Daily</option>
+        </select>
+        <button type="button" id="run-all-btn" class="btn primary">Run All</button>
+        <span class="info-tip">
+          <button type="button" class="info-tip-btn" aria-label="About Run All">i</button>
+          <span class="info-tip-pop" role="tooltip">Manual: click Run All once to walk every inbox email. Automatic: starts a schedule that re-runs the full inbox on your chosen cadence (2 min to daily). Progress shows below. Does not auto-Approve — Human review still required.</span>
+        </span>
+      </
+      </div>
       <div class="smart-stats" id="smart-stats" hidden></div>
       <div class="smart-filter-tags" id="smart-filter-tags" hidden></div>
-      <div class="inbox-toolbar" id="reviewer-mode-controls" style="margin-top:0;">
+            <details class="tool-overflow" id="tool-overflow">
+        <summary>⋯ 更多工具</summary>
+        <div class="tool-overflow-body">
+<div class="inbox-toolbar" id="reviewer-mode-controls">
         <label class="run-mode-label" for="reviewer-mode">Reviewer</label>
         <select class="field-input run-mode-select" id="reviewer-mode" aria-label="Reviewer mode">
           <option value="manual" selected>Manual (default)</option>
@@ -2397,7 +2455,7 @@ body {
         <summary>Demo chips</summary>
         <div id="demo-chips" class="demo-chips"></div>
       </details>
-      <div class="inbox-toolbar" id="triage-select-controls" style="margin-top:0;">
+      <div class="inbox-toolbar" id="triage-select-controls">
         <label class="select-all-label" for="triage-select-all">
           <input type="checkbox" id="triage-select-all" class="mail-select" aria-label="Select all shown emails">
           Select all shown
@@ -2409,6 +2467,8 @@ body {
           <span class="info-tip-pop align-end" role="tooltip">Selections are kept when you change the Priority filter, so you can pick across P0 / P1 / P2. Select all shown only adds the emails visible under the current filter. Delete selected moves Gmail messages to Gmail Trash (recoverable for 30 days); only messages Gmail confirms leave this list. Demo mode just hides them.</span>
         </span>
       </div>
+        </div>
+      </details>
       <div id="case-list" aria-label="Email list"></div>
       <div id="noise-panel" hidden>
         <p class="muted" id="noise-status" style="padding: 0 var(--sp-4); margin: var(--sp-2) 0;"></p>
@@ -10831,6 +10891,17 @@ initSettings();
 initPriorityFilter();
 initInboxSourceControls();
 initSmartFilterFold();
+var openSettingsBtn = document.getElementById("open-settings-btn");
+if (openSettingsBtn) {
+  openSettingsBtn.addEventListener("click", function () {
+    var settings = document.getElementById("settings-block");
+    if (!settings) return;
+    settings.open = true;
+    settings.scrollIntoView({ behavior: "smooth", block: "start" });
+    var firstInput = settings.querySelector("input.field-input");
+    if (firstInput) setTimeout(function () { firstInput.focus(); }, 350);
+  });
+}
 initChatEmailLinks();
 initReviewerModeControls();
 initViewTabs();
