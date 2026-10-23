@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Aurora Inbox Copilot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════════════════════════════════════
    AGENTIC AI CAPSTONE — LOCKED DESIGN TOKENS  v0.3 (inlined)
@@ -2293,24 +2296,533 @@ body {
   .console { padding: var(--sp-3); }
 }
 </style>
+
+<style>
+/* ════════════════════════════════════════════════════════════════════════
+   GMAIL TRIAGE WORKSPACE — restored from Figma NfPrWsqANxvv0mMEZ61sg8
+   Inter · accent #5752c9 · canvas #f7f8fa · sidebar #f1f2f5 · 216px nav
+   Frame 3:1860 + settings 6:12244 + rules 6:12847 + activity 6:13160
+   ════════════════════════════════════════════════════════════════════════ */
+[data-skin="studio"] {
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --bg: #f7f8fa;
+  --bg-raise: #ffffff;
+  --bg-inset: #f1f2f5;
+  --line: #e7e8ed;
+  --ink: #242733;
+  --ink-2: #747884;
+  --ink-3: #969aa5;
+  --accent: #5752c9;
+  --accent-ink: #ffffff;
+  --accent-soft: #eeedfb;
+  --accent-deep: #4640b8;
+  --chip: #f1f2f5;
+  --cta: #5752c9;
+  --ok: #39806b;
+  --warn: #a77831;
+  --danger: #b75e53;
+  --info: #5752c9;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 2px rgba(36, 39, 51, 0.05);
+}
+html { color-scheme: light; }
+body {
+  background: var(--bg) !important;
+  font-family: var(--font-body);
+  letter-spacing: 0;
+  -webkit-font-smoothing: antialiased;
+}
+* { letter-spacing: normal; }
+h1, h2, h3, h4 { letter-spacing: -0.2px; }
+
+/* ── App shell: 216px sidebar + workspace ────────────────────────────── */
+.app-shell { display: grid; grid-template-columns: 216px minmax(0, 1fr); min-height: 100vh; }
+.app-main { min-width: 0; display: flex; flex-direction: column; }
+
+/* ── Sidebar ─────────────────────────────────────────────────────────── */
+.app-nav {
+  position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  background: #f1f2f5; display: flex; flex-direction: column; gap: 24px;
+  padding: 25px 16px 20px; scrollbar-width: thin;
+}
+.nav-brand { display: flex; align-items: center; gap: 11px; padding-left: 12px; }
+.nav-brand-icon {
+  width: 26px; height: 26px; display: grid; place-items: center; color: var(--accent);
+}
+.nav-brand-icon svg { width: 22px; height: 17px; }
+.nav-brand-name { font-size: 23px; font-weight: 400; color: var(--ink); letter-spacing: -0.8px; }
+.nav-compose {
+  display: flex; align-items: center; gap: 12px; height: 46px; padding: 0 17px;
+  background: #fff; border: 1px solid var(--line); border-radius: 12px;
+  color: var(--ink); font-size: 13px; font-weight: 500; cursor: pointer;
+  transition: box-shadow .15s ease, border-color .15s ease;
+}
+.nav-compose:hover { border-color: color-mix(in srgb, var(--accent) 35%, var(--line)); box-shadow: var(--shadow); }
+.nav-compose svg { width: 18px; height: 18px; color: var(--ink); }
+.nav-group { display: flex; flex-direction: column; gap: 3px; }
+.nav-item {
+  display: flex; align-items: center; gap: 11px; width: 100%; height: 39px;
+  padding: 0 12px; border: 0; border-radius: 8px; background: transparent;
+  color: var(--ink-2); font-size: 12px; font-weight: 400; text-align: left;
+  cursor: pointer; transition: background .12s ease, color .12s ease;
+}
+.nav-item:hover { background: rgba(255, 255, 255, 0.7); color: var(--ink); }
+.nav-item svg { width: 17px; height: 17px; flex: none; color: var(--ink-2); }
+.nav-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nav-count { font-size: 11px; font-weight: 500; color: var(--ink-3); }
+.nav-item.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.nav-item.active svg, .nav-item.active .nav-count { color: var(--accent); }
+.nav-item.nav-demo { opacity: .82; }
+.nav-item.needs-key { color: var(--warn); }
+.nav-item.needs-key svg { color: var(--warn); }
+.nav-item.needs-key::after {
+  content: ""; width: 6px; height: 6px; border-radius: 999px; background: var(--warn); flex: none;
+}
+.nav-section { display: flex; flex-direction: column; gap: 3px; }
+.nav-section-label {
+  display: flex; align-items: center; gap: 5px; height: 14px; padding-left: 12px;
+  font-size: 10px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: .08em;
+}
+.nav-section-label svg { width: 13px; height: 13px; color: var(--ink-3); }
+.nav-labels { display: flex; flex-direction: column; gap: 12px; padding-left: 12px; }
+.nav-label-item { display: flex; align-items: center; gap: 12px; font-size: 12px; color: var(--ink-2); }
+.nav-label-marker { width: 8px; height: 8px; border-radius: 999px; }
+.nav-account { margin-top: auto; display: flex; flex-direction: column; gap: 14px; padding-top: 18px; border-top: 1px solid var(--line); }
+.nav-connection { display: flex; flex-direction: column; gap: 5px; padding: 0 12px; }
+.nav-connection-row { display: flex; align-items: center; gap: 8px; min-height: 18px; }
+.status-dot { width: 6px; height: 6px; border-radius: 999px; background: var(--ok); flex: none; }
+.nav-account-row { display: flex; align-items: center; gap: 10px; padding: 0 12px; }
+.nav-avatar {
+  width: 32px; height: 32px; border-radius: 999px; background: var(--accent-soft);
+  color: var(--accent); font-size: 11px; font-weight: 600;
+  display: grid; place-items: center; flex: none;
+}
+.nav-account-name { font-size: 12px; font-weight: 600; color: var(--ink); }
+.nav-account-mail { font-size: 10px; color: var(--ink-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 128px; }
+
+/* ── Search & utilities bar (h76) ────────────────────────────────────── */
+.searchbar {
+  position: sticky; top: 0; z-index: 30; height: 76px; background: #fff;
+  border-bottom: 1px solid var(--line); display: flex; align-items: center;
+  justify-content: space-between; gap: 24px; padding: 0 28px;
+}
+.search-field {
+  display: flex; align-items: center; gap: 11px; width: 590px; max-width: 52vw;
+  height: 40px; background: var(--bg); border-radius: 8px; padding: 0 14px;
+  border: 1px solid transparent; transition: border-color .15s ease, background .15s ease;
+}
+.search-field:focus-within { border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); background: #fff; }
+.search-field svg { width: 17px; height: 17px; color: var(--ink-2); flex: none; }
+.search-field input {
+  flex: 1; min-width: 0; border: 0; outline: 0; background: transparent;
+  font-family: inherit; font-size: 12px; color: var(--ink);
+}
+.search-field input::placeholder { color: var(--ink-3); }
+.search-kbd { font-size: 10px; color: var(--ink-3); flex: none; }
+.search-utilities { display: flex; align-items: center; gap: 18px; flex: none; }
+.search-date { font-size: 11px; color: var(--ink-2); white-space: nowrap; }
+.search-divider { width: 1px; height: 19px; background: var(--line); }
+.util-btn {
+  width: 32px; height: 32px; border: 0; border-radius: 8px; background: transparent;
+  color: var(--ink-2); display: grid; place-items: center; cursor: pointer;
+  transition: background .12s ease, color .12s ease;
+}
+.util-btn:hover { background: var(--bg-inset); color: var(--ink); }
+.util-btn svg { width: 18px; height: 18px; }
+.search-profile {
+  width: 31px; height: 31px; border-radius: 999px; background: var(--accent-soft);
+  color: var(--accent); font-size: 10px; font-weight: 600;
+  display: grid; place-items: center; cursor: default;
+}
+
+/* ── Console → vertical workspace flow ───────────────────────────────── */
+.console { display: block; padding: 0; gap: 0; min-height: 0; }
+.console[data-layout="reading"],
+.console.session-open,
+.console[data-layout="reading"].session-open { display: block; }
+.workspace-col { display: flex; flex-direction: column; min-height: calc(100vh - 76px); }
+
+/* ── Inbox introduction (hero, frame 3:1934) ─────────────────────────── */
+.inbox-intro { display: flex; flex-direction: column; gap: 22px; padding: 27px 28px 24px; }
+.page-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; }
+.page-greeting { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.page-title { margin: 0; font-size: 28px; line-height: 1.2; font-weight: 600; color: var(--ink); }
+.page-sub { margin: 0; font-size: 12px; color: var(--ink-2); }
+.page-action {
+  display: inline-flex; align-items: center; gap: 7px; height: 35px; padding: 9px 14px;
+  background: #fff; border: 1px solid var(--line); border-radius: 8px;
+  color: var(--ink); font-size: 12px; font-weight: 500; cursor: pointer; white-space: nowrap;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.page-action:hover { border-color: color-mix(in srgb, var(--accent) 35%, var(--line)); box-shadow: var(--shadow); }
+.page-action svg { width: 16px; height: 16px; color: var(--ink-2); }
+.triage-summary-card {
+  display: flex; align-items: center; gap: 17px; padding: 17px 20px;
+  background: #fff; border: 1px solid var(--line); border-radius: 12px;
+}
+.agent-symbol {
+  width: 40px; height: 40px; border-radius: 12px; background: var(--accent-soft);
+  color: var(--accent); display: grid; place-items: center; flex: none;
+}
+.agent-symbol svg { width: 20px; height: 20px; }
+.triage-status { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.triage-status-title { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--ink); }
+.triage-status-line { font-size: 11px; color: var(--ink-2); }
+.triage-summary-card .smart-stats {
+  display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; border: 0; background: transparent;
+}
+.triage-runstamp { display: flex; flex-direction: column; gap: 4px; text-align: right; flex: none; }
+.triage-runstamp-main { font-size: 10px; color: var(--ink-2); white-space: nowrap; }
+.triage-runstamp-sub { font-size: 10px; color: var(--ink-3); white-space: nowrap; }
+.triage-summary-divider { width: 1px; height: 32px; background: var(--line); flex: none; }
+
+/* ── Inbox columns: list + 340px agent assistant ─────────────────────── */
+.inbox-columns {
+  display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 24px;
+  align-items: start; padding: 0 28px 40px;
+}
+.console:not(.session-open) .inbox-columns { grid-template-columns: minmax(0, 1fr); }
+
+/* ── Panels ──────────────────────────────────────────────────────────── */
+.panel { background: #fff; border: 1px solid var(--line); border-radius: 12px; box-shadow: none; }
+.inbox-pane { overflow: hidden; }
+.panel-head {
+  display: flex; align-items: center; gap: 10px; padding: 16px 20px;
+  font-size: 13px; font-weight: 600; color: var(--ink); border-bottom: 1px solid var(--line); margin: 0;
+}
+.inbox-head { padding: 19px 20px 16px; }
+.inbox-title { display: flex; align-items: center; gap: 8px; font-size: 17px; font-weight: 600; }
+.count-badge {
+  min-width: 20px; height: 20px; padding: 3px 7px; border-radius: 5px; background: var(--bg-inset);
+  color: var(--ink-2); font-size: 10px; font-weight: 500; display: inline-flex; align-items: center; justify-content: center;
+}
+.inbox-head-controls { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.session-toggle {
+  position: static; writing-mode: horizontal-tb; width: auto; min-height: 0; height: 30px;
+  padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; background: #fff;
+  color: var(--ink-2); font-size: 11px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px;
+  cursor: pointer;
+}
+.session-toggle::before, .session-toggle-icon, .session-toggle-icon::after { content: none; }
+.session-toggle:hover { border-color: var(--accent); color: var(--accent); background: #fff; }
+.session-toggle[aria-expanded="true"] { background: var(--accent-soft); border-color: transparent; color: var(--accent); }
+.session-toggle-label { display: inline; }
+.inbox-body { padding: 0; }
+.inbox-body > .muted { padding: 10px 20px !important; margin: 0; font-size: 11px; }
+
+/* ── Toolbar ─────────────────────────────────────────────────────────── */
+.inbox-toolrow { padding: 12px 20px 8px; display: flex; flex-direction: column; gap: 10px; }
+.inbox-toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.run-mode-label { font-size: 10px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: .06em; }
+.chip {
+  height: 26px; padding: 6px 10px; border: 0; border-radius: 8px; background: transparent;
+  color: var(--ink-2); font-size: 10px; font-weight: 400; display: inline-flex; align-items: center; gap: 6px;
+  cursor: pointer; transition: background .12s ease, color .12s ease;
+}
+.chip:hover { background: var(--bg-inset); color: var(--ink); }
+.chip.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.chip .muted { color: inherit; opacity: .7; }
+.field-input, .run-mode-select, select.field-input {
+  height: 30px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px;
+  background: #fff; color: var(--ink); font-family: inherit; font-size: 11px; outline: none;
+}
+.field-input:focus-visible, .run-mode-select:focus-visible { border-color: var(--accent); }
+.btn {
+  height: 30px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 8px;
+  background: #fff; color: var(--ink); font-family: inherit; font-size: 11px; font-weight: 500;
+  display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+  transition: border-color .12s ease, box-shadow .12s ease, background .12s ease;
+}
+.btn:hover:not(:disabled) { border-color: color-mix(in srgb, var(--accent) 35%, var(--line)); box-shadow: var(--shadow); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.primary:hover:not(:disabled) { background: var(--accent-deep); border-color: var(--accent-deep); }
+.btn.danger { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 35%, var(--line)); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.badge {
+  height: 20px; padding: 3px 7px; border-radius: 5px; font-size: 10px; font-weight: 500;
+  display: inline-flex; align-items: center; gap: 4px; border: 0;
+}
+.badge.neutral { background: var(--bg-inset); color: var(--ink-2); }
+.badge.info { background: var(--accent-soft); color: var(--accent); }
+.badge.ok { background: #e7f2ee; color: var(--ok); }
+.badge.warn { background: #fbf3e5; color: var(--warn); }
+.badge.danger { background: #f9e9e7; color: var(--danger); }
+
+/* ── Email rows (frames 3:2003 / 3:2035) ─────────────────────────────── */
+#case-list, #noise-list { display: flex; flex-direction: column; }
+.case-card {
+  position: relative; display: flex; flex-direction: column; margin: 0; padding: 0;
+  background: #fff; border: 0; border-bottom: 1px solid var(--line); border-radius: 0;
+  cursor: pointer; transition: background .12s ease;
+}
+.case-card:last-child { border-bottom: 0; }
+.case-card:hover { background: #fafaff; }
+.case-card.active { background: #f7f6fd; box-shadow: inset 3px 0 0 var(--accent); }
+.case-card.is-selected { background: var(--accent-soft); }
+.case-card::before { left: 0; top: 0; bottom: 0; width: 3px; border-radius: 0; }
+.console[data-layout="list"] .case-card,
+.console[data-layout="reading"] .case-card { display: flex; }
+.mail-summary { display: flex; align-items: flex-start; gap: 11px; padding: 12px 18px 10px; min-width: 0; }
+.case-card .mail-select { width: 13px; height: 13px; margin: 9px 0 0; flex: none; accent-color: var(--accent); }
+.sender-avatar {
+  width: 30px; height: 30px; border-radius: 999px; background: var(--bg-inset); color: var(--ink-2);
+  font-size: 9px; font-weight: 500; letter-spacing: .02em; display: grid; place-items: center;
+  flex: none; margin-top: 1px; text-transform: uppercase;
+}
+.case-card.is-unread .sender-avatar { background: #e4e0f5; color: var(--accent); }
+.mail-content { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; padding-right: 70px; }
+.case-card .from, .console[data-layout="list"] .case-card .from {
+  display: flex; align-items: center; gap: 6px; margin: 0; grid-column: auto;
+  font-size: 11px; font-weight: 600; color: var(--ink); min-width: 0;
+}
+.case-card.is-read .from, .case-card.is-read .from-name { font-weight: 500; color: var(--ink); }
+.from-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.unread-dot {
+  width: 5px; height: 5px; min-width: 5px; border-radius: 999px; background: var(--accent);
+  margin: 0 0 0 2px; display: inline-block; box-shadow: none; border: 0;
+}
+.case-card.is-read .unread-dot { display: none; }
+.subject-line { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.case-card .title, .console[data-layout="list"] .case-card .title {
+  flex: 1; min-width: 0; margin: 0; max-width: none; font-size: 12px; font-weight: 600; color: var(--ink);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.case-card.is-read .title { font-weight: 500; }
+.smart-cat-badge {
+  flex: none; height: 20px; padding: 3px 7px; border-radius: 5px; background: var(--bg-inset);
+  color: var(--ink-2); font-size: 10px; font-weight: 500; display: inline-flex; align-items: center;
+}
+.case-card .preview, .console[data-layout="list"] .case-card .preview {
+  margin: 0; flex: none; font-size: 10px; color: var(--ink-2);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.case-card .mail-when, .console[data-layout="list"] .case-card .mail-when {
+  position: absolute; top: 12px; right: 18px; margin: 0; grid-column: auto;
+  font-size: 9px; color: var(--ink-3); white-space: nowrap;
+}
+.case-card .mail-status-row, .console[data-layout="list"] .case-card .mail-status-row {
+  display: flex; align-items: center; gap: 8px; min-height: 0; margin: 0;
+  padding: 0 18px 12px 59px; grid-column: auto;
+}
+.case-card .mail-status-row:empty { display: none; padding: 0; }
+.case-card .prio {
+  height: 18px; padding: 2px 7px; border-radius: 5px; font-size: 9px; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 4px; border: 0;
+}
+.case-card .prio.p0 { color: var(--danger); background: #f9e9e7; border: 0; }
+.case-card .prio.p1 { color: var(--warn); background: #fbf3e5; border: 0; }
+.case-card .prio.p2 { color: var(--ink-2); background: var(--bg-inset); }
+.case-card .flag-line, .console[data-layout="list"] .case-card .flag-line {
+  margin: 0; padding: 0 18px 12px 59px; font-size: 10px; color: var(--danger); background: transparent;
+}
+.noise-card .from-name { font-weight: 500; }
+.noise-kind-badge {
+  height: 18px; padding: 2px 7px; border-radius: 5px; background: var(--bg-inset);
+  color: var(--ink-2); font-size: 9px; font-weight: 500;
+}
+#priority-filter-empty { padding: 20px; font-size: 12px; }
+
+/* ── Reading pane ────────────────────────────────────────────────────── */
+.reading-pane { margin: 0 28px 24px; overflow: hidden; }
+.reading-head { padding: 16px 20px; }
+.reading-head .btn { flex: none; }
+
+/* ── Agent assistant (session pane, 340px) ───────────────────────────── */
+.session-pane { position: sticky; top: 100px; overflow: hidden; }
+.session-pane .panel-body { padding: 14px 16px 18px; display: flex; flex-direction: column; gap: 14px; }
+.session-pane .fold-card {
+  background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; margin: 0;
+}
+.session-pane .fold-card summary { font-size: 12px; font-weight: 600; color: var(--ink); }
+.session-pane .log { font-size: 11px; }
+#summary { font-size: 10px; color: var(--ink-3); }
+
+/* ── Full pages: settings / evals / traces / matrix / rules / jobs ───── */
+.evals-view { display: none; }
+.evals-view.visible { display: block; padding: 0 28px 60px; }
+.section-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 27px 0 20px; border: 0; margin: 0; }
+.section-title-row .panel-head, .evals-view > .section-title-row > .panel-head {
+  padding: 0; border: 0; font-size: 28px; font-weight: 600; color: var(--ink);
+}
+.page-sub { margin: -12px 0 20px; font-size: 12px; color: var(--ink-2); max-width: 640px; }
+.matrix-card { background: #fff; border: 1px solid var(--line); border-radius: 12px; }
+.evals-table, .matrix-table { font-size: 12px; }
+.settings-view { padding: 0 28px 60px; }
+.settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; align-items: start; }
+.settings-card { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
+.settings-card-title { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--ink); margin: 0 0 4px; }
+.settings-card-title svg { width: 16px; height: 16px; color: var(--accent); }
+.settings-card-sub { font-size: 11px; color: var(--ink-2); margin: 0 0 14px; }
+.settings-card label.label-with-tip, .settings-card label.muted {
+  display: flex !important; margin: 12px 0 6px; font-size: 11px; font-weight: 500; color: var(--ink-2);
+}
+.settings-card .field-input { width: 100%; height: 34px; font-size: 12px; }
+.settings-card .row-actions { margin-top: 10px; }
+.settings-back { margin-top: 20px; }
+
+/* ── Chat drawer keeps function, adopts tokens ───────────────────────── */
+.global-chat { border-radius: 16px; border: 1px solid var(--line); box-shadow: 0 24px 64px -24px rgba(36, 39, 51, .35); }
+.chat-launcher { background: var(--accent); }
+
+/* ── Banners ─────────────────────────────────────────────────────────── */
+#first-run-banner, #origin-banner { margin: 0; padding: 0 28px; }
+#first-run-banner:empty, #origin-banner:empty { padding: 0; }
+#first-run-banner.visible, #origin-banner.visible {
+  margin: 16px 28px 0;
+  padding: 12px 18px;
+  border: 1px solid #fbf3e5;
+  border-radius: 12px;
+  background: #fff;
+  color: var(--ink-2);
+  font-size: 12px;
+  line-height: 1.55;
+  box-shadow: var(--shadow);
+}
+#first-run-banner.visible strong, #origin-banner.visible strong { color: var(--ink); }
+
+/* ── Responsive ──────────────────────────────────────────────────────── */
+@media (max-width: 1280px) {
+  .inbox-columns { grid-template-columns: minmax(0, 1fr); }
+  .console.session-open .inbox-columns { grid-template-columns: minmax(0, 1fr); }
+  .session-pane { position: static; }
+}
+@media (max-width: 1100px) {
+  .app-shell { grid-template-columns: 64px minmax(0, 1fr); }
+  .nav-brand-name, .nav-label, .nav-count, .nav-section-label span, .nav-labels,
+  .nav-connection, .nav-account-mail, .nav-compose span, .nav-item span:not(.nav-avatar) { display: none; }
+  .nav-item { justify-content: center; padding: 0; }
+  .nav-compose { justify-content: center; padding: 0; }
+  .nav-section-label { justify-content: center; padding: 0; }
+  .nav-account-row { justify-content: center; padding: 0; }
+  .search-field { max-width: none; flex: 1; }
+  .search-date, .search-divider { display: none; }
+}
+@media (max-width: 720px) {
+  .inbox-intro, .inbox-columns, .evals-view, .settings-view, .reading-pane { padding-left: 16px; padding-right: 16px; margin-left: 0; margin-right: 0; }
+  .searchbar { padding: 0 16px; }
+  .page-heading { flex-direction: column; }
+  .mail-content { padding-right: 56px; }
+}
+</style>
 </head>
 <body>
-<header class="topbar">
-  <div class="product"><span class="product-mark" aria-hidden="true">A</span>Aurora Inbox Copilot</div>
-  <span id="top-status" class="badge info">Ready</span>
-  <div class="meta" id="top-meta">Inbox triage · real clock · Liquid Glass theme</div>
-</header>
-
-<nav class="view-tabs" aria-label="Main views">
-  <div class="view-tabs-rail" role="presentation">
-    <button type="button" class="chip active" id="tab-work" data-view="work">Work</button>
-    <button type="button" class="chip" id="tab-evals" data-view="evals">Evals</button>
-    <button type="button" class="chip" id="tab-traces" data-view="traces">Trace</button>
-    <button type="button" class="chip" id="tab-matrix" data-view="matrix">Priority matrix</button>
-    <button type="button" class="chip" id="tab-jobs" data-view="jobs">Job board</button>
-    <button type="button" class="chip" id="tab-rules" data-view="rules">Rules</button>
+<div class="app-shell">
+<aside class="app-nav" aria-label="Main navigation">
+  <div class="nav-brand" title="Aurora Inbox Copilot">
+    <span class="nav-brand-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+    </span>
+    <span class="nav-brand-name">Gmail</span>
   </div>
-</nav>
+
+  <button type="button" class="nav-compose" id="nav-compose-btn" title="Ask the assistant — classify and draft">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg>
+    <span>Compose</span>
+  </button>
+
+  <nav class="nav-group" aria-label="Mail folders">
+    <button type="button" class="nav-item active" id="tab-work" data-view="work" title="Triage inbox">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+      <span class="nav-label">Inbox</span>
+      <span class="nav-count" id="nav-inbox-count">0</span>
+    </button>
+    <button type="button" class="nav-item" id="inbox-view-noise" data-view="noise" title="Spam &amp; ads filtered out of triage">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>
+      <span class="nav-label">Spam &amp; ads</span>
+      <span class="nav-count" id="noise-count-badge">0</span>
+    </button>
+    <button type="button" class="nav-item nav-demo" data-demo="Starred">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      <span class="nav-label">Starred</span><span class="nav-count">8</span>
+    </button>
+    <button type="button" class="nav-item nav-demo" data-demo="Snoozed">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span class="nav-label">Snoozed</span>
+    </button>
+    <button type="button" class="nav-item nav-demo" data-demo="Sent">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+      <span class="nav-label">Sent</span>
+    </button>
+    <button type="button" class="nav-item nav-demo" data-demo="Drafts">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>
+      <span class="nav-label">Drafts</span><span class="nav-count">3</span>
+    </button>
+    <button type="button" class="nav-item nav-demo" data-demo="All mail">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+      <span class="nav-label">All mail</span>
+    </button>
+    <button type="button" class="nav-item nav-demo" data-demo="More">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      <span class="nav-label">More</span>
+    </button>
+  </nav>
+
+  <div class="nav-section">
+    <div class="nav-section-label"><span>Agent</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+    </div>
+    <button type="button" class="nav-item" id="nav-tasks-btn" title="Open the agent assistant panel">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/><path d="M13 6h8"/><path d="M13 12h8"/><path d="M13 18h8"/></svg>
+      <span class="nav-label">Suggested tasks</span>
+      <span class="nav-count" id="nav-task-count">0</span>
+    </button>
+    <button type="button" class="nav-item" id="tab-rules" data-view="rules" title="Rule packs &amp; interview">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></svg>
+      <span class="nav-label">Triage rules</span>
+    </button>
+    <button type="button" class="nav-item" id="tab-traces" data-view="traces" title="Every agent run, reversible">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+      <span class="nav-label">Activity log</span>
+    </button>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label"><span>Workspace</span></div>
+    <button type="button" class="nav-item" id="tab-evals" data-view="evals">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+      <span class="nav-label">Evals</span>
+    </button>
+    <button type="button" class="nav-item" id="tab-matrix" data-view="matrix">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
+      <span class="nav-label">Priority matrix</span>
+    </button>
+    <button type="button" class="nav-item" id="tab-jobs" data-view="jobs">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="14" x="2" y="7" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+      <span class="nav-label">Job board</span>
+    </button>
+    <button type="button" class="nav-item" id="nav-settings-btn" title="API keys, routing, Google connection">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+      <span class="nav-label">Triage settings</span>
+    </button>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label"><span>Labels</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+    </div>
+    <div class="nav-labels">
+      <span class="nav-label-item"><span class="nav-label-marker" style="background:#5752c9"></span>Projects</span>
+      <span class="nav-label-item"><span class="nav-label-marker" style="background:#39806b"></span>People</span>
+      <span class="nav-label-item"><span class="nav-label-marker" style="background:#a77831"></span>Finance</span>
+    </div>
+  </div>
+
+  <div class="nav-account">
+    <div class="nav-connection">
+      <div class="nav-connection-row"><span class="status-dot" aria-hidden="true"></span><span id="top-status" class="badge info">Ready</span></div>
+      <span id="top-meta" class="nav-account-mail">New mail is triaged automatically</span>
+    </div>
+    <div class="nav-account-row">
+      <span class="nav-avatar" aria-hidden="true">A</span>
+      <span>
+        <span class="nav-account-name">Aurora operator</span><br>
+        <span class="nav-account-mail">ren@aurora.example</span>
+      </span>
+    </div>
+  </div>
+</aside>
+<main class="app-main">
 
 <div id="first-run-banner" role="status"></div>
 <div id="origin-banner" role="status"></div>
@@ -2368,15 +2880,87 @@ body {
     </div>
   </div>
 </aside>
+  <div class="workspace-col">
+    <header class="searchbar">
+      <div class="search-field">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="search" id="inbox-search" placeholder="Search mail, people, or tasks" aria-label="Search mail, people, or tasks" autocomplete="off">
+        <span class="search-kbd" aria-hidden="true">⌘ K</span>
+      </div>
+      <div class="search-utilities">
+        <span class="search-date" id="search-date">—</span>
+        <span class="search-divider" aria-hidden="true"></span>
+        <button type="button" class="util-btn" id="search-help-btn" title="About this workspace" aria-label="About this workspace">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+        </button>
+        <button type="button" class="util-btn" id="search-settings-btn" title="Triage settings" aria-label="Triage settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+        <span class="search-profile" title="Aurora operator" aria-hidden="true">AL</span>
+      </div>
+    </header>
+
+    <section class="inbox-intro" aria-label="Inbox introduction">
+      <div class="page-heading">
+        <div class="page-greeting">
+          <h1 class="page-title">A little less inbox. A lot more focus.</h1>
+          <p class="page-sub" id="hero-sub">Good morning. Your inbox is organized — here's what matters today.</p>
+        </div>
+        <button type="button" class="page-action" id="hero-settings-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></svg>
+          Triage settings
+        </button>
+      </div>
+      <div class="triage-summary-card">
+        <span class="agent-symbol" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+        </span>
+        <div class="triage-status">
+          <span class="triage-status-title" id="triage-status-title">You're all triaged</span>
+          <span class="triage-status-line" id="hero-default-line">Run All to organize this inbox · Jev decides priority · DeepSeek drafts replies</span>
+          <div class="smart-stats" id="smart-stats" hidden></div>
+        </div>
+        <div class="triage-runstamp">
+          <span class="triage-runstamp-main" id="triage-runstamp-main">Last synced just now</span>
+          <span class="triage-runstamp-sub">New mail is triaged automatically</span>
+        </div>
+        <span class="triage-summary-divider" aria-hidden="true"></span>
+        <button type="button" class="page-action" id="review-changes-btn" style="height:30px;padding:6px 10px;font-size:11px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+          Review changes
+        </button>
+      </div>
+    </section>
+
+    <!-- Reading · Triage (only after an email is clicked) -->
+    <main class="panel main-scroll reading-pane" id="reading-pane" hidden>
+      <div class="panel-head reading-head">
+        <span>Reading · Triage</span>
+        <button type="button" class="btn" id="inbox-back-btn">Back to inbox</button>
+      </div>
+      <div class="panel-body" id="work-area"></div>
+    </main>
+
   <!-- Inbox list (full-width until an email is opened) -->
+  <div class="inbox-columns">
   <aside class="panel left-scroll inbox-pane">
-    <div class="panel-head">
-      <span>Inbox</span>
-      <span class="info-tip">
-        <button type="button" class="info-tip-btn" aria-label="About inbox">i</button>
-          <span class="info-tip-pop align-end" role="tooltip">Click an email to open Reading · Triage. Run All can be Manual (once) or Automatic on a cadence you choose. Demo chips jump to a known story. Settings (API keys, Google) are folded at the bottom.</span>
+    <div class="panel-head inbox-head">
+      <span class="inbox-title">Inbox
+        <span class="count-badge" id="inbox-count-badge">0</span>
+        <span class="info-tip">
+          <button type="button" class="info-tip-btn" aria-label="About inbox">i</button>
+          <span class="info-tip-pop align-end" role="tooltip">Click an email to open Reading · Triage. Run All can be Manual (once) or Automatic on a cadence you choose. Demo chips jump to a known story.</span>
+        </span>
       </span>
-      <button type="button" class="btn" id="open-settings-btn" title="打开 Settings · API keys & Google" style="margin-left:auto;min-width:0;">⚙️ Settings</button>
+      <span class="inbox-head-controls">
+        <button type="button" class="session-toggle" id="session-toggle" aria-expanded="false" aria-controls="session-pane" title="Show agent assistant">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:13px;height:13px;"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+          <span class="session-toggle-label" id="session-toggle-label">Agent</span>
+        </button>
+        <button type="button" class="util-btn" id="open-settings-btn" title="打开 Settings · API keys & Google" aria-label="Settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </span>
     </div>
     <div class="panel-body inbox-body">
       <p class="muted" id="run-all-schedule" style="padding: 0 var(--sp-4);" hidden></p>
@@ -2385,8 +2969,6 @@ body {
       <p class="muted" id="gmail-inbox-status" style="padding: 0 var(--sp-4);" hidden></p>
       <div class="inbox-toolrow">
       <div class="inbox-toolbar" id="inbox-list-view-controls">
-        <button type="button" class="chip active" id="inbox-view-triage" data-view="triage">Triage</button>
-        <button type="button" class="chip" id="inbox-view-noise" data-view="noise">Spam &amp; ads <span id="noise-count-badge" class="muted">0</span></button>
         <details class="smart-filter-fold" id="smart-filter-fold">
           <summary class="chip">分类 <span id="smart-filter-count" class="muted">0</span></summary>
           <div class="smart-filter-pop" id="smart-filter-pop"></div>
@@ -2435,7 +3017,6 @@ body {
         </span>
       </div>
       </div>
-      <div class="smart-stats" id="smart-stats" hidden></div>
       <div class="smart-filter-tags" id="smart-filter-tags" hidden></div>
             <details class="tool-overflow" id="tool-overflow">
         <summary>⋯ 更多工具</summary>
@@ -2478,88 +3059,8 @@ body {
         </div>
         <div id="noise-list" aria-label="Spam and ads list"></div>
       </div>
-      <details class="settings-fold" id="settings-block">
-        <summary>Settings · API keys &amp; Google</summary>
-        <div class="settings-body">
-        <label class="muted label-with-tip" for="api-key">
-          Worker API key — DeepSeek (localStorage only)
-          <span class="info-tip">
-            <button type="button" class="info-tip-btn" aria-label="About worker key">i</button>
-            <span class="info-tip-pop" role="tooltip">Worker uses DeepSeek (via localhost:8787 proxy). Get a key at platform.deepseek.com. Open the app at http://localhost:8787/ (not file://). Keys stay in this browser only.</span>
-          </span>
-        </label>
-        <input class="field-input" type="password" id="api-key" placeholder="Paste DeepSeek API key">
-        <div class="row-actions" style="margin-top: var(--sp-2);">
-          <button id="save-key" class="btn">Save key</button>
-          <button id="clear-key" class="btn">Clear</button>
-          <span id="key-status" class="badge neutral">no key</span>
-        </div>
-        <label class="muted label-with-tip" for="jev-key" style="display:flex; margin-top: var(--sp-4);">
-          Triage API key — TypeSafe Jev (localStorage only)
-          <span class="info-tip">
-            <button type="button" class="info-tip-btn" aria-label="About Jev key">i</button>
-            <span class="info-tip-pop" role="tooltip">Jev decides each email's priority and whether a reply is needed. Only emails that need a reply are handed to the DeepSeek worker for drafting. Get a key at console.typesafe.ai. Calls go through the localhost:8787 proxy. Without a Jev key, DeepSeek decides priority as before.</span>
-          </span>
-        </label>
-        <input class="field-input" type="password" id="jev-key" placeholder="Paste TypeSafe API key">
-        <div class="row-actions" style="margin-top: var(--sp-2);">
-          <button id="save-jev-key" class="btn">Save Jev key</button>
-          <button id="clear-jev-key" class="btn">Clear</button>
-          <span id="jev-key-status" class="badge neutral">no key</span>
-        </div>
-        <label class="muted label-with-tip" for="openai-key" style="display:flex; margin-top: var(--sp-4);">
-          Reviewer API key — OpenAI (localStorage only)
-          <span class="info-tip">
-            <button type="button" class="info-tip-btn" aria-label="About reviewer key">i</button>
-            <span class="info-tip-pop" role="tooltip">Reviewer uses OpenAI (gpt-4o) as an independent check before you Approve / Edit / Escalate.</span>
-          </span>
-        </label>
-        <input class="field-input" type="password" id="openai-key" placeholder="Paste OpenAI key">
-        <div class="row-actions" style="margin-top: var(--sp-2);">
-          <button id="save-openai-key" class="btn">Save OpenAI key</button>
-          <button id="clear-openai-key" class="btn">Clear</button>
-          <span id="openai-key-status" class="badge neutral">no key</span>
-        </div>
-        <label class="muted label-with-tip" for="lmnr-key" style="display:flex; margin-top: var(--sp-4);">
-          Laminar project API key (optional tracing)
-          <span class="info-tip">
-            <button type="button" class="info-tip-btn" aria-label="About Laminar">i</button>
-            <span class="info-tip-pop" role="tooltip">Sends Jev, worker, and reviewer runs to Laminar Cloud (laminar.sh) via the Aurora proxy. Create a project at laminar.sh, copy its project API key, Save here. Self-hosted Laminar works too if the proxy is started with LMNR_BASE_URL=http://localhost. After changing this key, restart the Aurora server; it keeps the first key it saw.</span>
-          </span>
-        </label>
-        <input class="field-input" type="password" id="lmnr-key" placeholder="Paste Laminar project API key">
-        <div class="row-actions" style="margin-top: var(--sp-2);">
-          <button id="save-lmnr-key" class="btn">Save Laminar key</button>
-          <button id="clear-lmnr-key" class="btn">Clear</button>
-          <span id="lmnr-key-status" class="badge neutral">off</span>
-        </div>
-        <label class="muted label-with-tip" for="google-client-id" style="display:flex; margin-top: var(--sp-4);">
-          Google OAuth Client ID (Calendar + Gmail)
-          <span class="info-tip">
-            <button type="button" class="info-tip-btn" aria-label="About Google">i</button>
-            <span class="info-tip-pop align-end" role="tooltip">Connects Calendar events and Gmail (read, drafts, trash spam/ads). Enable Gmail API in Google Cloud. Origins/redirects: http://localhost:8787 and http://127.0.0.1:8787 — no trailing slash. Re-Connect Google after updates so consent includes gmail.modify. Triage sends mail text to DeepSeek/OpenAI; drafts are saved, never auto-sent.</span>
-          </span>
-        </label>
-        <input class="field-input" type="text" id="google-client-id" placeholder="xxxx.apps.googleusercontent.com">
-        <div class="row-actions" style="margin-top: var(--sp-2);">
-          <button id="save-google-client" class="btn">Save Client ID</button>
-          <button id="google-connect-btn" class="btn primary">Connect Google</button>
-          <button id="google-disconnect-btn" class="btn">Disconnect</button>
-          <span id="google-status" class="badge neutral">not connected</span>
-        </div>
-        </div>
-      </details>
     </div>
   </aside>
-
-  <!-- Reading · Triage (only after an email is clicked) -->
-  <main class="panel main-scroll reading-pane" id="reading-pane" hidden>
-    <div class="panel-head reading-head">
-      <span>Reading · Triage</span>
-      <button type="button" class="btn" id="inbox-back-btn">Back to inbox</button>
-    </div>
-    <div class="panel-body" id="work-area"></div>
-  </main>
 
   <!-- Session drawer (hidden by default; open from rail) -->
   <aside class="panel right-scroll session-pane" id="session-pane" hidden>
@@ -2586,11 +3087,8 @@ body {
       </details>
     </div>
   </aside>
-
-  <button type="button" class="session-toggle" id="session-toggle" aria-expanded="false" aria-controls="session-pane" title="Show session">
-    <span class="session-toggle-icon" aria-hidden="true"></span>
-    <span class="session-toggle-label" id="session-toggle-label">Show session</span>
-  </button>
+  </div><!-- /.inbox-columns -->
+  </div><!-- /.workspace-col -->
 </div>
 
 <section class="evals-view" id="evals-view" aria-label="Evals">
@@ -2601,6 +3099,7 @@ body {
       <span class="info-tip-pop" role="tooltip">Expected text is from your Design PRD. Run a row to fill Actual with what the agent really returned. You judge the verdict — the agent does not grade itself.</span>
     </span>
   </div>
+  <p class="page-sub">Expected answers come from your Design PRD. Run a case, compare with what the agent really returned, and judge the verdict yourself.</p>
   <div class="scoreboard" id="evals-scoreboard" aria-label="Eval scoreboard"></div>
   <div class="eval-run-meta">
     <div class="row-actions" style="align-items: center;">
@@ -2654,6 +3153,7 @@ body {
       <span class="info-tip-pop" role="tooltip">Local LangSmith-style log of every worker and reviewer API call in this browser. Open a run to inspect system prompt, context, and output — then write review notes. Notes and traces stay in this browser; Export JSON includes them. Nothing is sent to an external tracing service.</span>
     </span>
   </div>
+  <p class="page-sub">Every Jev, worker, and reviewer run in this browser — what changed, why it changed, and how to take it back.</p>
   <div class="row-actions" style="margin-bottom: var(--sp-3);">
     <button type="button" class="btn" id="traces-refresh-btn">Refresh</button>
     <button type="button" class="btn" id="traces-export-btn">Export JSON</button>
@@ -2676,6 +3176,7 @@ body {
       <span class="info-tip-pop" role="tooltip"><strong>Actual</strong> priorities sync from Work runs in this browser. Expected comes from the evaluator answer key (never sent to the agent). Collision rows are Discovery judgment cases. When all 16 Actuals are present, the matrix computes itself.</span>
     </span>
   </div>
+  <p class="page-sub">Actual priorities sync from Work runs; expected comes from the evaluation sheet. Compute to see P0 recall.</p>
   <p class="muted" id="matrix-sync-status" style="margin-top:0;"></p>
 
   <div class="matrix-card">
@@ -2724,6 +3225,7 @@ body {
       <span class="info-tip-pop" role="tooltip">Build and save multiple rule packs. Pick which pack Work uses, or stay on Aurora demo rules. Edit any saved pack anytime. Nothing sends without human approval.</span>
     </span>
   </div>
+  <p class="page-sub">Build and save rule packs, then choose which one Work uses for triage decisions.</p>
   <p class="muted" id="rules-active-banner" style="margin-top:0;"></p>
 
   <div class="matrix-card rules-mode-card">
@@ -2798,6 +3300,7 @@ body {
       <span class="info-tip-pop" role="tooltip">Summarizes emails that triage marked <strong>P0</strong> and look like job alerts (recruiting, openings, LinkedIn/Greenhouse, etc.). Run triage on Work first. Build summary uses your worker API key — it does not send mail.</span>
     </span>
   </div>
+  <p class="page-sub">P0 emails that look like job alerts, summarized into one board.</p>
   <p class="muted" id="jobs-status" style="margin-top:0;">Run triage on Work (or Run All), then refresh this list and Build summary.</p>
 
   <div class="matrix-card">
@@ -2830,6 +3333,108 @@ body {
     <div id="jobs-cards"></div>
   </div>
 </section>
+
+<section class="evals-view settings-view" id="settings-view" aria-label="Triage settings">
+  <div class="section-title-row">
+    <div class="panel-head">Triage settings</div>
+    <button type="button" class="btn" id="settings-back-btn">← Back to inbox</button>
+  </div>
+  <p class="page-sub">Keys stay in this browser only (localStorage). Jev decides each email's priority and whether a reply is needed; DeepSeek drafts; OpenAI gives an independent review; Laminar traces every run. Nothing is sent without your Approve.</p>
+  <div class="settings-grid">
+    <div class="settings-card">
+      <h2 class="settings-card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+        Automatic triage
+      </h2>
+      <p class="settings-card-sub">Classification routing — Jev gates priority, DeepSeek drafts replies.</p>
+      <label class="muted label-with-tip" for="api-key">
+        Worker API key — DeepSeek (localStorage only)
+        <span class="info-tip">
+          <button type="button" class="info-tip-btn" aria-label="About worker key">i</button>
+          <span class="info-tip-pop" role="tooltip">Worker uses DeepSeek (via localhost:8787 proxy). Get a key at platform.deepseek.com. Open the app at http://localhost:8787/ (not file://). Keys stay in this browser only.</span>
+        </span>
+      </label>
+      <input class="field-input" type="password" id="api-key" placeholder="Paste DeepSeek API key">
+      <div class="row-actions">
+        <button id="save-key" class="btn">Save key</button>
+        <button id="clear-key" class="btn">Clear</button>
+        <span id="key-status" class="badge neutral">no key</span>
+      </div>
+      <label class="muted label-with-tip" for="jev-key">
+        Triage API key — TypeSafe Jev (localStorage only)
+        <span class="info-tip">
+          <button type="button" class="info-tip-btn" aria-label="About Jev key">i</button>
+          <span class="info-tip-pop" role="tooltip">Jev decides each email's priority and whether a reply is needed. Only emails that need a reply are handed to the DeepSeek worker for drafting. Get a key at console.typesafe.ai. Calls go through the localhost:8787 proxy. Without a Jev key, DeepSeek decides priority as before.</span>
+        </span>
+      </label>
+      <input class="field-input" type="password" id="jev-key" placeholder="Paste TypeSafe API key">
+      <div class="row-actions">
+        <button id="save-jev-key" class="btn">Save Jev key</button>
+        <button id="clear-jev-key" class="btn">Clear</button>
+        <span id="jev-key-status" class="badge neutral">no key</span>
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <h2 class="settings-card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        Confidence &amp; review
+      </h2>
+      <p class="settings-card-sub">Independent reviewer and run tracing.</p>
+      <label class="muted label-with-tip" for="openai-key">
+        Reviewer API key — OpenAI (localStorage only)
+        <span class="info-tip">
+          <button type="button" class="info-tip-btn" aria-label="About reviewer key">i</button>
+          <span class="info-tip-pop" role="tooltip">Reviewer uses OpenAI (gpt-4o) as an independent check before you Approve / Edit / Escalate.</span>
+        </span>
+      </label>
+      <input class="field-input" type="password" id="openai-key" placeholder="Paste OpenAI key">
+      <div class="row-actions">
+        <button id="save-openai-key" class="btn">Save OpenAI key</button>
+        <button id="clear-openai-key" class="btn">Clear</button>
+        <span id="openai-key-status" class="badge neutral">no key</span>
+      </div>
+      <label class="muted label-with-tip" for="lmnr-key">
+        Laminar project API key (optional tracing)
+        <span class="info-tip">
+          <button type="button" class="info-tip-btn" aria-label="About Laminar">i</button>
+          <span class="info-tip-pop" role="tooltip">Sends Jev, worker, and reviewer runs to Laminar Cloud (laminar.sh) via the Aurora proxy. Create a project at laminar.sh, copy its project API key, Save here. Self-hosted Laminar works too if the proxy is started with LMNR_BASE_URL=http://localhost. After changing this key, restart the Aurora server; it keeps the first key it saw.</span>
+        </span>
+      </label>
+      <input class="field-input" type="password" id="lmnr-key" placeholder="Paste Laminar project API key">
+      <div class="row-actions">
+        <button id="save-lmnr-key" class="btn">Save Laminar key</button>
+        <button id="clear-lmnr-key" class="btn">Clear</button>
+        <span id="lmnr-key-status" class="badge neutral">off</span>
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <h2 class="settings-card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+        Google connection
+      </h2>
+      <p class="settings-card-sub">Gmail + Calendar OAuth. Drafts are saved, never auto-sent.</p>
+      <label class="muted label-with-tip" for="google-client-id">
+        Google OAuth Client ID (Calendar + Gmail)
+        <span class="info-tip">
+          <button type="button" class="info-tip-btn" aria-label="About Google">i</button>
+          <span class="info-tip-pop align-end" role="tooltip">Connects Calendar events and Gmail (read, drafts, trash spam/ads). Enable Gmail API in Google Cloud. Origins/redirects: http://localhost:8787 and http://127.0.0.1:8787 — no trailing slash. Re-Connect Google after updates so consent includes gmail.modify. Triage sends mail text to DeepSeek/OpenAI; drafts are saved, never auto-sent.</span>
+        </span>
+      </label>
+      <input class="field-input" type="text" id="google-client-id" placeholder="xxxx.apps.googleusercontent.com">
+      <div class="row-actions">
+        <button id="save-google-client" class="btn">Save Client ID</button>
+        <button id="google-connect-btn" class="btn primary">Connect Google</button>
+        <button id="google-disconnect-btn" class="btn">Disconnect</button>
+        <span id="google-status" class="badge neutral">not connected</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+</div><!-- /.app-shell -->
 
 
 <script>
@@ -3972,16 +4577,20 @@ function renderNoiseList() {
     var s = senderById(em.sender_id) || {};
     var preview = String(em.body || "").replace(/\s+/g, " ").trim().slice(0, 90);
     if ((em.body || "").length > 90) preview += "…";
+    var senderName = s.name || em.gmail_from || "Unknown";
+    var initials = (senderName.replace(/[^A-Za-z\u00C0-\u024F]+/g, " ").trim().split(/\s+/).slice(0, 2)
+      .map(function (w) { return w.charAt(0); }).join("") || "?").toUpperCase();
     var card = document.createElement("div");
     card.className = "case-card noise-card is-read";
     card.innerHTML =
-      "<div class='mail-row-top'>" +
-      "<div class='from'>" + escapeHtml(s.name || em.gmail_from || "Unknown") +
+      "<div class='mail-summary'>" +
+      "<span class='sender-avatar' aria-hidden='true'>" + escapeHtml(initials) + "</span>" +
+      "<div class='mail-content'>" +
+      "<div class='from'><span class='from-name'>" + escapeHtml(senderName) + "</span>" +
       "<span class='noise-kind-badge'>" + escapeHtml(noiseKindLabel(em.noise_kind)) + "</span></div>" +
-      "</div>" +
-      "<div class='mail-main'>" +
-      "<span class='title'>" + escapeHtml(em.subject) + "</span>" +
+      "<div class='subject-line'><span class='title'>" + escapeHtml(em.subject) + "</span></div>" +
       "<span class='preview'>" + escapeHtml(preview) + "</span>" +
+      "</div>" +
       "</div>" +
       "<div class='mail-when'>" + escapeHtml(em.received_at || "") + "</div>";
     list.appendChild(card);
@@ -4441,12 +5050,9 @@ function refreshKeyStatus() {
     lst.textContent = hasLmnr ? "Laminar on" : "off";
     lst.className = "badge " + (hasLmnr ? "ok" : "neutral");
   }
-  var settings = document.getElementById("settings-block");
-  if (settings) {
-    var needsSettings = !has || (isReviewerAuto() && !hasOai);
-    settings.classList.toggle("needs-key", needsSettings);
-    if (needsSettings) settings.open = true;
-  }
+  var needsSettings = !has || (isReviewerAuto() && !hasOai);
+  var settingsLink = document.getElementById("nav-settings-btn");
+  if (settingsLink) settingsLink.classList.toggle("needs-key", needsSettings);
 
   var banner = document.getElementById("first-run-banner");
   if (banner) {
@@ -5441,7 +6047,9 @@ function initSessionToggle() {
       paintWelcome();
     });
   }
-  setSessionOpen(false);
+  // Figma 3:1860 shows the Agent assistant panel as part of the workspace —
+  // open it by default on wide screens, collapse on narrow ones.
+  setSessionOpen(window.matchMedia("(min-width: 1280px)").matches);
   setWorkLayout("list");
 }
 
@@ -6767,24 +7375,28 @@ function setMainView(name) {
   var matrix = document.getElementById("matrix-view");
   var rules = document.getElementById("rules-view");
   var jobs = document.getElementById("jobs-view");
+  var settingsView = document.getElementById("settings-view");
   var tabWork = document.getElementById("tab-work");
   var tabEvals = document.getElementById("tab-evals");
   var tabTraces = document.getElementById("tab-traces");
   var tabMatrix = document.getElementById("tab-matrix");
   var tabRules = document.getElementById("tab-rules");
   var tabJobs = document.getElementById("tab-jobs");
+  var navSettings = document.getElementById("nav-settings-btn");
   if (work) work.classList.toggle("hidden", name !== "work");
   if (evals) evals.classList.toggle("visible", name === "evals");
   if (traces) traces.classList.toggle("visible", name === "traces");
   if (matrix) matrix.classList.toggle("visible", name === "matrix");
   if (rules) rules.classList.toggle("visible", name === "rules");
   if (jobs) jobs.classList.toggle("visible", name === "jobs");
+  if (settingsView) settingsView.classList.toggle("visible", name === "settings");
   if (tabWork) tabWork.classList.toggle("active", name === "work");
   if (tabEvals) tabEvals.classList.toggle("active", name === "evals");
   if (tabTraces) tabTraces.classList.toggle("active", name === "traces");
   if (tabMatrix) tabMatrix.classList.toggle("active", name === "matrix");
   if (tabRules) tabRules.classList.toggle("active", name === "rules");
   if (tabJobs) tabJobs.classList.toggle("active", name === "jobs");
+  if (navSettings) navSettings.classList.toggle("active", name === "settings");
   var banner = document.getElementById("first-run-banner");
   if (banner) banner.style.display = name === "work" ? "" : "none";
   if (name === "traces") renderTracesView();
@@ -10789,19 +11401,22 @@ function render() {
     var s = senderById(em.sender_id) || {};
     var preview = String(em.body || "").replace(/\s+/g, " ").trim().slice(0, 90);
     if ((em.body || "").length > 90) preview += "…";
+    var senderName = s.name || em.gmail_from || "Unknown";
+    var initials = (senderName.replace(/[^A-Za-z\u00C0-\u024F]+/g, " ").trim().split(/\s+/).slice(0, 2)
+      .map(function (w) { return w.charAt(0); }).join("") || "?").toUpperCase();
     var card = document.createElement("div");
     card.className = "case-card is-unread";
     card.setAttribute("role", "button");
     card.tabIndex = 0;
     card.innerHTML =
-      "<div class='mail-row-top'>" +
-      "<div class='from'><input type='checkbox' class='mail-select' aria-label='Select email from " +
-      escapeHtml(s.name || "Unknown") + "'>" + escapeHtml(s.name || "Unknown") + "</div>" +
-      "<span class='prio' hidden></span>" +
-      "</div>" +
-      "<div class='mail-main'>" +
-      "<span class='title'>" + escapeHtml(em.subject) + "</span>" +
+      "<div class='mail-summary'>" +
+      "<input type='checkbox' class='mail-select' aria-label='Select email from " + escapeHtml(senderName) + "'>" +
+      "<span class='sender-avatar' aria-hidden='true'>" + escapeHtml(initials) + "</span>" +
+      "<div class='mail-content'>" +
+      "<div class='from'><span class='from-name'>" + escapeHtml(senderName) + "</span><span class='prio' hidden></span></div>" +
+      "<div class='subject-line'><span class='title'>" + escapeHtml(em.subject) + "</span></div>" +
       "<span class='preview'>" + escapeHtml(preview) + "</span>" +
+      "</div>" +
       "</div>" +
       "<div class='mail-when'>" + escapeHtml(em.received_at) + "</div>" +
       "<div class='mail-status-row'></div>";
@@ -10815,14 +11430,16 @@ function render() {
     badgeEl.hidden = true;
     badgeEl.textContent = "";
     statusRow.appendChild(prioEl);
+    var fromEl = card.querySelector(".from");
+    var subjectLine = card.querySelector(".subject-line");
     if (SMART_APPLIED && em.smart_cat) {
       var catBadge = document.createElement("span");
       catBadge.className = "smart-cat-badge";
       catBadge.textContent = em.smart_cat;
       catBadge.title = em.smart_cat;
-      statusRow.appendChild(catBadge);
+      (subjectLine || statusRow).appendChild(catBadge);
     }
-    statusRow.appendChild(readDot);
+    (fromEl || statusRow).appendChild(readDot);
     statusRow.appendChild(badgeEl);
 
     var view = {
@@ -10857,6 +11474,28 @@ function render() {
     list.appendChild(card);
     updateCaseCardBadge(view);
   });
+
+  // Gmail triage workspace — sync sidebar counts and hero summary (Figma restore).
+  var triagedCount = CASE_VIEWS.filter(function (v) { return v.result; }).length;
+  var navInboxCount = document.getElementById("nav-inbox-count");
+  if (navInboxCount) navInboxCount.textContent = String(activeEmails.length);
+  var inboxBadge = document.getElementById("inbox-count-badge");
+  if (inboxBadge) inboxBadge.textContent = String(activeEmails.length);
+  var navTaskCount = document.getElementById("nav-task-count");
+  if (navTaskCount) navTaskCount.textContent = String(triagedCount);
+  var heroSub = document.getElementById("hero-sub");
+  if (heroSub) {
+    heroSub.textContent = activeEmails.length
+      ? activeEmails.length + " emails in this inbox · " + triagedCount + " triaged with agent suggestions"
+      : "Connect Google in Triage settings, or switch the source to Demo, then Run All.";
+  }
+  var heroDefault = document.getElementById("hero-default-line");
+  var smartStatsEl = document.getElementById("smart-stats");
+  if (heroDefault && smartStatsEl) heroDefault.hidden = !smartStatsEl.hidden;
+  var runstamp = document.getElementById("triage-runstamp-main");
+  if (runstamp) {
+    runstamp.textContent = "Last synced " + new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  }
 
   var chips = document.getElementById("demo-chips");
   if (chips) {
@@ -10893,14 +11532,7 @@ initInboxSourceControls();
 initSmartFilterFold();
 var openSettingsBtn = document.getElementById("open-settings-btn");
 if (openSettingsBtn) {
-  openSettingsBtn.addEventListener("click", function () {
-    var settings = document.getElementById("settings-block");
-    if (!settings) return;
-    settings.open = true;
-    settings.scrollIntoView({ behavior: "smooth", block: "start" });
-    var firstInput = settings.querySelector("input.field-input");
-    if (firstInput) setTimeout(function () { firstInput.focus(); }, 350);
-  });
+  openSettingsBtn.addEventListener("click", function () { setMainView("settings"); });
 }
 initChatEmailLinks();
 initReviewerModeControls();
@@ -10927,7 +11559,102 @@ renderEvalsTable();
   else if (hash === "traces" || hash === "trace") setMainView("traces");
   else if (hash === "jobs" || hash === "job-board" || hash === "jobboard") setMainView("jobs");
   else if (hash === "rules" || hash === "rule-builder") setMainView("rules");
+  else if (hash === "settings") setMainView("settings");
   else setMainView("work");
+})();
+
+// ═══ Gmail triage workspace — navigation & search wiring (Figma restore) ═══
+(function initGmailWorkspaceNav() {
+  // Compose opens the AI assistant drawer (classification + drafting).
+  var composeBtn = document.getElementById("nav-compose-btn");
+  if (composeBtn) {
+    composeBtn.addEventListener("click", function () {
+      setMainView("work");
+      setGlobalChatOpen(true);
+    });
+  }
+
+  // Sidebar "Inbox" always returns to the Work view in triage list mode.
+  var tabWorkBtn = document.getElementById("tab-work");
+  if (tabWorkBtn) {
+    tabWorkBtn.addEventListener("click", function () {
+      if (typeof INBOX_LIST_VIEW !== "undefined" && INBOX_LIST_VIEW !== "triage") {
+        INBOX_LIST_VIEW = "triage";
+        syncInboxListViewUi();
+      }
+    });
+  }
+  // Spam & ads list lives inside the Work view.
+  var noiseBtn = document.getElementById("inbox-view-noise");
+  if (noiseBtn) noiseBtn.addEventListener("click", function () { setMainView("work"); });
+
+  // Suggested tasks → agent assistant panel.
+  var tasksBtn = document.getElementById("nav-tasks-btn");
+  if (tasksBtn) {
+    tasksBtn.addEventListener("click", function () {
+      setMainView("work");
+      setSessionOpen(true);
+      var pane = document.getElementById("session-pane");
+      if (pane) pane.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
+  }
+
+  // Settings entry points.
+  ["nav-settings-btn", "search-settings-btn", "hero-settings-btn"].forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener("click", function () { setMainView("settings"); });
+  });
+  var settingsBack = document.getElementById("settings-back-btn");
+  if (settingsBack) settingsBack.addEventListener("click", function () { setMainView("work"); });
+
+  // Design-reference folders (Starred / Snoozed / …) stay visual only.
+  Array.prototype.forEach.call(document.querySelectorAll(".nav-demo"), function (el) {
+    el.addEventListener("click", function () {
+      setTopStatus("info", (el.getAttribute("data-demo") || "This folder") + " — design reference only");
+    });
+  });
+
+  // Search bar date.
+  var dateEl = document.getElementById("search-date");
+  if (dateEl) {
+    dateEl.textContent = new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+  }
+
+  // Help → orientation hint.
+  var helpBtn = document.getElementById("search-help-btn");
+  if (helpBtn) {
+    helpBtn.addEventListener("click", function () {
+      setMainView("work");
+      setTopStatus("info", "Pick an email, run the agent, then Approve / Edit / Escalate");
+    });
+  }
+
+  // Live text filter over subject / sender / preview (client-side only).
+  var searchInput = document.getElementById("inbox-search");
+  if (searchInput) {
+    var applySearch = function () {
+      var q = searchInput.value.trim().toLowerCase();
+      CASE_VIEWS.forEach(function (v) {
+        if (!v.card) return;
+        var senderName = ((senderById(v.em.sender_id) || {}).name) || v.em.gmail_from || "";
+        var hay = ((v.em.subject || "") + " " + senderName + " " + String(v.em.body || "").slice(0, 200)).toLowerCase();
+        var matches = !q || hay.indexOf(q) !== -1;
+        v.card.style.display = (matches && viewMatchesPriorityFilter(v)) ? "" : "none";
+      });
+      refreshPriorityFilterEmptyState();
+    };
+    searchInput.addEventListener("input", applySearch);
+    var prioSelect = document.getElementById("inbox-priority-filter");
+    if (prioSelect) prioSelect.addEventListener("change", function () { setTimeout(applySearch, 0); });
+    window.addEventListener("keydown", function (e) {
+      if ((e.metaKey || e.ctrlKey) && String(e.key).toLowerCase() === "k") {
+        e.preventDefault();
+        setMainView("work");
+        searchInput.focus();
+        searchInput.select();
+      }
+    });
+  }
 })();
 </script>
 </body>
