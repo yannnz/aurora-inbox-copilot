@@ -665,7 +665,10 @@ body {
   padding: var(--sp-2) var(--sp-3);
   border: var(--border-w) solid var(--line);
   border-radius: var(--radius);
-  background: var(--bg-raise, #fff);
+  background: var(--bg-raise, #ffffff);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  opacity: 1;
   box-shadow: 0 16px 40px -18px rgba(0,0,0,.45);
 }
 .smart-cat-badge {
@@ -680,6 +683,86 @@ body {
   background: color-mix(in srgb, var(--accent) 10%, transparent);
   color: var(--ink);
   white-space: nowrap;
+}
+
+/* Studio skin uses a translucent --bg-raise; the dropdown must be opaque for readability. */
+[data-skin="studio"] .smart-filter-pop { background: #ffffff; }
+
+/* ---- UX upgrade: urgency strip / P0 highlight ---- */
+.case-card { position: relative; }
+.case-card::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: transparent;
+}
+.case-card.urg-P0::before { background: var(--danger, #d92d20); }
+.case-card.urg-P1::before { background: var(--warn, #f79009); }
+.case-card.urg-P2::before { background: var(--accent, #1570ef); }
+.case-card.urg-P3::before { background: var(--line, #98a2b3); }
+.case-card.urg-P0 {
+  background: color-mix(in srgb, var(--danger, #d92d20) 6%, var(--bg-raise, #fff));
+}
+
+/* ---- Top stats bar ---- */
+.smart-stats { display: flex; flex-wrap: wrap; gap: var(--sp-2); align-items: center; padding: var(--sp-1) var(--sp-4); }
+.smart-stat-btn {
+  display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px;
+  border-radius: 999px; border: var(--border-w) solid var(--line);
+  background: var(--bg-raise, #fff); cursor: pointer; font-size: var(--fs-0, .72rem);
+}
+.smart-stat-btn.is-danger { border-color: var(--danger, #d92d20); color: var(--danger, #d92d20); }
+.smart-stat-btn:hover { border-color: var(--accent, #1570ef); }
+
+/* ---- Active smart-filter tags ---- */
+.smart-filter-tags { display: flex; flex-wrap: wrap; gap: var(--sp-2); padding: 0 var(--sp-4); margin-top: var(--sp-1); }
+.smart-filter-tag {
+  display: inline-flex; align-items: center; gap: 6px; padding: 1px 10px;
+  border-radius: 999px; border: var(--border-w) solid color-mix(in srgb, var(--accent) 45%, var(--line));
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  font-size: var(--fs-0, .72rem); cursor: pointer; white-space: nowrap;
+}
+.smart-filter-tag:hover { background: color-mix(in srgb, var(--danger) 10%, transparent); }
+
+/* ---- Classification flow stepper ---- */
+.smart-stepper {
+  align-self: stretch; display: flex; flex-direction: column; gap: var(--sp-1);
+  padding: var(--sp-2) var(--sp-3); border: var(--border-w) dashed var(--line);
+  border-radius: var(--radius);
+}
+.smart-step { display: flex; align-items: center; gap: var(--sp-2); font-size: var(--fs-0, .78rem); color: var(--ink-soft, #667085); }
+.smart-step .dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--line); flex: none; }
+.smart-step.doing { color: var(--ink); font-weight: 600; }
+.smart-step.doing .dot { border-color: var(--accent, #1570ef); animation: smartPulse 1s infinite alternate; }
+.smart-step.done { color: var(--ink); }
+.smart-step.done .dot { border-color: var(--ok, #12b76a); background: var(--ok, #12b76a); }
+.smart-step.error { color: var(--danger, #d92d20); }
+.smart-step.error .dot { border-color: var(--danger, #d92d20); background: var(--danger, #d92d20); }
+@keyframes smartPulse { from { transform: scale(.8);} to { transform: scale(1.2);} }
+
+/* ---- Per-category review cards ---- */
+.smart-review { display: flex; flex-direction: column; gap: var(--sp-2); }
+.smart-review-card { border: var(--border-w) solid var(--line); border-radius: var(--radius); padding: var(--sp-2) var(--sp-3); background: var(--bg-raise, #fff); }
+.smart-review-card .smart-review-head { display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap; }
+.smart-review-card .smart-review-name { font-weight: 600; }
+.smart-review-card .smart-review-action { color: var(--ink-soft, #667085); font-size: var(--fs-0, .78rem); }
+.smart-review-card ul { margin: var(--sp-1) 0 0; padding-left: 18px; }
+.smart-review-card li { font-size: var(--fs-0, .78rem); color: var(--ink-soft, #667085); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.smart-review-card .smart-review-btns { display: flex; gap: var(--sp-2); margin-top: var(--sp-2); }
+
+/* ---- AI action timeline ---- */
+.smart-timeline { border-top: var(--border-w) solid var(--line); padding: var(--sp-2) var(--sp-3); }
+.smart-timeline > summary { cursor: pointer; font-size: var(--fs-0, .78rem); color: var(--ink-soft, #667085); }
+.smart-timeline ul { margin: var(--sp-2) 0 0; padding-left: 4px; list-style: none; max-height: 180px; overflow: auto; }
+.smart-timeline li { font-size: var(--fs-0, .72rem); color: var(--ink-soft, #667085); padding: 2px 0; border-left: 2px solid var(--line); padding-left: 8px; }
+
+/* ---- Toast ---- */
+.smart-toast {
+  position: fixed; right: 20px; bottom: 20px; z-index: 90;
+  padding: var(--sp-2) var(--sp-3); border-radius: var(--radius);
+  border: var(--border-w) solid var(--line); background: var(--bg-raise, #fff);
+  box-shadow: 0 12px 32px -12px rgba(0,0,0,.4); font-size: var(--fs-0, .8rem); max-width: 320px;
 }
 
 /* Markdown rendering inside assistant chat bubbles */
@@ -2208,6 +2291,10 @@ body {
       <button type="button" class="btn" id="global-chat-classify" title="让助手分析并分类当前加载的邮箱，生成行动建议">📊 分类邮箱</button>
     </div>
     <div class="email-chat-thread" id="global-chat-thread" aria-live="polite"></div>
+    <details class="smart-timeline" id="smart-timeline" hidden>
+      <summary>最近 AI 动作</summary>
+      <ul id="smart-timeline-list"></ul>
+    </details>
     <div class="email-chat-compose">
       <div class="global-chat-compose-row">
         <textarea class="field-input" id="global-chat-input" rows="2" placeholder="Ask a question…"></textarea>
@@ -2285,6 +2372,7 @@ body {
           <option value="P0">P0</option>
           <option value="P1">P1</option>
           <option value="P2">P2</option>
+          <option value="P3">P3</option>
           <option value="none">Not triaged yet</option>
         </select>
         <span class="info-tip">
@@ -2292,6 +2380,8 @@ body {
           <span class="info-tip-pop" role="tooltip">Triage = primary inbox for the agent. Spam &amp; ads = promotions, social, spam folder, and heuristic ad/spam matches — shown separately. Delete all moves them to Gmail Trash (not permanent wipe). Re-Connect Google if trash fails (needs gmail.modify).</span>
         </span>
       </div>
+      <div class="smart-stats" id="smart-stats" hidden></div>
+      <div class="smart-filter-tags" id="smart-filter-tags" hidden></div>
       <div class="inbox-toolbar" id="reviewer-mode-controls" style="margin-top:0;">
         <label class="run-mode-label" for="reviewer-mode">Reviewer</label>
         <select class="field-input run-mode-select" id="reviewer-mode" aria-label="Reviewer mode">
@@ -3747,7 +3837,7 @@ async function deleteSelectedEmails() {
 
 function viewMatchesPriorityFilter(view) {
   if (INBOX_PRIORITY_FILTER === "all") return true;
-  var p = view.result ? priorityForView(view) : "";
+  var p = priorityForView(view) || (view.em && view.em.smart_urgency) || "";
   if (INBOX_PRIORITY_FILTER === "none") return !p;
   return p === INBOX_PRIORITY_FILTER;
 }
@@ -4020,6 +4110,10 @@ async function loadGmailInbox() {
   var clean = [];
   var moved = [];
   triageEmails.forEach(function (em) {
+    if (isJobOpportunityEmail(em)) {
+      clean.push(em); // job opportunities always stay in Triage
+      return;
+    }
     var kind = em.noise_kind || classifyNoiseKind({
       subject: em.subject,
       body: em.body,
@@ -4033,7 +4127,13 @@ async function loadGmailInbox() {
       clean.push(em);
     }
   });
+  var rescued = [];
   noiseEmails.forEach(function (em) {
+    if (isJobOpportunityEmail(em)) {
+      em.noise_kind = "";
+      rescued.push(em); // rescue misfiled job mail from Spam & ads
+      return;
+    }
     if (!em.noise_kind) {
       em.noise_kind = classifyNoiseKind({
         subject: em.subject,
@@ -4043,8 +4143,10 @@ async function loadGmailInbox() {
       }) || "promo";
     }
   });
+  clean = clean.concat(rescued);
   var noiseMap = {};
   noiseEmails.concat(moved).forEach(function (em) {
+    if (!em.noise_kind) return; // rescued job opportunities stay in Triage
     if (em.gmail_id) noiseMap[em.gmail_id] = em;
   });
   GMAIL_EMAILS = clean;
@@ -4057,6 +4159,10 @@ async function loadGmailInbox() {
       " spam/ads (last 14 days). Triage sends bodies to DeepSeek/OpenAI.";
   }
   setTopStatus("ok", "Gmail · " + GMAIL_EMAILS.length + " triage · " + GMAIL_NOISE_EMAILS.length + " noise");
+  if (rescued.length) {
+    logSmartAction("rescue", "从 Spam & ads 救回 " + rescued.length + " 封求职相关邮件到收件箱");
+    showSmartToast("🛟 已从 Spam & ads 救回 " + rescued.length + " 封求职相关邮件");
+  }
   handleNewEmailsAfterLoad();
   render();
   renderNoiseList();
@@ -4451,6 +4557,40 @@ function classifySmartEmail(em) {
   return { cat: "其他通知", act: "按需查看" };
 }
 
+// Job opportunities must never be buried in Spam & ads.
+function isJobOpportunityEmail(em) {
+  var from = String((em && (em.gmail_from || em.from)) || "").toLowerCase();
+  var subj = String((em && em.subject) || "").toLowerCase();
+  if (/lietou-edm\.com|liepin\.com|51job\.com|zhaopin\.com|bosszhipin\.com/.test(from)) return true;
+  if (/对您很感兴趣|邀您沟通|招聘|内推/.test(subj)) return true;
+  if (/@linkedin\.com/.test(from)) {
+    if (/(is )?hiring|hired near you|\bjobs?\b|next steps|position|vacanc|opportunit/.test(subj)) return true;
+  }
+  return false;
+}
+
+// Heuristic urgency per smart category (used until the LLM/agent provides one).
+function smartUrgencyForCat(cat) {
+  switch (cat) {
+    case "今天行动 · 招聘方触达":
+    case "真人会议 · 需确认":
+    case "安全与登录警报":
+      return "P0";
+    case "投递管线 · 已投递等回复":
+    case "开发者任务":
+    case "开发者 · 密钥过期":
+    case "账单与订阅":
+    case "求职信息流 · ⭐匹配你的偏好":
+      return "P1";
+    case "投递管线 · 未通过":
+    case "开发者 · 权限请求":
+    case "工具通知":
+      return "P2";
+    default:
+      return "P3";
+  }
+}
+
 function escSmart(s) {
   return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
     return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
@@ -4533,6 +4673,7 @@ function saveSmartClassification() {
     localStorage.setItem(SMART_STORAGE_KEY, JSON.stringify({
       categories: SMART_APPLIED.categories,
       map: SMART_APPLIED.map,
+      urgency: SMART_APPLIED.urgency || {},
       selected: SMART_FILTER_SELECTED
     }));
   } catch (e) { /* storage full/blocked — classification just won't persist */ }
@@ -4545,7 +4686,7 @@ function restoreSmartClassification() {
     if (!raw) return;
     var obj = JSON.parse(raw);
     if (!obj || !Array.isArray(obj.categories) || !obj.emails && !obj.map) return;
-    SMART_APPLIED = { categories: obj.categories, map: obj.map || obj.emails };
+    SMART_APPLIED = { categories: obj.categories, map: obj.map || obj.emails, urgency: obj.urgency || {} };
     SMART_FILTER_SELECTED = obj.selected || {};
     var anyTrue = Object.keys(SMART_FILTER_SELECTED).some(function (c) { return SMART_FILTER_SELECTED[c]; });
     if (!anyTrue) {
@@ -4557,6 +4698,7 @@ function restoreSmartClassification() {
     }
     getActiveEmails().forEach(function (em) {
       em.smart_cat = SMART_APPLIED.map[em.email_id] || "待分类";
+      em.smart_urgency = SMART_APPLIED.urgency[em.email_id] || smartUrgencyForCat(em.smart_cat);
     });
   } catch (e) { /* corrupted entry — start fresh */ }
 }
@@ -4572,8 +4714,9 @@ function buildClassifyPrompt() {
     "1. 分成 5-10 个对用户有行动意义的类别（例如：需今天回复的招聘触达、真人会议需确认、安全警报、投递管线、账单、值得读的行业内容、求职信息流、可退订噪音等，按实际内容定）；\n" +
     "2. 每个类别给一句行动建议；\n" +
     "3. 每封邮件归入且只归入一个类别；正文里提到具体邮件时必须带上它的 email_id（如 GM-xxx），界面会把它渲染成可点击的邮件链接；\n" +
-    "4. 先用简短中文说明分类思路，最后输出一个 ```classify 代码块，内容是严格 JSON：\n" +
-    '```classify\n{"categories":[{"name":"类别名","action":"行动建议"}],"emails":{"<email_id>":"类别名"}}\n```\n\n' +
+    "4. 按真实截止时间和影响给每封邮件标紧急度：P0（今天必须处理）/ P1（本周）/ P2（有空时）/ P3（纯信息流）；\n" +
+    "5. 先用简短中文说明分类思路，最后输出一个 ```classify 代码块，内容是严格 JSON：\n" +
+    '```classify\n{"categories":[{"name":"类别名","action":"行动建议"}],"emails":{"<email_id>":"类别名"},"urgency":{"<email_id>":"P0|P1|P2|P3"}}\n```\n\n' +
     "邮件清单（email_id | 发件人 | 主题 | 正文摘要）：\n" + digest;
 }
 
@@ -4589,7 +4732,14 @@ function parseSmartClassify(text) {
     Object.keys(obj.emails).forEach(function (id) {
       if (!names[obj.emails[id]]) names[obj.emails[id]] = "";
     });
-    return { categories: obj.categories, map: obj.emails, allCats: names };
+    var urg = {};
+    if (obj.urgency && typeof obj.urgency === "object") {
+      Object.keys(obj.urgency).forEach(function (id) {
+        var u = String(obj.urgency[id]).toUpperCase();
+        if (/^P[0-3]$/.test(u)) urg[id] = u;
+      });
+    }
+    return { categories: obj.categories, map: obj.emails, urgency: urg, allCats: names };
   } catch (e) { return null; }
 }
 
@@ -4608,8 +4758,18 @@ function applySmartClassification() {
     Object.keys(SMART_PENDING.map).forEach(function (id) {
       SMART_APPLIED.map[id] = SMART_PENDING.map[id];
     });
+    if (SMART_PENDING.urgency) {
+      Object.keys(SMART_PENDING.urgency).forEach(function (id) {
+        SMART_APPLIED.urgency[id] = SMART_PENDING.urgency[id];
+      });
+    }
   } else {
     SMART_APPLIED = SMART_PENDING;
+  }
+  if (SMART_PENDING.urgency) {
+    SMART_APPLIED.urgency = SMART_PENDING.urgency;
+  } else if (!SMART_APPLIED.urgency) {
+    SMART_APPLIED.urgency = {};
   }
   SMART_PENDING = null;
   SMART_FILTER_SELECTED = {};
@@ -4621,11 +4781,16 @@ function applySmartClassification() {
   var emails = getActiveEmails();
   emails.forEach(function (em) {
     em.smart_cat = SMART_APPLIED.map[em.email_id] || "未分类";
+    em.smart_urgency = SMART_APPLIED.urgency[em.email_id] || smartUrgencyForCat(em.smart_cat);
   });
   renderSmartFilterControl();
   render();
   renderGlobalChatThread();
   saveSmartClassification();
+  SMART_FLOW.step = null;
+  SMART_FLOW.error = null;
+  logSmartAction("apply", (SMART_PENDING_MODE === "merge" ? "合并新分类建议" : "启用分类方案") +
+    " · " + SMART_APPLIED.categories.length + " 类");
   setTopStatus("ok", "分类已启用 · 用 Triage 旁的分类下拉筛选");
 }
 
@@ -4643,9 +4808,12 @@ function renderSmartFilterControl() {
   }
   // counts
   var counts = {};
+  var p0Counts = {};
   getActiveEmails().forEach(function (em) {
     var c = em.smart_cat || "未分类";
     counts[c] = (counts[c] || 0) + 1;
+    var u = em.smart_urgency || (SMART_APPLIED && SMART_APPLIED.urgency && SMART_APPLIED.urgency[em.email_id]) || "";
+    if (u === "P0") p0Counts[c] = (p0Counts[c] || 0) + 1;
   });
   var cats = SMART_APPLIED.categories.map(function (c) { return c.name; });
   Object.keys(counts).forEach(function (c) { if (cats.indexOf(c) < 0) cats.push(c); });
@@ -4658,7 +4826,7 @@ function renderSmartFilterControl() {
     html += '<label style="display:flex;align-items:center;gap:var(--sp-2);padding:var(--sp-1) 0;cursor:pointer;">' +
       '<input type="checkbox" class="smart-filter-cat" value="' + escSmart(c) + '"' +
       (SMART_FILTER_SELECTED[c] ? " checked" : "") + '> ' +
-      escSmart(c) + ' <span class="muted">(' + (counts[c] || 0) + ')</span></label>';
+      escSmart(c) + ' <span class="muted">(' + (counts[c] || 0) + (p0Counts[c] ? ' · ⚡' + p0Counts[c] : '') + ')</span></label>';
   });
   pop.innerHTML = html;
   pop.querySelectorAll(".smart-filter-cat").forEach(function (box) {
@@ -4669,6 +4837,7 @@ function renderSmartFilterControl() {
       var selNow = Object.keys(SMART_FILTER_SELECTED).filter(function (c) { return SMART_FILTER_SELECTED[c]; });
       var cntEl = document.getElementById("smart-filter-count");
       if (cntEl) cntEl.textContent = String(selNow.length) + "/" + String(cats.length);
+      renderSmartFilterTags();
       render();
     });
   });
@@ -4682,12 +4851,227 @@ function renderSmartFilterControl() {
     cats.forEach(function (c) { SMART_FILTER_SELECTED[c] = false; });
     renderSmartFilterControl(); render();
   });
+  renderSmartFilterTags();
+  renderSmartStats();
 }
 
 function smartFilterActive() {
   return !!(SMART_APPLIED && Object.keys(SMART_FILTER_SELECTED).some(function (c) {
     return SMART_FILTER_SELECTED[c];
   }));
+}
+
+// ---- UX upgrades: stepper / stats / tags / timeline / toast ----
+var SMART_FLOW = { step: null, error: null }; // null | connect | load | analyze | confirm | error
+var SMART_FLOW_STEPS = [
+  { id: "connect", label: "连接 Gmail（OAuth 授权）" },
+  { id: "load",    label: "读取近 14 天邮件" },
+  { id: "analyze", label: "AI 分析与分类中" },
+  { id: "confirm", label: "确认分类方案" }
+];
+
+function setSmartFlowStep(step, error) {
+  SMART_FLOW.step = step;
+  SMART_FLOW.error = error || null;
+  renderGlobalChatThread();
+}
+
+function smartStepperHtml() {
+  if (!SMART_FLOW.step && !SMART_FLOW.error) return "";
+  var idx = SMART_FLOW_STEPS.findIndex(function (s) { return s.id === SMART_FLOW.step; });
+  var html = '<div class="smart-stepper" id="smart-stepper">';
+  SMART_FLOW_STEPS.forEach(function (s, i) {
+    var cls = "smart-step";
+    if (SMART_FLOW.error && i === Math.max(idx, 0)) cls += " error";
+    else if (i < idx) cls += " done";
+    else if (i === idx) cls += " doing";
+    html += '<div class="' + cls + '"><span class="dot"></span><span>' + s.label + '</span></div>';
+  });
+  if (SMART_FLOW.error) {
+    html += '<div style="color:var(--danger,#d92d20);font-size:var(--fs-0,.78rem);">' + escSmart(SMART_FLOW.error) + '</div>' +
+      '<button type="button" class="btn" id="smart-flow-retry">↻ 重试</button>';
+  }
+  html += '</div>';
+  return html;
+}
+
+function smartEmailByCategory(pending) {
+  var byCat = {};
+  Object.keys(pending.map || {}).forEach(function (id) {
+    var c = pending.map[id];
+    (byCat[c] = byCat[c] || []).push(id);
+  });
+  return byCat;
+}
+
+function renderSmartReviewCards() {
+  if (!SMART_PENDING) return "";
+  var byCat = smartEmailByCategory(SMART_PENDING);
+  var all = getActiveEmails();
+  var wrap = document.createElement("div");
+  wrap.className = "smart-review";
+  SMART_PENDING.categories.forEach(function (cat) {
+    var ids = byCat[cat.name] || [];
+    var samples = ids.slice(0, 3).map(function (id) {
+      var em = all.find(function (e) { return e.email_id === id; });
+      return em ? (em.subject || id) : id;
+    });
+    var p0 = ids.filter(function (id) { return (SMART_PENDING.urgency || {})[id] === "P0"; }).length;
+    var card = document.createElement("div");
+    card.className = "smart-review-card";
+    var head = document.createElement("div");
+    head.className = "smart-review-head";
+    head.innerHTML = '<span class="smart-review-name"></span>' +
+      '<span class="badge neutral">' + ids.length + ' 封</span>' +
+      (p0 ? '<span class="badge danger">⚡P0 × ' + p0 + '</span>' : '');
+    head.querySelector(".smart-review-name").textContent = cat.name;
+    var act = document.createElement("div");
+    act.className = "smart-review-action";
+    act.textContent = "建议：" + (cat.action || "—");
+    card.appendChild(head);
+    card.appendChild(act);
+    if (samples.length) {
+      var ul = document.createElement("ul");
+      samples.forEach(function (s) {
+        var li = document.createElement("li");
+        li.textContent = s;
+        ul.appendChild(li);
+      });
+      card.appendChild(ul);
+    }
+    var btns = document.createElement("div");
+    btns.className = "smart-review-btns";
+    var rn = document.createElement("button");
+    rn.type = "button"; rn.className = "btn"; rn.textContent = "✏️ 重命名";
+    rn.addEventListener("click", function () {
+      var nn = window.prompt("新的类别名称", cat.name);
+      if (!nn || nn === cat.name) return;
+      nn = nn.trim();
+      SMART_PENDING.map = SMART_PENDING.map || {};
+      Object.keys(SMART_PENDING.map).forEach(function (id) {
+        if (SMART_PENDING.map[id] === cat.name) SMART_PENDING.map[id] = nn;
+      });
+      cat.name = nn;
+      renderGlobalChatThread();
+    });
+    var del = document.createElement("button");
+    del.type = "button"; del.className = "btn"; del.textContent = "🗑 删除该类";
+    del.addEventListener("click", function () {
+      SMART_PENDING.categories = SMART_PENDING.categories.filter(function (c) { return c !== cat; });
+      Object.keys(SMART_PENDING.map || {}).forEach(function (id) {
+        if (SMART_PENDING.map[id] === cat.name) delete SMART_PENDING.map[id];
+      });
+      renderGlobalChatThread();
+    });
+    btns.appendChild(rn); btns.appendChild(del);
+    card.appendChild(btns);
+    wrap.appendChild(card);
+  });
+  return wrap;
+}
+
+function renderSmartStats() {
+  var el = document.getElementById("smart-stats");
+  if (!el) return;
+  var emails = getActiveEmails();
+  if (!emails.length) { el.hidden = true; el.innerHTML = ""; return; }
+  var p0 = 0, p1 = 0, pending = 0;
+  emails.forEach(function (em) {
+    var u = em.smart_urgency || (SMART_APPLIED && SMART_APPLIED.urgency && SMART_APPLIED.urgency[em.email_id]) || "";
+    if (u === "P0") p0++;
+    else if (u === "P1") p1++;
+    if (em.smart_cat === "待分类") pending++;
+  });
+  el.hidden = !(p0 || p1 || pending);
+  el.innerHTML = "";
+  function statBtn(label, tier, danger) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "smart-stat-btn" + (danger ? " is-danger" : "");
+    b.innerHTML = label;
+    b.addEventListener("click", function () {
+      var sel = document.getElementById("inbox-priority-filter");
+      if (!sel) return;
+      sel.value = tier;
+      sel.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    el.appendChild(b);
+  }
+  if (p0) statBtn("🔴 P0 × " + p0, "P0", true);
+  if (p1) statBtn("🟠 P1 × " + p1, "P1", false);
+  if (pending) statBtn("📥 待归类 × " + pending, "none", false);
+}
+
+function renderSmartFilterTags() {
+  var el = document.getElementById("smart-filter-tags");
+  if (!el) return;
+  if (!SMART_APPLIED) { el.hidden = true; el.innerHTML = ""; return; }
+  var sel = Object.keys(SMART_FILTER_SELECTED).filter(function (c) { return SMART_FILTER_SELECTED[c]; });
+  el.hidden = !sel.length;
+  el.innerHTML = "";
+  sel.forEach(function (c) {
+    var t = document.createElement("button");
+    t.type = "button";
+    t.className = "smart-filter-tag";
+    t.innerHTML = escSmart(c) + " <span aria-hidden='true'>×</span>";
+    t.title = "点击取消筛选该分类";
+    t.addEventListener("click", function () {
+      SMART_FILTER_SELECTED[c] = false;
+      renderSmartFilterControl();
+      render();
+    });
+    el.appendChild(t);
+  });
+}
+
+// ---- AI action timeline (auditable log of what the assistant did) ----
+var SMART_ACTIONS_KEY = "aurora_smart_actions_v1";
+var SMART_ACTIONS = [];
+try {
+  SMART_ACTIONS = JSON.parse(localStorage.getItem(SMART_ACTIONS_KEY) || "[]");
+  if (!Array.isArray(SMART_ACTIONS)) SMART_ACTIONS = [];
+} catch (e) { SMART_ACTIONS = []; }
+
+function logSmartAction(kind, text) {
+  SMART_ACTIONS.unshift({ t: Date.now(), kind: kind, text: text });
+  if (SMART_ACTIONS.length > 50) SMART_ACTIONS.length = 50;
+  try { localStorage.setItem(SMART_ACTIONS_KEY, JSON.stringify(SMART_ACTIONS)); } catch (e) {}
+  renderSmartTimeline();
+}
+
+function renderSmartTimeline() {
+  var box = document.getElementById("smart-timeline");
+  var list = document.getElementById("smart-timeline-list");
+  if (!box || !list) return;
+  box.hidden = !SMART_ACTIONS.length;
+  list.innerHTML = "";
+  SMART_ACTIONS.slice(0, 20).forEach(function (a) {
+    var li = document.createElement("li");
+    var d = new Date(a.t);
+    var hh = String(d.getHours()).padStart(2, "0");
+    var mm = String(d.getMinutes()).padStart(2, "0");
+    li.textContent = hh + ":" + mm + " · " + a.text;
+    list.appendChild(li);
+  });
+}
+
+var SMART_TOAST_TIMER = null;
+var SMART_TOAST_QUEUE = [];
+function showSmartToast(msg) {
+  SMART_TOAST_QUEUE.push(msg);
+  if (SMART_TOAST_TIMER) return;
+  SMART_TOAST_TIMER = setTimeout(function () {
+    SMART_TOAST_TIMER = null;
+    var text = SMART_TOAST_QUEUE.join("；");
+    SMART_TOAST_QUEUE = [];
+    var old = document.querySelector(".smart-toast");
+    if (old) old.remove();
+    var t = document.createElement("div");
+    t.className = "smart-toast";
+    t.textContent = text;
+    document.body.appendChild(t);
+    setTimeout(function () { t.remove(); }, 6000);
+  }, 300);
 }
 
 // First click on the 分类 chip (no classification yet): auto-run the whole flow —
@@ -4697,37 +5081,42 @@ async function startFirstTimeClassification() {
   if (SMART_AUTO_RUNNING) return;
   SMART_AUTO_RUNNING = true;
   try {
+    SMART_FLOW.error = null;
     setGlobalChatOpen(true);
+    setSmartFlowStep("connect");
     if (INBOX_SOURCE !== "gmail") {
       INBOX_SOURCE = "gmail";
       syncInboxSourceUi();
     }
-    if (!GMAIL_EMAILS.length) {
-      GLOBAL_CHAT.messages.push({
-        role: "assistant",
-        content: "正在读取近 14 天的 Gmail 邮件…"
+    if (!getGoogleAccessToken()) {
+      GLOBAL_CHAT.messages = GLOBAL_CHAT.messages.filter(function (m) {
+        return !(m.role === "assistant" && /正在读取近 14 天/.test(m.content || ""));
       });
-      renderGlobalChatThread();
-      if (!getGoogleAccessToken()) {
-        GLOBAL_CHAT.messages.push({
-          role: "error",
-          content: "尚未连接 Google。请在 Settings 里点击 Connect Google（勾选全部 Gmail 权限），再点一次「分类」。"
-        });
-        renderGlobalChatThread();
-        return;
-      }
+      GLOBAL_CHAT.messages.push({
+        role: "error",
+        content: "尚未连接 Google。请在 Settings → Connect Google（勾选全部 Gmail 权限）完成授权，然后点下面的「重试」继续。"
+      });
+      setSmartFlowStep("connect", "Google 未授权 — 请到 Settings 完成 Connect Google");
+      return;
+    }
+    if (!GMAIL_EMAILS.length) {
+      setSmartFlowStep("load");
       await loadGmailInbox();
       render();
     }
+    setSmartFlowStep("analyze");
     var inputEl = document.getElementById("global-chat-input");
     if (inputEl) inputEl.value = buildClassifyPrompt();
     await sendGlobalChatMessage();
+    if (SMART_PENDING) setSmartFlowStep("confirm");
+    else setSmartFlowStep("analyze", "AI 未返回可用的分类结果 — 可重试，或直接在聊天里补充要求后再试");
   } catch (err) {
-    GLOBAL_CHAT.messages.push({
-      role: "error",
-      content: "读取邮件失败：" + (err && err.message ? err.message : String(err))
-    });
-    renderGlobalChatThread();
+    var msg = err && err.message ? err.message : String(err);
+    var friendly = /401|invalid_grant|token/i.test(msg)
+      ? "Google 授权已过期 — 请到 Settings 重新 Connect Google，然后点「重试」"
+      : "读取邮件失败：" + msg + "（网络或 Google 服务波动时可点「重试」）";
+    GLOBAL_CHAT.messages.push({ role: "error", content: friendly });
+    setSmartFlowStep(SMART_FLOW.step || "load", friendly);
   } finally {
     SMART_AUTO_RUNNING = false;
   }
@@ -4821,38 +5210,138 @@ function buildClassifyNewPrompt(unknown) {
     "下面是刷新后新进来的邮件。请逐封判断：\n" +
     "1. 属于某个已有类别 → 归入该类别；\n" +
     "2. 都不属于 → 在正文里明确提醒用户，并建议一个新类别（给出名称和一句行动建议）；\n" +
-    "3. 提到邮件必须带 email_id（界面会渲染成可点击链接）；\n" +
-    "4. 最后输出 ```classify 代码块，严格 JSON（只包含下面这些新邮件的归类，新类别也要出现在 categories 里）：\n" +
-    '```classify\n{"categories":[{"name":"类别名","action":"行动建议"}],"emails":{"<email_id>":"类别名"}}\n```\n\n' +
+    "3. 按真实截止时间和影响给每封标紧急度 P0/P1/P2/P3；\n" +
+    "4. 提到邮件必须带 email_id（界面会渲染成可点击链接）；\n" +
+    "5. 最后输出 ```classify 代码块，严格 JSON（只包含下面这些新邮件的归类，新类别也要出现在 categories 里）：\n" +
+    '```classify\n{"categories":[{"name":"类别名","action":"行动建议"}],"emails":{"<email_id>":"类别名"},"urgency":{"<email_id>":"P0|P1|P2|P3"}}\n```\n\n' +
     "新邮件清单（email_id | 发件人 | 主题 | 正文摘要）：\n" + digest;
 }
 
-function handleNewEmailsAfterLoad() {
+// Classify ONE new email with Jev (category + urgency). Returns
+// { ok, category, urgency, confidence, noneOfTheAbove } or { ok:false }.
+async function classifyEmailWithJev(em) {
+  if (!getJevKey()) return { ok: false, noKey: true };
+  var cats = SMART_APPLIED.categories;
+  var criteria = {};
+  cats.forEach(function (c) { criteria[c.name] = c.action || c.name; });
+  criteria["__none__"] = "None of the listed categories fits this email; it likely needs a new category.";
+  var urgencyCriteria = {
+    P0: "Must be acted on today: a real deadline within ~48h with real consequence, a meeting to confirm, a security alert to verify, or a recruiter/sender waiting on a reply.",
+    P1: "Important this week: application pipeline updates, developer tasks with deadlines, billing to verify, job matches worth opening.",
+    P2: "No decision needed soon: routine notifications, tool updates, low-signal digests.",
+    P3: "Pure information stream: newsletters, job alert blasts, social/promotional bulk."
+  };
+  var state = {
+    real_clock: realClockPromptBlock().trim(),
+    email: {
+      email_id: em.email_id,
+      from: em.gmail_from || "",
+      received_at: em.received_at || "",
+      subject: em.subject || "",
+      body: String(em.body || "").slice(0, 3000)
+    },
+    known_categories: cats.map(function (c) { return { name: c.name, action: c.action || "" }; })
+  };
+  var questions = {
+    category: {
+      type: "choice",
+      instructions: "Which `known_categories` entry does `email` belong to by content? Choose __none__ only if no listed category truly fits.",
+      criteria: criteria
+    },
+    urgency: {
+      type: "choice",
+      instructions: "How urgent is `email` for the operator right now, judged against `real_clock`?",
+      criteria: urgencyCriteria
+    }
+  };
+  try {
+    var resp = await fetch(JEV_API_URL, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "authorization": "Bearer " + getJevKey(),
+        "x-aurora-email-id": String(em.email_id || ""),
+        "x-aurora-role": "jev-classify"
+      },
+      body: JSON.stringify({ state: state, model: JEV_MODEL, questions: questions })
+    });
+    if (!resp.ok) return { ok: false, status: resp.status };
+    var data = await resp.json();
+    var a = (data && data.answers) || {};
+    if (!a.category || !a.urgency) return { ok: false, badShape: true };
+    var cat = a.category.choice || "__none__";
+    return {
+      ok: true,
+      category: cat,
+      urgency: normalizePriorityTier(a.urgency.choice) || "P2",
+      confidence: a.category.confidence,
+      probabilities: a.category.probabilities || {},
+      noneOfTheAbove: cat === "__none__"
+    };
+  } catch (e) {
+    return { ok: false, error: String(e) };
+  }
+}
+
+async function handleNewEmailsAfterLoad() {
   if (!SMART_APPLIED) return; // nothing classified yet — first-time flow handles it
   var unknown = [];
-  GMAIL_EMAILS.forEach(function (em) {
+  var newEmails = GMAIL_EMAILS.filter(function (em) { return !SMART_APPLIED.map[em.email_id]; });
+  var jevDone = 0, jevFallbackRules = 0;
+  for (var i = 0; i < newEmails.length; i++) {
+    var em = newEmails[i];
     if (SMART_APPLIED.map[em.email_id]) {
       em.smart_cat = SMART_APPLIED.map[em.email_id];
-      return;
+      em.smart_urgency = SMART_APPLIED.urgency[em.email_id] || smartUrgencyForCat(em.smart_cat);
+      continue;
     }
-    // Rule-based first: only auto-assign when the rule's category already exists.
+    // Jev first: it owns routine classification + urgency for known categories.
+    if (getJevKey()) {
+      var r = await classifyEmailWithJev(em);
+      if (r.ok) {
+        if (!r.noneOfTheAbove) {
+          SMART_APPLIED.map[em.email_id] = r.category;
+          SMART_APPLIED.urgency[em.email_id] = r.urgency;
+          em.smart_cat = r.category;
+          em.smart_urgency = r.urgency;
+          jevDone++;
+          continue;
+        }
+        // Jev says it needs a new category → escalate to DeepSeek below.
+        em.smart_cat = "待分类";
+        em.smart_urgency = "P1";
+        unknown.push(em);
+        continue;
+      }
+      jevFallbackRules++; // Jev unavailable/errored → rules below
+    }
+    // Rule fallback: only auto-assign when the rule's category already exists.
     var c = classifySmartEmail(em);
     var exists = SMART_APPLIED.categories.some(function (x) { return x.name === c.cat; });
     if (exists) {
       SMART_APPLIED.map[em.email_id] = c.cat;
       em.smart_cat = c.cat;
+      em.smart_urgency = SMART_APPLIED.urgency[em.email_id] || smartUrgencyForCat(c.cat);
     } else {
       em.smart_cat = "待分类";
+      em.smart_urgency = "P1";
       unknown.push(em);
     }
-  });
+  }
   saveSmartClassification();
   renderSmartFilterControl();
+  if (jevDone || jevFallbackRules) {
+    setTopStatus("ok", "Jev classified " + jevDone + " new emails" + (unknown.length ? " · " + unknown.length + " escalated" : ""));
+  }
+  if (jevDone) {
+    logSmartAction("jev", "Jev 自动归类 " + jevDone + " 封新邮件并给出紧急度");
+  }
   if (unknown.length) {
+    logSmartAction("escalate", "Jev 判定 " + unknown.length + " 封新邮件需要新类别，已升级 DeepSeek 分析");
     setGlobalChatOpen(true);
     GLOBAL_CHAT.messages.push({
       role: "assistant",
-      content: "📬 检测到 **" + unknown.length + " 封新邮件**无法归入现有类别（已按规则自动归类了能匹配的其余新邮件）。我来分析它们应该放哪里——"
+      content: "📬 Jev 判定 **" + unknown.length + " 封新邮件**不属于任何现有类别（需要新归类）。已交给 DeepSeek 分析并建议新类别；其余新邮件已由 Jev 自动归类并给出紧急度。"
     });
     renderGlobalChatThread();
     var inputEl = document.getElementById("global-chat-input");
@@ -4968,7 +5457,7 @@ function getField(fields, label) {
 var PRIORITY_SCORECARD_STORAGE = "aurora_priority_scorecard_v1";
 
 function normalizePriorityTier(raw) {
-  var m = String(raw || "").trim().match(/\b(P[012])\b/i);
+  var m = String(raw || "").trim().match(/\b(P[0123])\b/i);
   return m ? m[1].toUpperCase() : "";
 }
 
@@ -8047,29 +8536,61 @@ function renderGlobalChatThread() {
   var thread = document.getElementById("global-chat-thread");
   if (!thread) return;
   thread.innerHTML = "";
+  var stepHtml = smartStepperHtml();
+  if (stepHtml) {
+    thread.insertAdjacentHTML("beforeend", stepHtml);
+    var retry = thread.querySelector("#smart-flow-retry");
+    if (retry) retry.addEventListener("click", function () {
+      SMART_FLOW.error = null;
+      startFirstTimeClassification();
+    });
+  }
   GLOBAL_CHAT.messages.forEach(function (m) {
     var bub = document.createElement("div");
     bub.className = "chat-bubble " + (m.role === "user" ? "user" : (m.role === "error" ? "error" : "assistant"));
-    if (m.role === "assistant") bub.innerHTML = mdLiteToHtml(m.content || "");
+    if (m.role === "assistant") {
+      var content = String(m.content || "");
+      if (content.length > 1200) {
+        // Fold long analyses: show the opening summary, collapse the rest.
+        var cut = content.slice(0, 900);
+        var keepOpen = cut.slice(0, Math.max(cut.lastIndexOf("\n"), 800));
+        bub.innerHTML = mdLiteToHtml(keepOpen) +
+          "<details style='margin-top:var(--sp-2);'><summary style='cursor:pointer;color:var(--ink-soft,#667085);'>展开完整分析（" +
+          (content.length - keepOpen.length) + " 字）</summary>" +
+          mdLiteToHtml(content.slice(keepOpen.length)) + "</details>";
+      } else {
+        bub.innerHTML = mdLiteToHtml(content);
+      }
+    }
     else bub.textContent = m.content || "";
     if (m.role === "assistant") linkifyEmailRefs(bub);
     thread.appendChild(bub);
     if (m.role === "assistant" && m.smartJson && SMART_PENDING) {
+      // Per-category review cards instead of a single blind "apply" button.
+      var reviewWrap = document.createElement("div");
+      reviewWrap.className = "chat-bubble assistant";
+      reviewWrap.style.background = "transparent";
+      reviewWrap.style.border = "none";
+      reviewWrap.style.padding = "0";
+      var intro = document.createElement("div");
+      intro.style.marginBottom = "var(--sp-2)";
+      intro.textContent = "请逐类确认（可重命名/删除），然后应用：";
+      reviewWrap.appendChild(intro);
+      reviewWrap.appendChild(renderSmartReviewCards());
       var ok = document.createElement("button");
       ok.type = "button";
       ok.className = "btn primary";
-      ok.style.margin = "0 0 var(--sp-2) auto";
+      ok.style.margin = "var(--sp-2) 0 0 auto";
       ok.textContent = (SMART_PENDING_MODE === "merge")
         ? "✅ 采纳建议，合并到已有分类列表"
-        : "✅ 采用此分类，启用列表筛选";
+        : "✅ 应用全部，启用列表筛选";
       ok.addEventListener("click", function () { applySmartClassification(); });
-      var wrap = document.createElement("div");
-      wrap.style.display = "flex";
-      wrap.appendChild(ok);
-      thread.appendChild(wrap);
+      reviewWrap.appendChild(ok);
+      thread.appendChild(reviewWrap);
     }
   });
   thread.scrollTop = thread.scrollHeight;
+  renderSmartTimeline();
 }
 
 function setGlobalChatOpen(open) {
@@ -9295,8 +9816,13 @@ function updateCaseCardBadge(view) {
   view.flagLine.style.display = flagged ? "block" : "none";
   view.flagLine.textContent = flagged ? "Flagged · Escalated" : "";
 
-  // Priority only after the agent has produced a labeled result for this email.
-  setPriorityChip(view.prioEl, priorityForView(view), !!view.result);
+  // Agent result wins; otherwise show the smart-classification urgency.
+  var shownPriority = priorityForView(view) || (view.em && view.em.smart_urgency) || "";
+  setPriorityChip(view.prioEl, shownPriority, !!(view.result || shownPriority));
+  // Left color strip + P0 background so urgency is scannable while scrolling.
+  view.card.classList.remove("urg-P0", "urg-P1", "urg-P2", "urg-P3");
+  var uTier = normalizePriorityTier(shownPriority);
+  if (uTier) view.card.classList.add("urg-" + uTier);
 
   if (view.readStateEl) {
     view.readStateEl.className = "badge " + (view.read ? "neutral" : "info") + " read-state";
@@ -10114,11 +10640,22 @@ async function restoreInboxSnapshot() {
   VIEW_STATE_CACHE = snap.view_state || {};
   if (Array.isArray(snap.gmail_emails)) GMAIL_EMAILS = snap.gmail_emails;
   if (Array.isArray(snap.gmail_noise_emails)) GMAIL_NOISE_EMAILS = snap.gmail_noise_emails;
+  // Rescue job opportunities that an older snapshot left in Spam & ads.
+  if (GMAIL_NOISE_EMAILS.length) {
+    var rescuedNoise = GMAIL_NOISE_EMAILS.filter(isJobOpportunityEmail);
+    if (rescuedNoise.length) {
+      rescuedNoise.forEach(function (em) { em.noise_kind = ""; });
+      GMAIL_EMAILS = GMAIL_EMAILS.concat(rescuedNoise);
+      var rescuedIds = {};
+      rescuedNoise.forEach(function (em) { rescuedIds[em.gmail_id] = true; });
+      GMAIL_NOISE_EMAILS = GMAIL_NOISE_EMAILS.filter(function (em) { return !rescuedIds[em.gmail_id]; });
+    }
+  }
   if (snap.gmail_senders) GMAIL_SENDERS = snap.gmail_senders;
   if (snap.demo_noise_deleted) DEMO_NOISE_DELETED = snap.demo_noise_deleted;
   GMAIL_LOADED_AT = snap.gmail_loaded_at || "";
   INBOX_SOURCE = snap.inbox_source === "demo" ? "demo" : "gmail";
-  if (/^(all|P0|P1|P2|none)$/.test(snap.priority_filter || "")) INBOX_PRIORITY_FILTER = snap.priority_filter;
+  if (/^(all|P0|P1|P2|P3|none)$/.test(snap.priority_filter || "")) INBOX_PRIORITY_FILTER = snap.priority_filter;
   restoreSmartClassification();
   var prioSel = document.getElementById("inbox-priority-filter");
   if (prioSel) prioSel.value = INBOX_PRIORITY_FILTER;
@@ -10240,6 +10777,7 @@ function render() {
       read: false
     };
     restoreViewState(view);
+    updateCaseCardBadge(view); // show smart urgency chip immediately on render
     CASE_VIEWS.push(view);
     view.selectBox = card.querySelector(".mail-select");
     setEmailSelected(view, !!SELECTED_EMAIL_IDS[em.email_id]);
