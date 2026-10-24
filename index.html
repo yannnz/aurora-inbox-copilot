@@ -2840,6 +2840,13 @@ h1, h2, h3, h4 { letter-spacing: -0.2px; }
 .task-title-row { display: flex; align-items: flex-start; gap: 9px; }
 .task-check { width: 14px; height: 14px; margin-top: 2px; accent-color: var(--accent); flex: none; cursor: pointer; }
 .task-title { flex: 1; font-size: 12px; font-weight: 500; color: var(--ink); line-height: 1.4; }
+.task-reason {
+  flex: none; height: 18px; margin-left: 8px; padding: 2px 7px; border-radius: 5px;
+  font-size: 9px; font-weight: 500; display: inline-flex; align-items: center; white-space: nowrap;
+}
+.task-reason.priority, .task-reason.review { background: #f9e9e7; color: var(--danger); }
+.task-reason.time { background: #fbf3e5; color: var(--warn); }
+.task-reason.reply, .task-reason.hot { background: var(--accent-soft); color: var(--accent); }
 .task-source { display: flex; align-items: center; gap: 5px; padding-left: 23px; font-size: 10px; color: var(--accent); background: transparent; border: 0; cursor: pointer; text-align: left; font-family: inherit; min-width: 0; }
 .task-source svg { width: 11px; height: 11px; flex: none; }
 .task-source span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -6537,7 +6544,7 @@ function parseAgentOutput(text) {
 }
 
 function getField(fields, label) {
-  var f = fields.find(function (x) { return x.label === label; });
+  var f = (fields || []).find(function (x) { return x.label === label; });
   return f ? f.value.trim() : "";
 }
 
@@ -12191,17 +12198,58 @@ function refreshAgentStrip(view) {
 
 // ── Agent assistant panel (Figma 3:2193) ──────────────────────────────────
 var AGENT_TASK_TAB = "suggested";
+// Why an email belongs in the to-do list: priority, deadline, or a required
+// user action (drafted reply / escalation / smart "needs action" hit).
+function actionInfoForView(view) {
+  if (!view || !view.em) return { reasons: [], tier: "", draft: "", actionLabel: "Open email" };
+  var em = view.em;
+  var res = view.result;
+  var tier = normalizePriorityTier(priorityForView(view) || em.smart_urgency || "");
+  var draft = res && res.fields ? String(getField(res.fields, "Draft reply") || "").trim() : "";
+  var smart = em.smart_cat ? null : classifySmartEmail(em);
+  var smartAct = smart && smart.act ? smart.act : "";
+  var hot = tier === "P0" || tier === "P1" || em.smart_urgency === "P0" || em.smart_urgency === "P1" || !!(smart && smart.hot);
+  var hay = ((em.subject || "") + " " + String(em.body || "").slice(0, 400)).toLowerCase();
+  var timeLabel = "";
+  if (/(today|tonight|by eod|end of day|今天|今晚|当天)/i.test(hay)) timeLabel = "Today";
+  else if (/(tomorrow|明天)/i.test(hay)) timeLabel = "Tomorrow";
+  else if (/(this week|by friday|by thursday|本周|这周|周五前)/i.test(hay)) timeLabel = "This week";
+  // Negative context: informational emails that mention dates but need nothing.
+  var fyi = /(no action needed|no reply (needed|necessary)|fyi only|for your information|无需回复|不需要你|仅供参考|not actionable)/i.test(hay);
+  var reasons = [];
+  if (isEscalatedOutcome(view)) reasons.push({ kind: "review", label: "Needs review" });
+  if (tier === "P0") reasons.push({ kind: "priority", label: "High priority" });
+  else if (tier === "P1") reasons.push({ kind: "priority", label: "Medium priority" });
+  if (timeLabel && !fyi) reasons.push({ kind: "time", label: "Time-sensitive · " + timeLabel });
+  if (draft) reasons.push({ kind: "reply", label: "Reply drafted" });
+  if (!reasons.length && hot && !fyi) reasons.push({ kind: "hot", label: "Needs action" });
+  var order = { review: 0, priority: 1, time: 2, reply: 3, hot: 4 };
+  reasons.sort(function (a, b) { return order[a.kind] - order[b.kind]; });
+  return {
+    reasons: reasons,
+    tier: tier,
+    draft: draft,
+    smartAct: smartAct,
+    timeLabel: fyi ? "" : timeLabel,
+    actionable: reasons.length > 0
+  };
+}
 function taskItems() {
   var suggested = [], completed = [];
   CASE_VIEWS.forEach(function (v) {
-    if (!v.result) return;
     var id = v.em.email_id;
+    var info = actionInfoForView(v);
+    if (!info.actionable) return; // FYI-only, low-priority emails stay out
     var isDone = !!TASK_DONE[id] || /^(Approved|Edited)/i.test(v.humanDone || "");
     var item = {
       id: id, view: v, custom: false, done: isDone,
-      title: getField(v.result.fields, "Summary") || v.em.subject || "Review email",
+      title: (v.result && getField(v.result.fields, "Summary")) ||
+        (info.smartAct && info.smartAct !== "按需查看" ? info.smartAct : "") ||
+        v.em.subject || "Review email",
       source: senderNameOf(v.em) + " · " + String(v.em.subject || "").slice(0, 26),
-      due: (normalizePriorityTier(priorityForView(v) || v.em.smart_urgency || "") === "P0") ? "Today" : "No due date"
+      due: info.timeLabel || (info.tier === "P0" ? "Today" : "No due date"),
+      reason: info.reasons[0] || null,
+      actionLabel: info.draft ? "Review reply" : "Open email"
     };
     (isDone ? completed : suggested).push(item);
   });
@@ -12276,7 +12324,9 @@ function renderAgentPanel() {
     p.className = "task-empty";
     p.textContent = AGENT_TASK_TAB === "completed"
       ? "Nothing completed yet."
-      : (CASE_VIEWS.length ? "No suggested to-dos yet — triage an email and next steps appear here." : "Load an inbox first, then triage to see suggested to-dos.");
+      : (CASE_VIEWS.length
+        ? "Nothing needs you right now. High-priority, time-sensitive, and action-needed emails land here."
+        : "Load an inbox first — high-priority and action-needed emails land here.");
     wrap.appendChild(p);
   }
   list.slice(0, 8).forEach(function (t, i) {
@@ -12286,11 +12336,13 @@ function renderAgentPanel() {
     cardEl.innerHTML =
       "<div class='task-title-row'>" +
       "<input type='checkbox' class='task-check'" + (t.done ? " checked" : "") + " aria-label='Complete task'>" +
-      "<span class='task-title'>" + escapeHtml(t.title) + "</span></div>" +
+      "<span class='task-title'>" + escapeHtml(t.title) + "</span>" +
+      (t.reason ? "<span class='task-reason " + t.reason.kind + "'>" + escapeHtml(t.reason.label) + "</span>" : "") +
+      "</div>" +
       "<button type='button' class='task-source'>" + MAIL_SM_SVG + "<span>" + escapeHtml(t.source) + "</span>" + ARROW_UP_RIGHT_SVG + "</button>" +
       "<div class='task-foot'>" +
       "<span class='task-due'>" + CLOCK_SM_SVG + escapeHtml(t.due) + "</span>" +
-      "<button type='button' class='task-action" + (isTop ? " primary" : "") + "'>" + (t.custom ? "Remove" : "Open email") + "</button>" +
+      "<button type='button' class='task-action" + (isTop ? " primary" : "") + "'>" + (t.custom ? "Remove" : (t.actionLabel || "Open email")) + "</button>" +
       "</div>";
     cardEl.querySelector(".task-check").addEventListener("change", function () { toggleTaskDone(t); });
     cardEl.querySelector(".task-source").addEventListener("click", function () { if (t.view) selectCase(t.view); });
