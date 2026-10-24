@@ -3322,6 +3322,13 @@ body.chat-resizing { user-select: none; cursor: col-resize; }
           <div class="filter-pop-sub">Choices apply when you press Apply</div>
         </div>
         <div class="filter-groups">
+          <div class="filter-group fp-time-group">
+            <div class="filter-group-label">TIME</div>
+            <label class="filter-opt"><input type="radio" name="fp-time" value="any"><span>Any time</span></label>
+            <label class="filter-opt"><input type="radio" name="fp-time" value="7d"><span>Last 7 days</span></label>
+            <label class="filter-opt"><input type="radio" name="fp-time" value="30d" checked><span>Last 30 days</span></label>
+            <label class="filter-opt"><input type="radio" name="fp-time" value="90d"><span>Last 90 days</span></label>
+          </div>
           <div class="filter-group">
             <div class="filter-group-label">PRIORITY</div>
             <label class="filter-opt"><input type="radio" name="fp-priority" value="all" checked><span>All priorities</span></label>
@@ -11818,6 +11825,9 @@ function render() {
       return SMART_FILTER_SELECTED[em.smart_cat || "未分类"];
     });
   }
+  if (INBOX_TIME_FILTER !== "any") {
+    activeEmails = activeEmails.filter(timeMatchesEmail);
+  }
   document.getElementById("summary").textContent =
     (INBOX_SOURCE === "gmail" ? "Gmail live · " : "World: ") +
     activeEmails.length + " emails · " + SENDERS.length + " demo senders · " +
@@ -11963,7 +11973,9 @@ function render() {
   var appendedCount = 0;
   groups.forEach(function (g) {
     var budget = INBOX_EXPANDED ? g.views.length : Math.min(g.views.length, MAX_INBOX_ROWS - appendedCount);
-    var included = g.views.slice(0, Math.max(0, budget));
+    // Structural filtering: the DOM list is rebuilt to exactly the matching
+    // emails — tabs/filters physically change the table, not just CSS.
+    var included = g.views.filter(unifiedVisible).slice(0, Math.max(0, budget));
     if (!included.length) return;
     appendedCount += included.length;
     var head = document.createElement("div");
@@ -12001,6 +12013,17 @@ function render() {
       v.catKey = g.key;
     });
   });
+  if (!groups.length || !groups.some(function (g) { return g.views.some(unifiedVisible); })) {
+    var none = document.createElement("p");
+    none.className = "muted";
+    none.style.padding = "20px";
+    none.textContent = activeEmails.length
+      ? "No emails match the current filters."
+      : (INBOX_SOURCE === "gmail"
+        ? (getGoogleAccessToken() ? "No Gmail messages in this window. Use the refresh icon, or widen the TIME filter." : "Connect Google in Triage settings, then load Gmail.")
+        : "No emails match the current filters.");
+    list.appendChild(none);
+  }
 
   // Figma hero + sidebar sync (3:1934)
   LAST_ACTIVE_COUNT = activeEmails.length;
@@ -12141,7 +12164,6 @@ function pillMatches(view) { return matchesPill(view, INBOX_PILL); }
 function updatePillCounts() {
   var counts = { attention: 0, work: 0, updates: 0 };
   CASE_VIEWS.forEach(function (v) {
-    if (!v.card || !v.card.isConnected) return;
     ["attention", "work", "updates"].forEach(function (p) {
       if (matchesPill(v, p)) counts[p]++;
     });
@@ -12191,8 +12213,21 @@ function applyInboxVisibility() {
 
 // ── Sort (Figma 6:11843 sort menu) ────────────────────────────────────────
 var INBOX_SORT = "priority";
-// Figma 3:1860/3:2188 — the list is a fixed table: default cap, footer expands.
-var MAX_INBOX_ROWS = 24;
+// Default window = last month of mail, no row cap (user request). The static
+// demo inbox carries fixed May dates, so its default window is bypassed unless
+// the user picks a time explicitly.
+var MAX_INBOX_ROWS = Infinity;
+var INBOX_TIME_FILTER = "30d";
+var TIME_CHOICES = { any: 0, "7d": 7, "30d": 30, "90d": 90 };
+function timeMatchesEmailWith(choice, em) {
+  var days = TIME_CHOICES[choice] || 0;
+  if (!days) return true;
+  if (INBOX_SOURCE === "demo" && choice === "30d") return true;
+  var t = emailTimeOf(em);
+  if (!t) return true;
+  return (Date.now() - t) <= days * 86400000;
+}
+function timeMatchesEmail(em) { return timeMatchesEmailWith(INBOX_TIME_FILTER, em); }
 var INBOX_EXPANDED = false;
 function applyInboxSort() {
   var list = document.getElementById("case-list");
@@ -12484,8 +12519,7 @@ function initInboxPageFigma() {
       Array.prototype.forEach.call(document.querySelectorAll(".filter-pill"), function (p) { p.classList.remove("active"); });
       pill.classList.add("active");
       INBOX_PILL = pill.getAttribute("data-pill") || "all";
-      applyInboxVisibility();
-      updatePillCounts();
+      render();
     });
   }
 
@@ -12558,12 +12592,14 @@ function initInboxPageFigma() {
   }
   function readPending() {
     var checked = filterPop.querySelector("input[name='fp-priority']:checked");
+    var timeRadio = filterPop.querySelector("input[name='fp-time']:checked");
     var cats = {};
     Array.prototype.forEach.call(filterPop.querySelectorAll(".fp-cat"), function (box) {
       cats[box.value] = box.checked;
     });
     return {
       priority: checked ? checked.value : "all",
+      time: timeRadio ? timeRadio.value : "30d",
       unread: !!(document.getElementById("fp-unread") || {}).checked,
       review: !!(document.getElementById("fp-review") || {}).checked,
       cats: cats
@@ -12574,12 +12610,15 @@ function initInboxPageFigma() {
     if (radio) radio.checked = true;
     var u = document.getElementById("fp-unread"); if (u) u.checked = !!p.unread;
     var r = document.getElementById("fp-review"); if (r) r.checked = !!p.review;
+    var timeRadio = filterPop.querySelector("input[name='fp-time'][value='" + (p.time || "30d") + "']");
+    if (timeRadio) timeRadio.checked = true;
     Array.prototype.forEach.call(filterPop.querySelectorAll(".fp-cat"), function (box) {
       if (p.cats && box.value in p.cats) box.checked = !!p.cats[box.value];
     });
   }
   function pendingCount(p) {
     return CASE_VIEWS.filter(function (v) {
+      if (!timeMatchesEmailWith(p.time, v.em)) return false;
       var tier = normalizePriorityTier(priorityForView(v) || (v.em && v.em.smart_urgency) || "");
       if (p.priority === "none" ? tier : p.priority !== "all" && tier !== p.priority) return false;
       if (p.review && !isEscalatedOutcome(v)) return false;
@@ -12597,7 +12636,7 @@ function initInboxPageFigma() {
       var closed = filterPop.hidden;
       if (closed) {
         buildCatChecks();
-        writePending({ priority: INBOX_PRIORITY_FILTER, unread: INBOX_STATUS_FILTER.unread, review: INBOX_STATUS_FILTER.review, cats: SMART_FILTER_SELECTED });
+        writePending({ priority: INBOX_PRIORITY_FILTER, time: INBOX_TIME_FILTER, unread: INBOX_STATUS_FILTER.unread, review: INBOX_STATUS_FILTER.review, cats: SMART_FILTER_SELECTED });
       }
       filterPop.hidden = !closed;
       filterTrigger.setAttribute("aria-expanded", String(closed));
@@ -12608,6 +12647,7 @@ function initInboxPageFigma() {
     if (applyBtn) applyBtn.addEventListener("click", function () {
       var p = readPending();
       INBOX_PRIORITY_FILTER = p.priority;
+      INBOX_TIME_FILTER = p.time || "30d";
       var sel = document.getElementById("inbox-priority-filter");
       if (sel) sel.value = p.priority;
       INBOX_STATUS_FILTER = { unread: p.unread, review: p.review };
@@ -12620,20 +12660,15 @@ function initInboxPageFigma() {
       });
       filterPop.hidden = true;
       filterTrigger.setAttribute("aria-expanded", "false");
-      if (catChanged) {
-        renderSmartFilterControl();
-        render();
-      } else {
-        applyInboxVisibility();
-        refreshSelectionUi();
-      }
+      renderSmartFilterControl();
+      render();
     });
     var resetBtn = document.getElementById("filter-reset");
     if (resetBtn) resetBtn.addEventListener("click", function () {
       var info = catFilterList();
       var catsAll = {};
       info.cats.forEach(function (c) { catsAll[c] = true; });
-      writePending({ priority: "all", unread: false, review: false, cats: catsAll });
+      writePending({ priority: "all", time: "30d", unread: false, review: false, cats: catsAll });
       syncMatch();
     });
     var cancelBtn = document.getElementById("filter-cancel");
@@ -12652,26 +12687,24 @@ function initInboxPageFigma() {
     }
     var info = catFilterList();
     var catCleared = false;
+    var catsAll = {};
     info.cats.forEach(function (c) {
+      catsAll[c] = true;
       if (SMART_FILTER_SELECTED[c] === false) { SMART_FILTER_SELECTED[c] = true; catCleared = true; }
     });
+    INBOX_TIME_FILTER = "any";
     INBOX_PILL = "all";
     Array.prototype.forEach.call(document.querySelectorAll(".filter-pill"), function (p) { p.classList.toggle("active", p.getAttribute("data-pill") === "all"); });
     INBOX_PRIORITY_FILTER = "all";
     var sel = document.getElementById("inbox-priority-filter");
     if (sel) sel.value = "all";
     INBOX_STATUS_FILTER = { unread: false, review: false };
-    if (filterPop) writePending({ priority: "all", unread: false, review: false });
     INBOX_SEARCH_TEXT = "";
     var searchInput = document.getElementById("inbox-search");
     if (searchInput) searchInput.value = "";
-    if (catCleared) {
-      renderSmartFilterControl();
-      render();
-    } else {
-      applyInboxVisibility();
-      refreshSelectionUi();
-    }
+    if (filterPop) writePending({ priority: "all", time: "any", unread: false, review: false, cats: catsAll || {} });
+    renderSmartFilterControl();
+    render();
   });
 
   var tabSug = document.getElementById("tab-suggested");
@@ -12892,9 +12925,13 @@ renderEvalsTable();
   if (searchInput) {
     var applySearch = function () {
       INBOX_SEARCH_TEXT = searchInput.value.trim().toLowerCase();
-      applyInboxVisibility();
+      render();
     };
-    searchInput.addEventListener("input", applySearch);
+    var searchDebounce = null;
+    searchInput.addEventListener("input", function () {
+      clearTimeout(searchDebounce);
+      searchDebounce = setTimeout(applySearch, 120);
+    });
     var prioSelect = document.getElementById("inbox-priority-filter");
     if (prioSelect) prioSelect.addEventListener("change", function () { setTimeout(applySearch, 0); });
     window.addEventListener("keydown", function (e) {
