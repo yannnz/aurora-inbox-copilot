@@ -2723,6 +2723,17 @@ h1, h2, h3, h4 { letter-spacing: -0.2px; }
 .icon-btn:disabled { opacity: .35; cursor: not-allowed; }
 .icon-btn svg { width: 14px; height: 14px; }
 .inbox-divider { width: 1px; height: 15px; background: var(--line); flex: none; }
+.triage-run-btn {
+  height: 26px; padding: 0 10px; border: 0; border-radius: 8px;
+  background: var(--accent); color: #fff; font-family: inherit;
+  font-size: 10px; font-weight: 500; letter-spacing: .02em;
+  display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+  transition: background .12s ease;
+}
+.triage-run-btn:hover { background: var(--accent-deep); }
+.triage-run-btn:disabled { opacity: .5; cursor: not-allowed; }
+.triage-run-btn svg { width: 12px; height: 12px; }
+.triage-run-btn.is-auto-on { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 30%, transparent); }
 .inbox-display-controls { display: flex; align-items: center; gap: 12px; }
 .sort-wrap, .filter-wrap { position: relative; }
 .sort-trigger { display: flex; align-items: center; gap: 6px; border: 0; background: transparent; color: var(--ink-2); font-size: 10px; font-family: inherit; cursor: pointer; padding: 0; }
@@ -3277,6 +3288,10 @@ body.chat-resizing { user-select: none; cursor: col-resize; }
         <button type="button" class="icon-btn" id="gmail-refresh-btn" title="Load / refresh Gmail" aria-label="Load / refresh Gmail" hidden>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
         </button>
+        <button type="button" id="run-all-btn" class="triage-run-btn" title="Run triage on every email in the list (Jev → DeepSeek)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+          Triage
+        </button>
         <span class="inbox-divider" aria-hidden="true"></span>
         <div class="sort-wrap">
           <button type="button" class="sort-trigger" id="sort-trigger" aria-haspopup="menu" aria-expanded="false">
@@ -3408,7 +3423,6 @@ body.chat-resizing { user-select: none; cursor: col-resize; }
           <option value="3600">Every 60 min</option>
           <option value="86400">Daily</option>
         </select>
-        <button type="button" id="run-all-btn" class="btn primary">Run All</button>
       </div>
       <details class="tool-overflow" id="tool-overflow">
         <summary>More tools</summary>
@@ -3933,7 +3947,7 @@ const MEETING_TZ = "Asia/Shanghai";
 // Last 14 days of inbox; hard cap avoids huge body fetches to LLM APIs.
 const GMAIL_INBOX_MAX = 150;
 const GMAIL_NOISE_MAX = 100;
-const GMAIL_LOOKBACK_QUERY = "newer_than:14d";
+const GMAIL_LOOKBACK_QUERY = "newer_than:30d";
 
 // Demo (synthetic EMAILS) vs live Gmail.
 var INBOX_SOURCE = "gmail"; // "demo" | "gmail"
@@ -4336,12 +4350,18 @@ function consumeGoogleOAuthRedirect() {
     setGoogleAccessToken(token, params.get("expires_in") || 3600, params.get("scope") || "");
     refreshGoogleStatus();
     setTopStatus("ok", "Google connected");
+    // Connected → this inbox becomes Gmail and the last month syncs itself.
+    INBOX_SOURCE = "gmail";
+    var srcSel = document.getElementById("inbox-source");
+    if (srcSel) srcSel.value = "gmail";
+    syncInboxSourceUi();
+    setTimeout(function () { maybeAutoSyncGmail(true); }, 400);
     alert(
       "Google connected (Calendar + Gmail).\n\n" +
       "• Calendar: optional event after Approve on a meeting case\n" +
-      "• Gmail: switch Inbox to Gmail, Load, then triage\n" +
+      "• Gmail: the last month syncs automatically — new mail only, stored in this browser\n" +
       "• Approve can save a reply as a Gmail draft — never auto-sends\n\n" +
-      "If Gmail Load fails with 403, enable Gmail API and Connect again to re-consent."
+      "If sync fails with 403, enable Gmail API and Connect again to re-consent."
     );
     return true;
   }
@@ -5173,109 +5193,152 @@ async function gmailApi(path, opts) {
   return data;
 }
 
-async function loadGmailInbox() {
+var GMAIL_SYNC_IN_FLIGHT = false;
+async function loadGmailInbox(opts) {
+  opts = opts || {};
+  if (GMAIL_SYNC_IN_FLIGHT) return;
+  GMAIL_SYNC_IN_FLIGHT = true;
   var statusEl = document.getElementById("gmail-inbox-status");
-  if (statusEl) {
-    statusEl.hidden = false;
-    statusEl.textContent = "Loading last 14 days of Gmail…";
-  }
-  setTopStatus("info", "Loading Gmail (14 days)");
+  try {
+    // Incremental sync: anything already stored is never re-fetched.
+    var known = {};
+    GMAIL_EMAILS.forEach(function (em) { if (em.gmail_id) known[em.gmail_id] = true; });
+    GMAIL_NOISE_EMAILS.forEach(function (em) { if (em.gmail_id) known[em.gmail_id] = true; });
 
-  var triageQ =
-    "in:inbox " + GMAIL_LOOKBACK_QUERY +
-    " -category:promotions -category:social -in:spam";
-  var triageRefs = await listGmailMessageRefs(triageQ, GMAIL_INBOX_MAX);
-
-  var noiseQueryParts = [
-    "in:inbox " + GMAIL_LOOKBACK_QUERY + " category:promotions",
-    "in:inbox " + GMAIL_LOOKBACK_QUERY + " category:social",
-    "in:spam " + GMAIL_LOOKBACK_QUERY
-  ];
-  var noiseRefMap = {};
-  for (var qi = 0; qi < noiseQueryParts.length; qi++) {
     if (statusEl) {
-      statusEl.textContent = "Listing spam/ads sources… (" + (qi + 1) + "/" + noiseQueryParts.length + ")";
+      statusEl.hidden = false;
+      statusEl.textContent = (opts.quiet ? "Syncing" : "Loading") + " last 30 days of Gmail…";
     }
-    var partRefs = await listGmailMessageRefs(noiseQueryParts[qi], GMAIL_NOISE_MAX);
-    partRefs.forEach(function (r) {
-      if (r && r.id) noiseRefMap[r.id] = r;
-    });
-  }
-  var noiseRefs = Object.keys(noiseRefMap).map(function (id) { return noiseRefMap[id]; });
+    setTopStatus("info", (opts.quiet ? "Syncing" : "Loading") + " Gmail (30 days)");
 
-  if (!triageRefs.length && !noiseRefs.length) {
-    GMAIL_EMAILS = [];
-    GMAIL_NOISE_EMAILS = [];
-    GMAIL_LOADED_AT = new Date().toISOString();
-    if (statusEl) statusEl.textContent = "No inbox / spam mail in the last 14 days.";
-    setTopStatus("warn", "Gmail empty");
-    render();
-    renderNoiseList();
-    return;
-  }
+    var triageQ =
+      "in:inbox " + GMAIL_LOOKBACK_QUERY +
+      " -category:promotions -category:social -in:spam";
+    var triageRefs = await listGmailMessageRefs(triageQ, GMAIL_INBOX_MAX);
 
-  var triageEmails = await fetchGmailEmailsFromRefs(triageRefs, statusEl, "Loading triage");
-  var noiseEmails = await fetchGmailEmailsFromRefs(noiseRefs, statusEl, "Loading spam/ads");
+    var noiseQueryParts = [
+      "in:inbox " + GMAIL_LOOKBACK_QUERY + " category:promotions",
+      "in:inbox " + GMAIL_LOOKBACK_QUERY + " category:social",
+      "in:spam " + GMAIL_LOOKBACK_QUERY
+    ];
+    var noiseRefMap = {};
+    for (var qi = 0; qi < noiseQueryParts.length; qi++) {
+      if (statusEl) {
+        statusEl.textContent = "Listing spam/ads sources… (" + (qi + 1) + "/" + noiseQueryParts.length + ")";
+      }
+      var partRefs = await listGmailMessageRefs(noiseQueryParts[qi], GMAIL_NOISE_MAX);
+      partRefs.forEach(function (r) {
+        if (r && r.id) noiseRefMap[r.id] = r;
+      });
+    }
+    var noiseRefs = Object.keys(noiseRefMap).map(function (id) { return noiseRefMap[id]; });
 
-  var clean = [];
-  var moved = [];
-  triageEmails.forEach(function (em) {
-    if (isJobOpportunityEmail(em)) {
-      clean.push(em); // job opportunities always stay in Triage
+    var newTriageRefs = triageRefs.filter(function (r) { return r && r.id && !known[r.id]; });
+    var newNoiseRefs = noiseRefs.filter(function (r) { return r && r.id && !known[r.id]; });
+    var skipped = (triageRefs.length + noiseRefs.length) - (newTriageRefs.length + newNoiseRefs.length);
+
+    if (!newTriageRefs.length && !newNoiseRefs.length) {
+      GMAIL_LOADED_AT = new Date().toISOString();
+      if (!triageRefs.length && !noiseRefs.length && !GMAIL_EMAILS.length && !GMAIL_NOISE_EMAILS.length) {
+        if (statusEl) statusEl.textContent = "No inbox / spam mail in the last 30 days.";
+        setTopStatus("warn", "Gmail empty");
+      } else {
+        if (statusEl) statusEl.textContent = "Up to date — no new mail. " + (GMAIL_EMAILS.length + GMAIL_NOISE_EMAILS.length) + " emails stay stored in this browser.";
+        setTopStatus("ok", "Gmail up to date · " + GMAIL_EMAILS.length + " triage");
+      }
+      render();
+      renderNoiseList();
+      scheduleInboxSave();
       return;
     }
-    var kind = em.noise_kind || classifyNoiseKind({
-      subject: em.subject,
-      body: em.body,
-      from: em.gmail_from,
-      labelIds: em.gmail_label_ids
-    });
-    if (kind) {
-      em.noise_kind = kind;
-      moved.push(em);
-    } else {
-      clean.push(em);
-    }
-  });
-  var rescued = [];
-  noiseEmails.forEach(function (em) {
-    if (isJobOpportunityEmail(em)) {
-      em.noise_kind = "";
-      rescued.push(em); // rescue misfiled job mail from Spam & ads
-      return;
-    }
-    if (!em.noise_kind) {
-      em.noise_kind = classifyNoiseKind({
+
+    var triageEmails = await fetchGmailEmailsFromRefs(newTriageRefs, statusEl, "Fetching new triage");
+    var noiseEmails = await fetchGmailEmailsFromRefs(newNoiseRefs, statusEl, "Fetching new spam/ads");
+
+    var clean = [];
+    var moved = [];
+    triageEmails.forEach(function (em) {
+      if (isJobOpportunityEmail(em)) {
+        clean.push(em); // job opportunities always stay in Triage
+        return;
+      }
+      var kind = em.noise_kind || classifyNoiseKind({
         subject: em.subject,
         body: em.body,
         from: em.gmail_from,
         labelIds: em.gmail_label_ids
-      }) || "promo";
-    }
-  });
-  clean = clean.concat(rescued);
-  var noiseMap = {};
-  noiseEmails.concat(moved).forEach(function (em) {
-    if (!em.noise_kind) return; // rescued job opportunities stay in Triage
-    if (em.gmail_id) noiseMap[em.gmail_id] = em;
-  });
-  GMAIL_EMAILS = clean;
-  GMAIL_NOISE_EMAILS = Object.keys(noiseMap).map(function (k) { return noiseMap[k]; });
-  GMAIL_LOADED_AT = new Date().toISOString();
+      });
+      if (kind) {
+        em.noise_kind = kind;
+        moved.push(em);
+      } else {
+        clean.push(em);
+      }
+    });
+    var rescued = [];
+    noiseEmails.forEach(function (em) {
+      if (isJobOpportunityEmail(em)) {
+        em.noise_kind = "";
+        rescued.push(em); // rescue misfiled job mail from Spam & ads
+        return;
+      }
+      if (!em.noise_kind) {
+        em.noise_kind = classifyNoiseKind({
+          subject: em.subject,
+          body: em.body,
+          from: em.gmail_from,
+          labelIds: em.gmail_label_ids
+        }) || "promo";
+      }
+    });
+    clean = clean.concat(rescued);
 
-  if (statusEl) {
-    statusEl.textContent =
-      "Loaded " + GMAIL_EMAILS.length + " triage · " + GMAIL_NOISE_EMAILS.length +
-      " spam/ads (last 14 days). Triage sends bodies to DeepSeek/OpenAI.";
+    // Merge new into stored (dedupe by gmail_id) — stored mail is never dropped.
+    var triageMap = {};
+    GMAIL_EMAILS.forEach(function (em) { if (em.gmail_id) triageMap[em.gmail_id] = em; });
+    clean.forEach(function (em) { if (em.gmail_id) triageMap[em.gmail_id] = em; });
+    var noiseMap = {};
+    noiseEmails.concat(moved).forEach(function (em) {
+      if (em.noise_kind && em.gmail_id) noiseMap[em.gmail_id] = em;
+    });
+    GMAIL_NOISE_EMAILS.forEach(function (em) {
+      if (em.gmail_id && !noiseMap[em.gmail_id]) noiseMap[em.gmail_id] = em;
+    });
+    GMAIL_EMAILS = Object.keys(triageMap).map(function (k) { return triageMap[k]; });
+    GMAIL_NOISE_EMAILS = Object.keys(noiseMap).map(function (k) { return noiseMap[k]; });
+    GMAIL_LOADED_AT = new Date().toISOString();
+
+    var fetchedNew = triageEmails.length + noiseEmails.length;
+    if (statusEl) {
+      statusEl.textContent =
+        "Synced +" + fetchedNew + " new · " + skipped + " already stored (skipped). Now " +
+        GMAIL_EMAILS.length + " triage · " + GMAIL_NOISE_EMAILS.length +
+        " spam/ads (last 30 days). Triage sends bodies to DeepSeek/OpenAI.";
+    }
+    setTopStatus("ok", "Gmail +" + fetchedNew + " new · " + GMAIL_EMAILS.length + " triage · " + GMAIL_NOISE_EMAILS.length + " noise");
+    if (rescued.length) {
+      logSmartAction("rescue", "从 Spam & ads 救回 " + rescued.length + " 封求职相关邮件到收件箱");
+      showSmartToast("已从 Spam & ads 救回 " + rescued.length + " 封求职相关邮件");
+    }
+    handleNewEmailsAfterLoad();
+    render();
+    renderNoiseList();
+    scheduleInboxSave();
+    syncInboxSourceUi();
+  } finally {
+    GMAIL_SYNC_IN_FLIGHT = false;
   }
-  setTopStatus("ok", "Gmail · " + GMAIL_EMAILS.length + " triage · " + GMAIL_NOISE_EMAILS.length + " noise");
-  if (rescued.length) {
-    logSmartAction("rescue", "从 Spam & ads 救回 " + rescued.length + " 封求职相关邮件到收件箱");
-    showSmartToast("🛟 已从 Spam & ads 救回 " + rescued.length + " 封求职相关邮件");
-  }
-  handleNewEmailsAfterLoad();
-  render();
-  renderNoiseList();
+}
+
+// Auto-sync: run quietly once per session when Gmail is connected (or forced
+// right after a fresh OAuth connection). Manual refresh uses the same path.
+function maybeAutoSyncGmail(force) {
+  if (!getGoogleAccessToken()) return false;
+  if (INBOX_SOURCE !== "gmail") return false;
+  if (GMAIL_SYNC_IN_FLIGHT) return false;
+  if (!force && GMAIL_LOADED_AT && (Date.now() - new Date(GMAIL_LOADED_AT).getTime()) < 5 * 60 * 1000) return false;
+  loadGmailInbox({ quiet: true });
+  return true;
 }
 
 function buildGmailReplyRaw(em, draftText) {
@@ -12831,7 +12894,10 @@ initGlobalChat();
 initRunAllControls();
 renderRunLog();
 render();
-restoreInboxSnapshot();
+restoreInboxSnapshot().then(function () {
+  // Gmail auto-sync: connected → quietly pull only new mail from the last month.
+  maybeAutoSyncGmail(false);
+});
 loadEvalResults();
 loadImprovementRecord();
 renderEvalsTable();
