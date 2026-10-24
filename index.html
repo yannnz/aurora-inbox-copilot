@@ -3290,7 +3290,7 @@ body.chat-resizing { user-select: none; cursor: col-resize; }
         </button>
         <button type="button" id="run-all-btn" class="triage-run-btn" title="Run triage on every email in the list (Jev → DeepSeek)">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
-          Triage
+          <span id="run-all-label">Triage</span>
         </button>
         <span class="inbox-divider" aria-hidden="true"></span>
         <div class="sort-wrap">
@@ -11663,16 +11663,17 @@ function syncRunAllControlsUi() {
   }
   if (modeEl) modeEl.disabled = RUN_ALL_STATE.autoOn;
   if (!btn) return;
+  var lbl = btn.querySelector("#run-all-label");
   btn.classList.toggle("is-auto-on", !!RUN_ALL_STATE.autoOn);
   if (RUN_ALL_STATE.mode === "manual") {
-    btn.textContent = "Run All";
+    if (lbl) lbl.textContent = "Triage";
     btn.disabled = !!RUN_ALL_STATE.running;
     if (scheduleEl) scheduleEl.hidden = true;
   } else if (RUN_ALL_STATE.autoOn) {
-    btn.textContent = "Stop schedule";
+    if (lbl) lbl.textContent = "Stop schedule";
     btn.disabled = false;
   } else {
-    btn.textContent = "Start schedule";
+    if (lbl) lbl.textContent = "Start schedule";
     btn.disabled = false;
   }
 }
