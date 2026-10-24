@@ -2959,19 +2959,33 @@ h1, h2, h3, h4 { letter-spacing: -0.2px; }
 .console[data-layout="reading"] .inbox-columns { display: none; }
 .console[data-layout="reading"] .reading-pane { margin-top: 24px; }
 
-/* F. Ask-assistant = left inline drawer; the workspace narrows to make room */
-.console.chat-open { display: flex; flex-direction: row; align-items: stretch; }
-.console.chat-open > .global-chat {
-  flex: none; width: 340px; max-width: 340px;
-  position: sticky; top: 96px; align-self: flex-start;
-  height: auto; max-height: none;
-  margin: 20px 24px 20px 28px;
-  display: flex; flex-direction: column;
+/* F. Ask-assistant = first column, LEFT of the nav; flat card surface; same
+      height as the nav column. The whole page scrolls as one (no local bars). */
+.app-nav {
+  position: static; height: auto; max-height: none; overflow: visible;
 }
-.console.chat-open > .workspace-col { flex: 1 1 auto; min-width: 0; }
+.session-pane { position: static; overflow: visible; }
+.app-shell > .global-chat {
+  position: static; inset: auto;
+  width: 340px; flex: none;
+  height: auto; max-height: none;
+  margin: 0; padding: 0;
+  display: none; flex-direction: column;
+  background: #ffffff;
+  border: 0; border-right: 1px solid var(--line);
+  border-radius: 0; box-shadow: none;
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+}
+.app-shell:has(.console.chat-open) { grid-template-columns: 340px 216px minmax(0, 1fr); }
+.app-shell:has(.console.chat-open) > .global-chat { display: flex; }
+.console.chat-open .chat-launcher { left: auto; right: 20px; }
 @media (max-width: 900px) {
-  .console.chat-open { flex-direction: column; }
-  .console.chat-open > .global-chat { position: static; width: auto; max-width: none; margin: 16px; }
+  .app-shell > .global-chat {
+    position: fixed; inset: 16px auto 16px 16px; z-index: 70;
+    width: min(360px, calc(100vw - 32px)); min-height: 0; height: auto;
+    border: 1px solid var(--line); border-radius: 12px;
+    box-shadow: 0 24px 64px -24px rgba(36, 39, 51, .35);
+  }
 }
 
 /* G. Read-mode email body with clickable links */
@@ -12493,6 +12507,14 @@ renderEvalsTable();
 
 // ═══ Gmail triage workspace — navigation & search wiring (Figma restore) ═══
 (function initGmailWorkspaceNav() {
+  // Ask-assistant lives as the FIRST column of the app shell, left of the nav.
+  var chatPanel = document.getElementById("global-chat");
+  var appShell = document.querySelector(".app-shell");
+  var appNav = document.querySelector(".app-nav");
+  if (chatPanel && appShell && appNav && chatPanel.parentElement !== appShell) {
+    appShell.insertBefore(chatPanel, appNav);
+  }
+
   // Compose opens the AI assistant drawer (classification + drafting).
   var composeBtn = document.getElementById("nav-compose-btn");
   if (composeBtn) {
