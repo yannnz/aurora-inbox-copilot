@@ -2942,32 +2942,14 @@ h1, h2, h3, h4 { letter-spacing: -0.2px; }
 /* C. Reading mode = reply-workspace overlay (Figma 6:13428); list stays mounted
       so the 3:1860 selected row + reasoning strip shows after Back. */
 
-/* D. One-screen workspace on desktop: fixed header + hero, list scrolls inside its card */
-@media (min-width: 1281px) {
-  html, body { height: 100%; overflow: hidden; }
-  .app-shell { height: 100vh; }
-  .app-main { height: 100vh; overflow: hidden; }
-  .workspace-col { height: 100%; overflow: hidden; }
-  .searchbar { flex: none; position: static; }
-  .inbox-intro { flex: none; }
-  .workspace-col { position: relative; }
-  .console[data-layout="reading"] .inbox-intro { display: none; }
-  .reading-pane {
-    position: absolute; left: 28px; right: 28px; top: 76px; bottom: 24px;
-    margin: 0; z-index: 30; overflow-y: auto;
-    display: flex; flex-direction: column;
-    box-shadow: 0 24px 64px -24px rgba(36, 39, 51, .35);
-  }
-  .reading-pane .panel-body { overflow: visible; }
-  .inbox-columns { flex: 1 1 auto; min-height: 0; overflow: hidden; align-items: stretch; }
-  .inbox-pane { display: flex; flex-direction: column; overflow: hidden; }
-  .inbox-heading, .inbox-filters, .inbox-pagination { flex: none; }
-  .inbox-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
-  .session-pane { position: static; overflow-y: auto; overscroll-behavior: contain; }
-}
-@media (max-width: 1280px) {
-  .inbox-scroll { overflow: visible; }
-  .reading-pane { overflow-y: auto; }
+/* D. Fixed table list per Figma: no internal scroller — the card is a flat
+      table capped at MAX rows; "View all emails" in the footer expands it. */
+.inbox-scroll { overflow: visible; }
+.reading-pane { overflow: visible; }
+.category-heading { height: 39px; }
+.inbox-pagination { height: 42px; }
+.inbox-heading { height: 59px; min-height: 59px; padding: 0 20px; align-items: center; }
+.inbox-filters { height: 41px; padding: 0 20px 14px; align-items: flex-start; padding-top: 0; }
 }
 </style>
 </head>
@@ -11878,7 +11860,13 @@ function render() {
     }
     return rank(a) - rank(b);
   });
+  CASE_VIEWS.forEach(function (v) { v.groupEl = null; });
+  var appendedCount = 0;
   groups.forEach(function (g) {
+    var budget = INBOX_EXPANDED ? g.views.length : Math.min(g.views.length, MAX_INBOX_ROWS - appendedCount);
+    var included = g.views.slice(0, Math.max(0, budget));
+    if (!included.length) return;
+    appendedCount += included.length;
     var head = document.createElement("div");
     head.className = "category-heading";
     head.innerHTML =
@@ -11890,7 +11878,7 @@ function render() {
       "<svg class='category-more' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round' aria-hidden='true'><circle cx='5' cy='12' r='1'/><circle cx='12' cy='12' r='1'/><circle cx='19' cy='12' r='1'/></svg>";
     list.appendChild(head);
     g.el = head;
-    g.views.forEach(function (v) {
+    included.forEach(function (v) {
       list.appendChild(v.card);
       v.groupEl = head;
     });
@@ -12000,7 +11988,7 @@ function unifiedVisible(view) {
 function updatePagination() {
   var el = document.getElementById("pagination-label");
   if (!el) return;
-  var vis = CASE_VIEWS.filter(unifiedVisible).length;
+  var vis = CASE_VIEWS.filter(function (v) { return v.card && v.card.isConnected && unifiedVisible(v); }).length;
   el.textContent = "Showing " + vis + " of " + CASE_VIEWS.length + " emails";
 }
 function applyInboxVisibility() {
@@ -12020,12 +12008,16 @@ function applyInboxVisibility() {
 
 // ── Sort (Figma 6:11843 sort menu) ────────────────────────────────────────
 var INBOX_SORT = "priority";
+// Figma 3:1860/3:2188 — the list is a fixed table: default cap, footer expands.
+var MAX_INBOX_ROWS = 24;
+var INBOX_EXPANDED = false;
 function applyInboxSort() {
   var list = document.getElementById("case-list");
   if (!list) return;
   var groups = [];
   var map = {};
   CASE_VIEWS.forEach(function (v) {
+    if (!v.groupEl) return;
     var key = v.groupEl || list;
     if (!map[key._gk]) { key._gk = key._gk || ("g" + groups.length); map[key._gk] = { head: key === list ? null : key, views: [] }; groups.push(map[key._gk]); }
     map[key._gk].views.push(v);
@@ -12345,6 +12337,11 @@ function initInboxPageFigma() {
 
   var viewAll = document.getElementById("view-all-btn");
   if (viewAll) viewAll.addEventListener("click", function () {
+    if (!INBOX_EXPANDED && CASE_VIEWS.length > MAX_INBOX_ROWS) {
+      INBOX_EXPANDED = true;
+      render();
+      return;
+    }
     INBOX_PILL = "all";
     Array.prototype.forEach.call(document.querySelectorAll(".filter-pill"), function (p) { p.classList.toggle("active", p.getAttribute("data-pill") === "all"); });
     INBOX_PRIORITY_FILTER = "all";
