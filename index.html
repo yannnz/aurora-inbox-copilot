@@ -12092,14 +12092,42 @@ function linkifyEmailBody(text) {
 var INBOX_PILL = "all";
 var INBOX_SEARCH_TEXT = "";
 var INBOX_STATUS_FILTER = { unread: false, review: false };
+// Smart-category → quick-pill buckets (explicit first, patterns as fallback
+// for LLM-generated category names). Priority-driven cats also surface under
+// "Needs attention" via their urgency tier.
+var SMART_CAT_PILL = {
+  "今天行动 · 招聘方触达": "work",
+  "真人会议 · 需确认": "work",
+  "安全与登录警报": "work",
+  "开发者任务": "work",
+  "开发者 · 密钥过期": "work",
+  "开发者 · 权限请求": "work",
+  "投递管线 · 已投递等回复": "work",
+  "投递管线 · 未通过": "work",
+  "账单与订阅": "work",
+  "求职信息流 · ⭐匹配你的偏好": "work",
+  "求职信息流": "work",
+  "工具通知": "updates",
+  "社区通知 · 已不活跃": "updates",
+  "社交与娱乐": "updates",
+  "内容订阅": "updates",
+  "其他通知": "updates"
+};
+function smartCatPill(cat) {
+  if (SMART_CAT_PILL[cat]) return SMART_CAT_PILL[cat];
+  if (/招聘|求职|投递|会议|开发者|账单|任务|行动|权限|密钥|审批|付款|发票|订单|合同|报价|客户|项目/.test(cat)) return "work";
+  if (/通知|订阅|社区|社交|娱乐|内容|简报|参考|信息|更新|update|newsletter/i.test(cat)) return "updates";
+  return "";
+}
 function pillMatches(view) {
   if (INBOX_PILL === "all") return true;
   var em = view.em;
-  var cat = String((SMART_APPLIED && em.smart_cat) || "");
-  var hay = cat + " " + (em.subject || "");
   if (INBOX_PILL === "attention") return tierRankOf(view) <= 1 || isEscalatedOutcome(view);
-  if (INBOX_PILL === "work") return /work|工作|项目|任务|order|contract|invoice|reorder|quote|proposal|payment|shipment|delivery/i.test(hay);
-  if (INBOX_PILL === "updates") return /update|updates|newsletter|通知|更新|订阅|meeting|schedule|fyi|invitation|invite|walk-through|follow-up/i.test(hay);
+  var cat = String((SMART_APPLIED && em.smart_cat) || "");
+  if (cat) return smartCatPill(cat) === INBOX_PILL; // classification drives Work / Updates
+  var hay = em.subject || "";
+  if (INBOX_PILL === "work") return /work|工作|项目|任务|order|contract|invoice|reorder|quote|proposal|payment|shipment|delivery|招聘|求职|meeting|invitation|invite/i.test(hay);
+  if (INBOX_PILL === "updates") return /update|updates|newsletter|通知|更新|订阅|schedule|fyi|walk-through|follow-up|receipt|subscription/i.test(hay);
   return true;
 }
 function statusMatches(view) {
@@ -12418,6 +12446,13 @@ function scheduleAgentPanelRender() {
 // ── Inbox page controls wiring (pills / sort / filter / tabs / add task) ───
 function initInboxPageFigma() {
   Array.prototype.forEach.call(document.querySelectorAll(".filter-pill"), function (pill) {
+    var hints = {
+      all: "Show every email",
+      attention: "P0 / P1 priority, escalated, or refused decisions",
+      work: "Smart categories: recruiting · meetings · developer · billing · applications",
+      updates: "Smart categories: notifications · subscriptions · social · newsletters"
+    };
+    pill.title = hints[pill.getAttribute("data-pill")] || "";
     pill.addEventListener("click", function () {
       Array.prototype.forEach.call(document.querySelectorAll(".filter-pill"), function (p) { p.classList.remove("active"); });
       pill.classList.add("active");
