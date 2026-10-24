@@ -2743,6 +2743,8 @@ h1, h2, h3, h4 { letter-spacing: -0.2px; }
 .filter-pill { height: 26px; padding: 6px 10px; border: 0; border-radius: 8px; background: transparent; color: var(--ink-2); font-size: 10px; font-family: inherit; cursor: pointer; white-space: nowrap; }
 .filter-pill:hover { color: var(--ink); }
 .filter-pill.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.filter-pill .pill-count { margin-left: 5px; color: var(--ink-3); font-weight: 500; }
+.filter-pill.active .pill-count { color: inherit; opacity: .75; }
 .filter-trigger { display: flex; align-items: center; gap: 6px; margin-left: auto; border: 0; background: transparent; color: var(--ink-2); font-size: 10px; font-family: inherit; cursor: pointer; padding: 0; }
 .filter-trigger:hover { color: var(--ink); }
 .filter-trigger svg { width: 13px; height: 13px; }
@@ -3305,9 +3307,9 @@ body.chat-resizing { user-select: none; cursor: col-resize; }
 
     <div class="inbox-filters" id="inbox-filters">
       <button type="button" class="filter-pill active" data-pill="all">All mail</button>
-      <button type="button" class="filter-pill" data-pill="attention">Needs attention</button>
-      <button type="button" class="filter-pill" data-pill="work">Work</button>
-      <button type="button" class="filter-pill" data-pill="updates">Updates</button>
+      <button type="button" class="filter-pill" data-pill="attention">Needs attention <span class="pill-count" data-pill-count="attention">0</span></button>
+      <button type="button" class="filter-pill" data-pill="work">Work <span class="pill-count" data-pill-count="work">0</span></button>
+      <button type="button" class="filter-pill" data-pill="updates">Updates <span class="pill-count" data-pill-count="updates">0</span></button>
       <button type="button" class="filter-trigger" id="filter-trigger" aria-haspopup="dialog" aria-expanded="false">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M7 12h10"/><path d="M10 18h4"/></svg>
         Filter
@@ -12004,6 +12006,7 @@ function render() {
   applyInboxSort();
   applyInboxVisibility();
   renderAgentPanel();
+  updatePillCounts();
   var chips = document.getElementById("demo-chips");
   if (chips) {
     chips.innerHTML = "";
@@ -12119,16 +12122,32 @@ function smartCatPill(cat) {
   if (/通知|订阅|社区|社交|娱乐|内容|简报|参考|信息|更新|update|newsletter/i.test(cat)) return "updates";
   return "";
 }
-function pillMatches(view) {
-  if (INBOX_PILL === "all") return true;
+function matchesPill(view, pill) {
+  if (pill === "all") return true;
   var em = view.em;
-  if (INBOX_PILL === "attention") return tierRankOf(view) <= 1 || isEscalatedOutcome(view);
+  if (pill === "attention") return tierRankOf(view) <= 1 || isEscalatedOutcome(view);
   var cat = String((SMART_APPLIED && em.smart_cat) || "");
-  if (cat) return smartCatPill(cat) === INBOX_PILL; // classification drives Work / Updates
+  var bucket = cat ? smartCatPill(cat) : "";
+  if (bucket) return bucket === pill; // known smart category drives Work / Updates
+  // No classification (or an unmapped category name) → keyword fallback on subject.
   var hay = em.subject || "";
-  if (INBOX_PILL === "work") return /work|工作|项目|任务|order|contract|invoice|reorder|quote|proposal|payment|shipment|delivery|招聘|求职|meeting|invitation|invite/i.test(hay);
-  if (INBOX_PILL === "updates") return /update|updates|newsletter|通知|更新|订阅|schedule|fyi|walk-through|follow-up|receipt|subscription/i.test(hay);
+  if (pill === "work") return /work|工作|项目|任务|order|contract|invoice|reorder|quote|proposal|payment|shipment|delivery|招聘|求职|meeting|invitation|invite/i.test(hay);
+  if (pill === "updates") return /update|updates|newsletter|通知|更新|订阅|schedule|fyi|walk-through|follow-up|receipt|subscription/i.test(hay);
   return true;
+}
+function pillMatches(view) { return matchesPill(view, INBOX_PILL); }
+function updatePillCounts() {
+  var counts = { attention: 0, work: 0, updates: 0 };
+  CASE_VIEWS.forEach(function (v) {
+    if (!v.card || !v.card.isConnected) return;
+    ["attention", "work", "updates"].forEach(function (p) {
+      if (matchesPill(v, p)) counts[p]++;
+    });
+  });
+  Object.keys(counts).forEach(function (p) {
+    var el = document.querySelector("[data-pill-count='" + p + "']");
+    if (el) el.textContent = String(counts[p]);
+  });
 }
 function statusMatches(view) {
   if (INBOX_STATUS_FILTER.review && !isEscalatedOutcome(view)) return false;
