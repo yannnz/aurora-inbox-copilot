@@ -2798,7 +2798,7 @@ h1, h2, h3, h4 { letter-spacing: -0.2px; }
 .agent-strip[hidden] { display: none; }
 .strip-reason { display: flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 500; color: var(--accent); line-height: 1.4; }
 .strip-reason svg { width: 12px; height: 12px; flex: none; color: var(--accent); }
-.strip-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-right: 44px; }
+.strip-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-right: 0; }
 .strip-task { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--ink-2); border: 0; background: transparent; padding: 0; font-family: inherit; cursor: pointer; text-align: left; min-width: 0; }
 .strip-task svg { width: 12px; height: 12px; flex: none; color: var(--ink-2); }
 .strip-task span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -2904,12 +2904,13 @@ h1, h2, h3, h4 { letter-spacing: -0.2px; }
 .sender-avatar { margin: 0; width: 30px; height: 30px; flex: none; }
 .case-card .mail-content {
   flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center;
-  gap: 3px; padding-right: 72px; height: 53px;
+  gap: 3px; padding-right: 0; height: 53px;
 }
 .case-card .from,
 .console[data-layout="list"] .case-card .from {
   height: 15px; display: flex; align-items: center; gap: 6px; margin: 0;
   font-size: 11px; font-weight: 600; line-height: 15px; min-width: 0;
+  padding-right: 104px; /* Figma 3:2003: reserve line-1 right cluster (prio·time·star) */
 }
 .from-name { line-height: 15px; }
 .case-card .subject-line { height: 20px; display: flex; align-items: center; gap: 8px; min-width: 0; }
