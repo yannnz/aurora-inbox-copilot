@@ -2400,6 +2400,7 @@ h1, h2, h3, h4 { letter-spacing: -0.2px; }
 }
 .nav-account-name { font-size: 12px; font-weight: 600; color: var(--ink); }
 .nav-account-mail { font-size: 10px; color: var(--ink-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 128px; }
+.nav-build { padding: 0 12px; font-size: 8px; letter-spacing: .04em; color: var(--ink-3); opacity: .7; }
 
 /* ── Search & utilities bar (h76) ────────────────────────────────────── */
 .searchbar {
@@ -3139,6 +3140,7 @@ body.chat-resizing { user-select: none; cursor: col-resize; }
         <span class="nav-account-mail">ren@aurora.example</span>
       </span>
     </div>
+    <div class="nav-build" id="nav-build">build 2026-10-24 · pills-v2</div>
   </div>
 </aside>
 <main class="app-main">
@@ -12472,13 +12474,20 @@ function initInboxPageFigma() {
       updates: "Smart categories: notifications · subscriptions · social · newsletters"
     };
     pill.title = hints[pill.getAttribute("data-pill")] || "";
-    pill.addEventListener("click", function () {
+  });
+  // Delegated clicks survive any re-binding — the pill filter can never silently die.
+  var filtersRow = document.getElementById("inbox-filters");
+  if (filtersRow) {
+    filtersRow.addEventListener("click", function (e) {
+      var pill = e.target && e.target.closest ? e.target.closest(".filter-pill") : null;
+      if (!pill || !filtersRow.contains(pill)) return;
       Array.prototype.forEach.call(document.querySelectorAll(".filter-pill"), function (p) { p.classList.remove("active"); });
       pill.classList.add("active");
       INBOX_PILL = pill.getAttribute("data-pill") || "all";
       applyInboxVisibility();
+      updatePillCounts();
     });
-  });
+  }
 
   var sortTrigger = document.getElementById("sort-trigger");
   var sortMenu = document.getElementById("sort-menu");
@@ -12716,6 +12725,7 @@ function initInboxPageFigma() {
   });
 }
 initInboxPageFigma();
+try { console.info("[Aurora] build 2026-10-24 · pills-v2 (delegated clicks)"); } catch (e) { /* ignore */ }
 
 // ═══ Chat drawer — drag to resize (min = default 340px), persisted ═══
 (function initChatDrawerResize() {
