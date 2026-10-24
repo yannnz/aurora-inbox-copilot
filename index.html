@@ -2705,6 +2705,183 @@ h1, h2, h3, h4 { letter-spacing: -0.2px; }
   .mail-content { padding-right: 56px; }
 }
 </style>
+<style>
+/* ═══ INBOX PAGE — 100% Figma restore (frames 3:1934/3:1974/3:1984/3:1996/3:2003/3:2188/3:2193) ═══ */
+
+/* Hero — run status (3:1934) */
+.run-status { display: flex; align-items: center; gap: 8px; }
+.run-status-title { font-size: 13px; font-weight: 600; color: var(--ink); }
+.run-status-badge { height: 20px; padding: 3px 7px; border-radius: 5px; background: #edf6f1; color: var(--ok); font-size: 10px; font-weight: 500; display: inline-flex; align-items: center; }
+.run-status-badge.demo { background: var(--accent-soft); color: var(--accent); }
+
+/* Inbox heading (3:1974) */
+.inbox-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 59px; padding: 19px 20px 16px; }
+.inbox-heading .inbox-title { font-size: 17px; font-weight: 600; }
+.icon-btn { width: 26px; height: 26px; border: 0; background: transparent; color: var(--ink-2); display: inline-grid; place-items: center; cursor: pointer; border-radius: 6px; }
+.icon-btn:hover:not(:disabled) { background: var(--bg-inset); color: var(--ink); }
+.icon-btn:disabled { opacity: .35; cursor: not-allowed; }
+.icon-btn svg { width: 14px; height: 14px; }
+.inbox-divider { width: 1px; height: 15px; background: var(--line); flex: none; }
+.inbox-display-controls { display: flex; align-items: center; gap: 12px; }
+.sort-wrap, .filter-wrap { position: relative; }
+.sort-trigger { display: flex; align-items: center; gap: 6px; border: 0; background: transparent; color: var(--ink-2); font-size: 10px; font-family: inherit; cursor: pointer; padding: 0; }
+.sort-trigger:hover { color: var(--ink); }
+.sort-trigger svg { width: 12px; height: 12px; }
+.sort-menu { position: absolute; right: 0; top: calc(100% + 6px); z-index: 60; width: 238px; background: #fff; border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 12px 32px -12px rgba(36, 39, 51, .28); padding: 6px; display: flex; flex-direction: column; gap: 2px; }
+.sort-menu[hidden], .filter-pop[hidden], .prio-menu[hidden] { display: none; }
+.menu-heading { font-size: 10px; font-weight: 600; color: var(--ink-3); letter-spacing: .06em; padding: 8px 8px 6px; }
+.sort-option { display: flex; align-items: center; justify-content: space-between; gap: 9px; min-height: 35px; padding: 9px 10px; border: 0; border-radius: 5px; background: transparent; color: var(--ink); font-size: 12px; font-family: inherit; cursor: pointer; text-align: left; }
+.sort-option:hover { background: var(--bg); }
+.sort-option.active { background: var(--accent-soft); color: var(--accent); font-weight: 500; }
+.sort-option .opt-check { width: 14px; height: 14px; display: none; flex: none; }
+.sort-option.active .opt-check { display: block; }
+.menu-divider { height: 1px; background: var(--line); margin: 4px 0; }
+.menu-foot { font-size: 10px; color: var(--ink-2); padding: 6px 8px 8px; }
+
+/* Inbox filters (3:1984) */
+.inbox-filters { position: relative; display: flex; align-items: center; gap: 6px; padding: 0 20px 15px; border-bottom: 1px solid var(--line); }
+.filter-pill { height: 26px; padding: 6px 10px; border: 0; border-radius: 8px; background: transparent; color: var(--ink-2); font-size: 10px; font-family: inherit; cursor: pointer; white-space: nowrap; }
+.filter-pill:hover { color: var(--ink); }
+.filter-pill.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.filter-trigger { display: flex; align-items: center; gap: 6px; margin-left: auto; border: 0; background: transparent; color: var(--ink-2); font-size: 10px; font-family: inherit; cursor: pointer; padding: 0; }
+.filter-trigger:hover { color: var(--ink); }
+.filter-trigger svg { width: 13px; height: 13px; }
+.filter-pop { position: absolute; right: 20px; top: calc(100% + 8px); z-index: 61; width: 352px; max-width: calc(100vw - 40px); background: #fff; border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 16px 40px -16px rgba(36, 39, 51, .32); padding: 20px; }
+.filter-pop-title { font-size: 17px; font-weight: 600; color: var(--ink); }
+.filter-pop-sub { font-size: 12px; color: var(--ink-2); margin: 4px 0 16px; }
+.filter-groups { display: flex; gap: 20px; }
+.filter-group { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+.filter-group-label { font-size: 10px; font-weight: 600; color: var(--ink-3); letter-spacing: .06em; }
+.filter-opt { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ink); cursor: pointer; }
+.filter-opt input { accent-color: var(--accent); margin: 0; }
+.filter-match { font-size: 11px; color: var(--ink-2); margin: 12px 0; }
+.filter-actions { display: flex; align-items: center; gap: 8px; }
+.filter-actions-gap { flex: 1; }
+.filter-link { border: 0; background: transparent; color: var(--accent); font-size: 12px; font-family: inherit; cursor: pointer; }
+
+/* Category heading (3:1996) */
+.category-heading { display: flex; align-items: center; gap: 7px; min-height: 39px; padding: 0 18px; background: #fafafc; border-bottom: 1px solid var(--line); }
+.category-chevron { width: 12px; height: 12px; color: var(--ink-2); flex: none; }
+.category-marker { width: 6px; height: 6px; border-radius: 999px; flex: none; }
+.category-name { font-size: 11px; font-weight: 600; color: var(--ink); }
+.category-count { font-size: 10px; color: var(--ink-3); }
+.category-desc { flex: 1; min-width: 0; font-size: 9px; color: var(--ink-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.category-more { width: 14px; height: 14px; color: var(--ink-2); flex: none; }
+
+/* Email row refinements (3:2003 / 3:2035) */
+.case-card .mail-when, .console[data-layout="list"] .case-card .mail-when { top: 12px; right: 44px; }
+.mail-star { position: absolute; top: 11px; right: 18px; width: 14px; height: 14px; border: 0; padding: 0; background: transparent; color: var(--ink-3); cursor: pointer; display: grid; place-items: center; }
+.mail-star svg { width: 12px; height: 12px; }
+.mail-star.starred { color: var(--warn); }
+.case-card .prio, .console[data-layout="list"] .case-card .prio {
+  position: absolute; top: 12px; right: 82px; height: 13px; padding: 0; border: 0 !important; border-radius: 0;
+  background: transparent !important; font-size: 9px; font-weight: 500; gap: 4px; box-shadow: none;
+}
+.case-card .prio.show { display: inline-flex; align-items: center; }
+.case-card .prio.p0 { color: var(--danger); background: transparent !important; }
+.case-card .prio.p1 { color: var(--warn); background: transparent !important; }
+.case-card .prio.p2 { color: var(--ink-2); background: transparent !important; }
+.case-card .prio.p3 { display: none; }
+.case-card .prio.show::before {
+  content: ""; width: 10px; height: 10px; flex: none; background: currentColor;
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z'/><line x1='4' x2='4' y1='22' y2='15'/></svg>") center / contain no-repeat;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z'/><line x1='4' x2='4' y1='22' y2='15'/></svg>") center / contain no-repeat;
+}
+.subject-line .badge, .subject-line .smart-cat-badge { flex: none; }
+.case-card .flag-line, .console[data-layout="list"] .case-card .flag-line { display: none !important; }
+.case-card .mail-status-row, .console[data-layout="list"] .case-card .mail-status-row {
+  display: contents; padding: 0; min-height: 0; margin: 0;
+}
+
+/* Agent reasoning strip (3:2003 · selected row) */
+.agent-strip { display: flex; flex-direction: column; gap: 8px; padding: 2px 18px 14px 59px; margin-top: -2px; }
+.agent-strip[hidden] { display: none; }
+.strip-reason { display: flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 500; color: var(--accent); line-height: 1.4; }
+.strip-reason svg { width: 12px; height: 12px; flex: none; color: var(--accent); }
+.strip-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-right: 44px; }
+.strip-task { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--ink-2); border: 0; background: transparent; padding: 0; font-family: inherit; cursor: pointer; text-align: left; min-width: 0; }
+.strip-task svg { width: 12px; height: 12px; flex: none; color: var(--ink-2); }
+.strip-task span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.strip-actions { display: flex; align-items: center; gap: 12px; flex: none; }
+.strip-link { border: 0; background: transparent; color: var(--accent); font-size: 10px; font-weight: 500; font-family: inherit; cursor: pointer; padding: 0; }
+.strip-link.undo { color: var(--ink-2); font-weight: 400; }
+.prio-menu { position: absolute; right: 18px; bottom: 10px; z-index: 55; width: 226px; background: #fff; border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 12px 32px -12px rgba(36, 39, 51, .28); padding: 6px; display: flex; flex-direction: column; gap: 2px; }
+.prio-menu .menu-heading { padding: 8px 8px 6px; }
+.prio-opt { display: flex; align-items: center; gap: 10px; min-height: 35px; padding: 9px 10px; border: 0; border-radius: 5px; background: transparent; color: var(--ink); font-size: 12px; font-family: inherit; cursor: pointer; text-align: left; }
+.prio-opt:hover { background: var(--bg); }
+.prio-opt svg { width: 14px; height: 14px; flex: none; }
+.prio-opt .opt-copy { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.prio-opt .opt-copy strong { font-size: 12px; font-weight: 500; }
+.prio-opt .opt-copy span { font-size: 9px; color: var(--ink-3); }
+
+/* Pagination (3:2188) */
+.inbox-pagination { display: flex; align-items: center; justify-content: space-between; min-height: 42px; padding: 0 20px; border-top: 1px solid var(--line); }
+.pagination-label { font-size: 10px; color: var(--ink-3); }
+.pagination-link { display: flex; align-items: center; gap: 8px; border: 0; background: transparent; color: var(--ink-2); font-size: 10px; font-family: inherit; cursor: pointer; padding: 0; }
+.pagination-link:hover { color: var(--ink); }
+.pagination-link svg { width: 13px; height: 13px; }
+
+/* Agent assistant column (3:2193) */
+.session-pane { display: flex; flex-direction: column; gap: 16px; padding: 0; background: transparent; border: 0; box-shadow: none; overflow: visible; }
+.console.session-open .session-pane { display: flex; }
+.todo-card { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 15px; }
+.tasks-heading { display: flex; align-items: center; justify-content: space-between; }
+.tasks-title { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; color: var(--ink); }
+.tasks-title svg { width: 17px; height: 17px; color: var(--accent); flex: none; }
+.tasks-sub { margin: 0; font-size: 11px; color: var(--ink-2); line-height: 1.45; }
+.task-tabs { display: flex; gap: 18px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+.task-tab { border: 0; background: transparent; font-size: 11px; color: var(--ink-3); font-family: inherit; cursor: pointer; padding: 0; }
+.task-tab.active { color: var(--accent); font-weight: 600; }
+.task-tab-count { margin-left: 4px; }
+.task-list { display: flex; flex-direction: column; gap: 10px; }
+.task-card { border: 1px solid var(--line); background: #fff; border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.task-card.is-top { background: #faf9fe; border-color: #dcd9f2; }
+.task-card.is-done { opacity: .62; }
+.task-title-row { display: flex; align-items: flex-start; gap: 9px; }
+.task-check { width: 14px; height: 14px; margin-top: 2px; accent-color: var(--accent); flex: none; cursor: pointer; }
+.task-title { flex: 1; font-size: 12px; font-weight: 500; color: var(--ink); line-height: 1.4; }
+.task-source { display: flex; align-items: center; gap: 5px; padding-left: 23px; font-size: 10px; color: var(--accent); background: transparent; border: 0; cursor: pointer; text-align: left; font-family: inherit; min-width: 0; }
+.task-source svg { width: 11px; height: 11px; flex: none; }
+.task-source span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.task-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-left: 23px; }
+.task-due { display: flex; align-items: center; gap: 4px; font-size: 9px; color: var(--ink-2); }
+.task-due svg { width: 11px; height: 11px; flex: none; }
+.task-action { height: 27px; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--line); background: #fff; color: var(--ink); font-size: 11px; font-weight: 500; font-family: inherit; cursor: pointer; flex: none; }
+.task-action:hover { border-color: color-mix(in srgb, var(--accent) 35%, var(--line)); }
+.task-action.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.task-empty { font-size: 11px; color: var(--ink-3); padding: 4px 0; line-height: 1.5; }
+.add-task-row { display: flex; align-items: center; justify-content: center; gap: 6px; padding-top: 2px; color: var(--accent); font-size: 11px; font-weight: 500; cursor: pointer; }
+.add-task-row:hover { text-decoration: underline; }
+.add-task-row svg { width: 13px; height: 13px; }
+.add-task-input { height: 34px; border: 1px solid var(--line); border-radius: 8px; padding: 0 10px; font-size: 12px; font-family: inherit; outline: none; }
+.add-task-input:focus-visible { border-color: var(--accent); }
+.decision-review-card { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 17px; display: flex; flex-direction: column; gap: 12px; }
+.review-heading { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--ink); }
+.review-heading svg { width: 17px; height: 17px; color: var(--warn); flex: none; }
+.review-body { margin: 0; font-size: 11px; color: var(--ink-2); line-height: 1.45; }
+.review-details { display: flex; align-items: center; justify-content: space-between; }
+.review-badge { height: 20px; padding: 3px 7px; border-radius: 5px; background: #fbf3e5; color: var(--warn); font-size: 10px; font-weight: 500; display: inline-flex; align-items: center; }
+.review-link { border: 0; background: transparent; color: var(--accent); font-size: 10px; font-weight: 500; cursor: pointer; font-family: inherit; padding: 0; }
+.agent-policy { display: flex; align-items: center; gap: 7px; padding: 0 5px; font-size: 9px; color: var(--ink-3); }
+.agent-policy svg { width: 13px; height: 13px; color: var(--ink-3); flex: none; }
+
+/* Noise view + misc */
+#noise-panel .muted { padding: 12px 20px; }
+.settings-view #first-run-banner.visible, .settings-view #origin-banner.visible { margin: 0 0 16px; }
+#session-log-card .log { font-size: 11px; }
+
+/* Responsive */
+@media (max-width: 1280px) {
+  .session-pane { position: static; }
+}
+@media (max-width: 720px) {
+  .inbox-filters { flex-wrap: wrap; row-gap: 8px; }
+  .filter-pop { position: fixed; left: 16px; right: 16px; top: 120px; width: auto; }
+  .filter-groups { flex-direction: column; gap: 12px; }
+  .strip-foot { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .prio-menu { position: fixed; left: 16px; right: 16px; width: auto; }
+}
+</style>
 </head>
 <body>
 <div class="app-shell">
@@ -2824,8 +3001,6 @@ h1, h2, h3, h4 { letter-spacing: -0.2px; }
 </aside>
 <main class="app-main">
 
-<div id="first-run-banner" role="status"></div>
-<div id="origin-banner" role="status"></div>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 
 <div class="console" id="work-view" data-layout="list">
@@ -2904,7 +3079,7 @@ h1, h2, h3, h4 { letter-spacing: -0.2px; }
       <div class="page-heading">
         <div class="page-greeting">
           <h1 class="page-title">A little less inbox. A lot more focus.</h1>
-          <p class="page-sub" id="hero-sub">Good morning. Your inbox is organized — here's what matters today.</p>
+          <p class="page-sub" id="hero-sub">Good morning. Your inbox is organized. Here's what matters today.</p>
         </div>
         <button type="button" class="page-action" id="hero-settings-btn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></svg>
@@ -2916,12 +3091,14 @@ h1, h2, h3, h4 { letter-spacing: -0.2px; }
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
         </span>
         <div class="triage-status">
-          <span class="triage-status-title" id="triage-status-title">You're all triaged</span>
-          <span class="triage-status-line" id="hero-default-line">Run All to organize this inbox · Jev decides priority · DeepSeek drafts replies</span>
-          <div class="smart-stats" id="smart-stats" hidden></div>
+          <div class="run-status">
+            <span class="run-status-title" id="triage-status-title">You're all triaged</span>
+            <span class="run-status-badge" id="triage-status-badge">Live</span>
+          </div>
+          <span class="triage-status-line" id="triage-status-line">24 emails organized · 3 high priority · 4 tasks suggested</span>
         </div>
         <div class="triage-runstamp">
-          <span class="triage-runstamp-main" id="triage-runstamp-main">Last synced just now</span>
+          <span class="triage-runstamp-main" id="triage-runstamp-main">Last synced at 9:42 AM</span>
           <span class="triage-runstamp-sub">New mail is triaged automatically</span>
         </div>
         <span class="triage-summary-divider" aria-hidden="true"></span>
@@ -2944,36 +3121,114 @@ h1, h2, h3, h4 { letter-spacing: -0.2px; }
   <!-- Inbox list (full-width until an email is opened) -->
   <div class="inbox-columns">
   <aside class="panel left-scroll inbox-pane">
-    <div class="panel-head inbox-head">
-      <span class="inbox-title">Inbox
+    <div class="inbox-heading">
+      <span class="inbox-title" id="inbox-heading-title">Inbox
         <span class="count-badge" id="inbox-count-badge">0</span>
         <span class="info-tip">
           <button type="button" class="info-tip-btn" aria-label="About inbox">i</button>
-          <span class="info-tip-pop align-end" role="tooltip">Click an email to open Reading · Triage. Run All can be Manual (once) or Automatic on a cadence you choose. Demo chips jump to a known story.</span>
+          <span class="info-tip-pop align-end" role="tooltip">Click an email to open Reading · Triage. Categories and priorities come from automatic triage; every action is reversible.</span>
         </span>
       </span>
-      <span class="inbox-head-controls">
-        <button type="button" class="session-toggle" id="session-toggle" aria-expanded="false" aria-controls="session-pane" title="Show agent assistant">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:13px;height:13px;"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
-          <span class="session-toggle-label" id="session-toggle-label">Agent</span>
+      <div class="inbox-display-controls">
+        <button type="button" class="icon-btn" id="gmail-refresh-btn" title="Load / refresh Gmail" aria-label="Load / refresh Gmail" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
         </button>
-        <button type="button" class="util-btn" id="open-settings-btn" title="打开 Settings · API keys & Google" aria-label="Settings">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
-        </button>
-      </span>
+        <span class="inbox-divider" aria-hidden="true"></span>
+        <div class="sort-wrap">
+          <button type="button" class="sort-trigger" id="sort-trigger" aria-haspopup="menu" aria-expanded="false">
+            <span id="sort-trigger-label">Priority first</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="sort-menu" id="sort-menu" role="menu" hidden>
+            <div class="menu-heading">SORT EMAILS</div>
+            <button type="button" class="sort-option active" data-sort="priority" role="menuitemradio" aria-checked="true">Priority first
+              <svg class="opt-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+            </button>
+            <button type="button" class="sort-option" data-sort="newest" role="menuitemradio" aria-checked="false">Newest first
+              <svg class="opt-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+            </button>
+            <button type="button" class="sort-option" data-sort="oldest" role="menuitemradio" aria-checked="false">Oldest first
+              <svg class="opt-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+            </button>
+            <button type="button" class="sort-option" data-sort="sender" role="menuitemradio" aria-checked="false">Sender A–Z
+              <svg class="opt-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+            </button>
+            <button type="button" class="sort-option" data-sort="unread" role="menuitemradio" aria-checked="false">Unread first
+              <svg class="opt-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+            </button>
+            <div class="menu-divider" aria-hidden="true"></div>
+            <div class="menu-foot">Applies within each category. Esc closes.</div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="panel-body inbox-body">
-      <p class="muted" id="run-all-schedule" style="padding: 0 var(--sp-4);" hidden></p>
-      <p class="muted" id="run-all-progress" style="padding: 0 var(--sp-4);"></p>
-      <p class="muted" id="run-all-summary" style="padding: 0 var(--sp-4);"></p>
-      <p class="muted" id="gmail-inbox-status" style="padding: 0 var(--sp-4);" hidden></p>
-      <div class="inbox-toolrow">
+
+    <div class="inbox-filters" id="inbox-filters">
+      <button type="button" class="filter-pill active" data-pill="all">All mail</button>
+      <button type="button" class="filter-pill" data-pill="attention">Needs attention</button>
+      <button type="button" class="filter-pill" data-pill="work">Work</button>
+      <button type="button" class="filter-pill" data-pill="updates">Updates</button>
+      <button type="button" class="filter-trigger" id="filter-trigger" aria-haspopup="dialog" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M7 12h10"/><path d="M10 18h4"/></svg>
+        Filter
+      </button>
+      <div class="filter-pop" id="filter-pop" role="dialog" aria-label="Filter" hidden>
+        <div class="filter-pop-head">
+          <div class="filter-pop-title">Filter</div>
+          <div class="filter-pop-sub">Choices apply when you press Apply</div>
+        </div>
+        <div class="filter-groups">
+          <div class="filter-group">
+            <div class="filter-group-label">PRIORITY</div>
+            <label class="filter-opt"><input type="radio" name="fp-priority" value="all" checked><span>All priorities</span></label>
+            <label class="filter-opt"><input type="radio" name="fp-priority" value="P0"><span>P0</span></label>
+            <label class="filter-opt"><input type="radio" name="fp-priority" value="P1"><span>P1</span></label>
+            <label class="filter-opt"><input type="radio" name="fp-priority" value="P2"><span>P2</span></label>
+            <label class="filter-opt"><input type="radio" name="fp-priority" value="none"><span>Not triaged yet</span></label>
+          </div>
+          <div class="filter-group">
+            <div class="filter-group-label">STATUS</div>
+            <label class="filter-opt"><input type="checkbox" id="fp-unread"><span>Unread only</span></label>
+            <label class="filter-opt"><input type="checkbox" id="fp-review"><span>Needs review</span></label>
+          </div>
+        </div>
+        <div class="menu-divider" aria-hidden="true"></div>
+        <div class="filter-match" id="filter-match">—</div>
+        <div class="filter-actions">
+          <button type="button" class="filter-link" id="filter-reset">Reset</button>
+          <span class="filter-actions-gap" aria-hidden="true"></span>
+          <button type="button" class="btn" id="filter-cancel">Cancel</button>
+          <button type="button" class="btn primary" id="filter-apply">Apply</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="case-list" aria-label="Email list"></div>
+    <div id="noise-panel" hidden>
+      <p class="muted" id="noise-status" style="padding: 12px 20px; margin: 0;"></p>
+      <div class="row-actions" id="noise-actions" style="padding: 0 20px 12px;" hidden>
+        <button type="button" class="btn danger" id="noise-delete-all-btn">Delete all spam &amp; ads</button>
+        <button type="button" class="btn" id="noise-refresh-btn">Refresh filter</button>
+      </div>
+      <div id="noise-list" aria-label="Spam and ads list"></div>
+    </div>
+    <div class="inbox-pagination" id="inbox-pagination">
+      <span class="pagination-label" id="pagination-label">Showing 0 of 0 emails</span>
+      <button type="button" class="pagination-link" id="view-all-btn">View all emails
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </button>
+    </div>
+
+    <div id="legacy-inbox-controls" hidden aria-hidden="true">
+      <p class="muted" id="run-all-schedule" hidden></p>
+      <p class="muted" id="run-all-progress"></p>
+      <p class="muted" id="run-all-summary"></p>
+      <p class="muted" id="gmail-inbox-status" hidden></p>
       <div class="inbox-toolbar" id="inbox-list-view-controls">
         <details class="smart-filter-fold" id="smart-filter-fold">
           <summary class="chip">分类 <span id="smart-filter-count" class="muted">0</span></summary>
           <div class="smart-filter-pop" id="smart-filter-pop"></div>
         </details>
-        <label class="run-mode-label" for="inbox-priority-filter" id="inbox-priority-filter-label">Priority</label>
         <select class="field-input run-mode-select" id="inbox-priority-filter" aria-label="Filter emails by priority">
           <option value="all" selected>All</option>
           <option value="P0">P0</option>
@@ -2982,22 +3237,8 @@ h1, h2, h3, h4 { letter-spacing: -0.2px; }
           <option value="P3">P3</option>
           <option value="none">Not triaged yet</option>
         </select>
-        <span class="info-tip">
-          <button type="button" class="info-tip-btn" aria-label="About spam filter">i</button>
-          <span class="info-tip-pop" role="tooltip">Triage = primary inbox for the agent. Spam &amp; ads = promotions, social, spam folder, and heuristic ad/spam matches — shown separately. Delete all moves them to Gmail Trash (not permanent wipe). Re-Connect Google if trash fails (needs gmail.modify).</span>
-        </span>
-      </div>
-      <div class="inbox-toolbar" id="inbox-source-controls">
-        <label class="run-mode-label" for="inbox-source">来源</label>
-        <select class="field-input run-mode-select" id="inbox-source" aria-label="Inbox source">
-          <option value="gmail" selected>Gmail (live)</option>
-          <option value="demo">Demo (synthetic)</option>
-        </select>
-        <button type="button" id="gmail-refresh-btn" class="btn" hidden>Load Gmail</button>
-        <button type="button" id="gmail-export-btn" class="btn" hidden>Export loaded JSON</button>
       </div>
       <div class="inbox-toolbar" id="run-all-controls">
-        <label class="run-mode-label" for="run-all-mode">Run All</label>
         <select class="field-input run-mode-select" id="run-all-mode" aria-label="Run All mode">
           <option value="manual" selected>Manual</option>
           <option value="auto">Automatic</option>
@@ -3011,80 +3252,73 @@ h1, h2, h3, h4 { letter-spacing: -0.2px; }
           <option value="86400">Daily</option>
         </select>
         <button type="button" id="run-all-btn" class="btn primary">Run All</button>
-        <span class="info-tip">
-          <button type="button" class="info-tip-btn" aria-label="About Run All">i</button>
-          <span class="info-tip-pop" role="tooltip">Manual: click Run All once to walk every inbox email. Automatic: starts a schedule that re-runs the full inbox on your chosen cadence (2 min to daily). Progress shows below. Does not auto-Approve — Human review still required.</span>
-        </span>
       </div>
-      </div>
-      <div class="smart-filter-tags" id="smart-filter-tags" hidden></div>
-            <details class="tool-overflow" id="tool-overflow">
-        <summary>⋯ 更多工具</summary>
+      <details class="tool-overflow" id="tool-overflow">
+        <summary>More tools</summary>
         <div class="tool-overflow-body">
-<div class="inbox-toolbar" id="reviewer-mode-controls">
-        <label class="run-mode-label" for="reviewer-mode">Reviewer</label>
-        <select class="field-input run-mode-select" id="reviewer-mode" aria-label="Reviewer mode">
-          <option value="manual" selected>Manual (default)</option>
-          <option value="auto">Auto after worker</option>
-        </select>
-        <span class="info-tip">
-          <button type="button" class="info-tip-btn" aria-label="About reviewer mode">i</button>
-          <span class="info-tip-pop" role="tooltip">Manual: Run agent only runs the worker; you click Run reviewer when you want a second opinion. Auto: reviewer runs automatically after every worker (needs OpenAI key).</span>
-        </span>
-      </div>
-      <details class="demo-chips-fold" id="demo-chips-fold">
-        <summary>Demo chips</summary>
-        <div id="demo-chips" class="demo-chips"></div>
-      </details>
-      <div class="inbox-toolbar" id="triage-select-controls">
-        <label class="select-all-label" for="triage-select-all">
-          <input type="checkbox" id="triage-select-all" class="mail-select" aria-label="Select all shown emails">
-          Select all shown
-        </label>
-        <span id="triage-select-count" class="muted">0 selected</span>
-        <button type="button" class="btn danger" id="triage-delete-selected" disabled>Delete selected</button>
-        <span class="info-tip">
-          <button type="button" class="info-tip-btn" aria-label="About selecting emails">i</button>
-          <span class="info-tip-pop align-end" role="tooltip">Selections are kept when you change the Priority filter, so you can pick across P0 / P1 / P2. Select all shown only adds the emails visible under the current filter. Delete selected moves Gmail messages to Gmail Trash (recoverable for 30 days); only messages Gmail confirms leave this list. Demo mode just hides them.</span>
-        </span>
-      </div>
+          <div class="inbox-toolbar" id="reviewer-mode-controls">
+            <select class="field-input run-mode-select" id="reviewer-mode" aria-label="Reviewer mode">
+              <option value="manual" selected>Manual (default)</option>
+              <option value="auto">Auto after worker</option>
+            </select>
+          </div>
+          <details class="demo-chips-fold" id="demo-chips-fold">
+            <summary>Demo chips</summary>
+            <div id="demo-chips" class="demo-chips"></div>
+          </details>
+          <div class="inbox-toolbar" id="triage-select-controls">
+            <label class="select-all-label" for="triage-select-all">
+              <input type="checkbox" id="triage-select-all" class="mail-select" aria-label="Select all shown emails">
+              Select all shown
+            </label>
+            <span id="triage-select-count" class="muted">0 selected</span>
+            <button type="button" class="btn danger" id="triage-delete-selected" disabled>Delete selected</button>
+          </div>
         </div>
       </details>
-      <div id="case-list" aria-label="Email list"></div>
-      <div id="noise-panel" hidden>
-        <p class="muted" id="noise-status" style="padding: 0 var(--sp-4); margin: var(--sp-2) 0;"></p>
-        <div class="row-actions" id="noise-actions" style="padding: 0 var(--sp-4); margin-bottom: var(--sp-2);" hidden>
-          <button type="button" class="btn danger" id="noise-delete-all-btn">Delete all spam &amp; ads</button>
-          <button type="button" class="btn" id="noise-refresh-btn">Refresh filter</button>
-        </div>
-        <div id="noise-list" aria-label="Spam and ads list"></div>
-      </div>
+      <div class="smart-stats" id="smart-stats" hidden></div>
+      <div class="smart-filter-tags" id="smart-filter-tags" hidden></div>
     </div>
   </aside>
 
   <!-- Session drawer (hidden by default; open from rail) -->
   <aside class="panel right-scroll session-pane" id="session-pane" hidden>
-    <div class="panel-head">
-      <span>Session</span>
-      <span class="info-tip">
-        <button type="button" class="info-tip-btn" aria-label="About session">i</button>
-        <span class="info-tip-pop align-end" role="tooltip">Session only. Nothing is complete until Approve, Edit, or Escalate.</span>
-      </span>
+    <div class="todo-card">
+      <div class="tasks-heading">
+        <div class="tasks-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/><path d="M13 6h8"/><path d="M13 12h8"/><path d="M13 18h8"/></svg>
+          Suggested to-dos
+        </div>
+        <span class="count-badge" id="agent-task-count">0</span>
+      </div>
+      <p class="tasks-sub">Your next steps, pulled from your inbox. Nothing is sent without your approval.</p>
+      <div class="task-tabs" role="tablist">
+        <button type="button" class="task-tab active" id="tab-suggested" role="tab" aria-selected="true">Suggested <span class="task-tab-count" id="task-suggested-count">0</span></button>
+        <button type="button" class="task-tab" id="tab-completed" role="tab" aria-selected="false">Completed <span class="task-tab-count" id="task-completed-count">0</span></button>
+      </div>
+      <div class="task-list" id="agent-task-list"></div>
+      <div class="add-task-row" id="add-task-row" role="button" tabindex="0">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+        <span>Add your own task</span>
+      </div>
+      <input class="add-task-input" id="add-task-input" placeholder="Describe the task, then press Enter" hidden>
     </div>
-    <div class="panel-body" style="padding-top: var(--sp-3);">
-      <details class="side-fold" open>
-        <summary>Run log</summary>
-        <div class="fold-body">
-          <div class="log" id="run-log"></div>
-        </div>
-      </details>
-      <details class="side-fold" style="margin-top: var(--sp-3);">
-        <summary>Policies loaded</summary>
-        <div class="fold-body">
-          <ul id="policy-list" class="muted" style="padding-left: var(--sp-4);"></ul>
-          <p class="muted" id="summary"></p>
-        </div>
-      </details>
+
+    <div class="decision-review-card" id="decision-review-card" hidden>
+      <div class="review-heading">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
+        One decision needs a look
+      </div>
+      <p class="review-body" id="decision-review-body"></p>
+      <div class="review-details">
+        <span class="review-badge" id="decision-review-badge">Needs review</span>
+        <button type="button" class="review-link" id="decision-review-link">Review →</button>
+      </div>
+    </div>
+
+    <div class="agent-policy">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+      <span>You're in control. Every triage action is reversible.</span>
     </div>
   </aside>
   </div><!-- /.inbox-columns -->
@@ -3165,6 +3399,13 @@ h1, h2, h3, h4 { letter-spacing: -0.2px; }
     <div class="trace-detail" id="trace-detail">
       <p class="muted">Run an email on Work (or an Eval row). Each model call appears here.</p>
     </div>
+  </div>
+  <div class="matrix-card" id="session-log-card" style="margin-top: 20px;">
+    <div class="panel-head" style="border-bottom:0;">Session log</div>
+    <div class="log" id="run-log" style="padding: 0 20px 8px;"></div>
+    <div class="panel-head" style="border-bottom:0;padding-top:4px;">Policies loaded</div>
+    <ul id="policy-list" class="muted" style="margin:0;padding: 0 20px 12px 36px;"></ul>
+    <p class="muted" id="summary" style="margin:0;padding: 0 20px 16px;font-size:10px;color:var(--ink-3);"></p>
   </div>
 </section>
 
@@ -3339,6 +3580,8 @@ h1, h2, h3, h4 { letter-spacing: -0.2px; }
     <div class="panel-head">Triage settings</div>
     <button type="button" class="btn" id="settings-back-btn">← Back to inbox</button>
   </div>
+  <div id="first-run-banner" role="status"></div>
+  <div id="origin-banner" role="status"></div>
   <p class="page-sub">Keys stay in this browser only (localStorage). Jev decides each email's priority and whether a reply is needed; DeepSeek drafts; OpenAI gives an independent review; Laminar traces every run. Nothing is sent without your Approve.</p>
   <div class="settings-grid">
     <div class="settings-card">
@@ -3347,6 +3590,17 @@ h1, h2, h3, h4 { letter-spacing: -0.2px; }
         Automatic triage
       </h2>
       <p class="settings-card-sub">Classification routing — Jev gates priority, DeepSeek drafts replies.</p>
+      <label class="muted label-with-tip" for="inbox-source">
+        Inbox source
+        <span class="info-tip">
+          <button type="button" class="info-tip-btn" aria-label="About inbox source">i</button>
+          <span class="info-tip-pop" role="tooltip">Gmail (live) reads real threads via the Gmail API. Demo loads the synthetic Aurora morning inbox — no keys needed. Load / Refresh lives in the Inbox heading.</span>
+        </span>
+      </label>
+      <select class="field-input" id="inbox-source" aria-label="Inbox source">
+        <option value="gmail" selected>Gmail (live)</option>
+        <option value="demo">Demo (synthetic)</option>
+      </select>
       <label class="muted label-with-tip" for="api-key">
         Worker API key — DeepSeek (localStorage only)
         <span class="info-tip">
@@ -3427,6 +3681,7 @@ h1, h2, h3, h4 { letter-spacing: -0.2px; }
         <button id="save-google-client" class="btn">Save Client ID</button>
         <button id="google-connect-btn" class="btn primary">Connect Google</button>
         <button id="google-disconnect-btn" class="btn">Disconnect</button>
+        <button id="gmail-export-btn" class="btn" hidden>Export loaded JSON</button>
         <span id="google-status" class="badge neutral">not connected</span>
       </div>
     </div>
@@ -4419,6 +4674,15 @@ function syncInboxListViewUi() {
   if (prioLabel) prioLabel.hidden = INBOX_LIST_VIEW === "noise";
   var selectBar = document.getElementById("triage-select-controls");
   if (selectBar) selectBar.hidden = INBOX_LIST_VIEW === "noise";
+  // Figma inbox chrome only exists in the triage list; hide it in Spam & ads.
+  var filtersRow = document.getElementById("inbox-filters");
+  if (filtersRow) filtersRow.style.display = INBOX_LIST_VIEW === "noise" ? "none" : "";
+  var pagination = document.getElementById("inbox-pagination");
+  if (pagination) pagination.style.display = INBOX_LIST_VIEW === "noise" ? "none" : "";
+  var headingTitle = document.getElementById("inbox-heading-title");
+  if (headingTitle && headingTitle.firstChild) {
+    headingTitle.firstChild.nodeValue = INBOX_LIST_VIEW === "noise" ? "Spam & ads " : "Inbox ";
+  }
 }
 
 function setEmailSelected(view, on) {
@@ -4511,7 +4775,7 @@ function refreshPriorityFilterEmptyState() {
   var list = document.getElementById("case-list");
   if (!list) return;
   var note = document.getElementById("priority-filter-empty");
-  var anyVisible = CASE_VIEWS.some(viewMatchesPriorityFilter);
+  var anyVisible = CASE_VIEWS.some(unifiedVisible);
   if (anyVisible || INBOX_PRIORITY_FILTER === "all" || !CASE_VIEWS.length) {
     if (note) note.remove();
     return;
@@ -4525,7 +4789,7 @@ function refreshPriorityFilterEmptyState() {
   }
   note.textContent = INBOX_PRIORITY_FILTER === "none"
     ? "Every email has been triaged."
-    : "No " + INBOX_PRIORITY_FILTER + " emails yet. Priority appears after an email is triaged.";
+    : "No emails match the current filters.";
 }
 
 function applyPriorityFilter() {
@@ -4876,7 +5140,13 @@ function syncInboxSourceUi() {
   if (sel && sel.value !== INBOX_SOURCE) sel.value = INBOX_SOURCE;
   if (refreshBtn) {
     refreshBtn.hidden = INBOX_SOURCE !== "gmail";
-    refreshBtn.textContent = GMAIL_EMAILS.length ? "Refresh Gmail" : "Load Gmail";
+    var refreshLabel = GMAIL_EMAILS.length ? "Refresh Gmail" : "Load Gmail";
+    if (refreshBtn.querySelector("svg")) {
+      refreshBtn.title = refreshLabel;
+      refreshBtn.setAttribute("aria-label", refreshLabel);
+    } else {
+      refreshBtn.textContent = refreshLabel;
+    }
     refreshBtn.disabled = !getGoogleAccessToken();
   }
   var exportBtn = document.getElementById("gmail-export-btn");
@@ -6022,14 +6292,16 @@ function setSessionOpen(open) {
   var pane = document.getElementById("session-pane");
   var btn = document.getElementById("session-toggle");
   var label = document.getElementById("session-toggle-label");
-  if (!consoleEl || !btn) return;
+  if (!consoleEl) return;
   consoleEl.classList.toggle("session-open", !!open);
   if (pane) {
     if (open) pane.removeAttribute("hidden");
     else pane.setAttribute("hidden", "");
   }
-  btn.setAttribute("aria-expanded", open ? "true" : "false");
-  btn.title = open ? "Hide session" : "Show session";
+  if (btn) {
+    btn.setAttribute("aria-expanded", open ? "true" : "false");
+    btn.title = open ? "Hide session" : "Show session";
+  }
   if (label) label.textContent = open ? "Hide session" : "Show session";
 }
 
@@ -10449,6 +10721,7 @@ function isEscalatedOutcome(view) {
 }
 
 function priorityForView(view) {
+  if (view && view.em && MANUAL_PRIORITY[view.em.email_id]) return MANUAL_PRIORITY[view.em.email_id];
   if (!view || !view.result || !view.result.fields) return "";
   return normalizePriorityTier(getField(view.result.fields, "Priority"));
 }
@@ -10470,7 +10743,7 @@ function setPriorityChip(el, priority, show) {
 
 function updateCaseCardBadge(view) {
   if (!view || !view.card) return;
-  view.card.style.display = viewMatchesPriorityFilter(view) ? "" : "none";
+  applyInboxVisibility();
   refreshPriorityFilterEmptyState();
   refreshSelectionUi();
   snapshotViewState(view);
@@ -10495,6 +10768,13 @@ function updateCaseCardBadge(view) {
   view.card.classList.remove("urg-P0", "urg-P1", "urg-P2", "urg-P3");
   var uTier = normalizePriorityTier(shownPriority);
   if (uTier) view.card.classList.add("urg-" + uTier);
+
+  // Figma priority chip: flag + High / Medium / Low (3:2003)
+  if (view.prioEl && !view.prioEl.hidden) {
+    view.prioEl.textContent = uTier === "P0" ? "High" : uTier === "P1" ? "Medium" : "Low";
+  }
+  refreshAgentStrip(view);
+  scheduleAgentPanelRender();
 
   if (view.readStateEl) {
     view.readStateEl.className = "badge " + (view.read ? "neutral" : "info") + " read-state";
@@ -11386,10 +11666,10 @@ function render() {
   if (INBOX_SOURCE === "gmail" && !activeEmails.length) {
     var empty = document.createElement("p");
     empty.className = "muted";
-    empty.style.padding = "var(--sp-4)";
+    empty.style.padding = "20px";
     empty.textContent = getGoogleAccessToken()
-      ? "No Gmail messages loaded yet. Click Load Gmail."
-      : "Connect Google in Settings, then Load Gmail.";
+      ? "No Gmail messages loaded yet. Use the refresh icon in the Inbox heading."
+      : "Connect Google in Triage settings, then load Gmail.";
     list.appendChild(empty);
   }
   var liveIds = {};
@@ -11418,10 +11698,14 @@ function render() {
       "<span class='preview'>" + escapeHtml(preview) + "</span>" +
       "</div>" +
       "</div>" +
-      "<div class='mail-when'>" + escapeHtml(em.received_at) + "</div>" +
-      "<div class='mail-status-row'></div>";
+      "<button type='button' class='mail-star" + (TASK_STARS[em.email_id] ? " starred" : "") + "' aria-label='Star this email' aria-pressed='" + (TASK_STARS[em.email_id] ? "true" : "false") + "'>" + STAR_ICON_SVG + "</button>" +
+      "<div class='mail-when'>" + escapeHtml(shortInboxTime(em.received_at)) + "</div>" +
+      "<div class='mail-status-row'></div>" +
+      "<div class='agent-strip' hidden></div>";
     var prioEl = card.querySelector(".prio");
     var statusRow = card.querySelector(".mail-status-row");
+    var subjectLine = card.querySelector(".subject-line");
+    var starBtn = card.querySelector(".mail-star");
     var readDot = document.createElement("span");
     readDot.className = "unread-dot";
     readDot.title = "Unread";
@@ -11430,17 +11714,22 @@ function render() {
     badgeEl.hidden = true;
     badgeEl.textContent = "";
     statusRow.appendChild(prioEl);
-    var fromEl = card.querySelector(".from");
-    var subjectLine = card.querySelector(".subject-line");
+    card.querySelector(".from").appendChild(readDot);
+    subjectLine.appendChild(badgeEl);
     if (SMART_APPLIED && em.smart_cat) {
       var catBadge = document.createElement("span");
       catBadge.className = "smart-cat-badge";
       catBadge.textContent = em.smart_cat;
       catBadge.title = em.smart_cat;
-      (subjectLine || statusRow).appendChild(catBadge);
+      subjectLine.insertBefore(catBadge, badgeEl);
     }
-    (fromEl || statusRow).appendChild(readDot);
-    statusRow.appendChild(badgeEl);
+    starBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      TASK_STARS[em.email_id] = !TASK_STARS[em.email_id];
+      saveTaskStars();
+      starBtn.classList.toggle("starred", !!TASK_STARS[em.email_id]);
+      starBtn.setAttribute("aria-pressed", TASK_STARS[em.email_id] ? "true" : "false");
+    });
 
     var view = {
       em: em,
@@ -11471,32 +11760,57 @@ function render() {
         selectCase(view);
       }
     });
-    list.appendChild(card);
     updateCaseCardBadge(view);
   });
 
-  // Gmail triage workspace — sync sidebar counts and hero summary (Figma restore).
-  var triagedCount = CASE_VIEWS.filter(function (v) { return v.result; }).length;
-  var navInboxCount = document.getElementById("nav-inbox-count");
-  if (navInboxCount) navInboxCount.textContent = String(activeEmails.length);
-  var inboxBadge = document.getElementById("inbox-count-badge");
-  if (inboxBadge) inboxBadge.textContent = String(activeEmails.length);
-  var navTaskCount = document.getElementById("nav-task-count");
-  if (navTaskCount) navTaskCount.textContent = String(triagedCount);
-  var heroSub = document.getElementById("hero-sub");
-  if (heroSub) {
-    heroSub.textContent = activeEmails.length
-      ? activeEmails.length + " emails in this inbox · " + triagedCount + " triaged with agent suggestions"
-      : "Connect Google in Triage settings, or switch the source to Demo, then Run All.";
-  }
-  var heroDefault = document.getElementById("hero-default-line");
-  var smartStatsEl = document.getElementById("smart-stats");
-  if (heroDefault && smartStatsEl) heroDefault.hidden = !smartStatsEl.hidden;
-  var runstamp = document.getElementById("triage-runstamp-main");
-  if (runstamp) {
-    runstamp.textContent = "Last synced " + new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-  }
+  // Category groups (Figma 3:1996) — smart categories when triaged, one group otherwise.
+  var catPalette = ["#b75e53", "#a77831", "#39806b", "#5752c9", "#747884"];
+  var groupMap = {};
+  var groups = [];
+  CASE_VIEWS.forEach(function (view) {
+    var key = (SMART_APPLIED && view.em.smart_cat) ? String(view.em.smart_cat) : "__untriaged__";
+    if (!groupMap[key]) {
+      groupMap[key] = { key: key, views: [], el: null, color: catPalette[groups.length % catPalette.length] };
+      groups.push(groupMap[key]);
+    }
+    groupMap[key].views.push(view);
+  });
+  groups.sort(function (a, b) {
+    function rank(g) {
+      if (g.key === "__untriaged__") return 99;
+      var best = 9;
+      g.views.forEach(function (v) {
+        var t = normalizePriorityTier(priorityForView(v) || (v.em && v.em.smart_urgency) || "");
+        if (t === "P0") best = 0; else if (t === "P1" && best > 1) best = 1;
+      });
+      return best;
+    }
+    return rank(a) - rank(b);
+  });
+  groups.forEach(function (g) {
+    var head = document.createElement("div");
+    head.className = "category-heading";
+    head.innerHTML =
+      "<svg class='category-chevron' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d='m6 9 6 6 6-6'/></svg>" +
+      "<span class='category-marker' style='background:" + g.color + "'></span>" +
+      "<span class='category-name'>" + escapeHtml(g.key === "__untriaged__" ? "All mail" : g.key) + "</span>" +
+      "<span class='category-count'>" + g.views.length + "</span>" +
+      "<span class='category-desc'>" + escapeHtml(g.key === "__untriaged__" ? "Not triaged yet — run triage to organize automatically" : "Sorted by automatic triage") + "</span>" +
+      "<svg class='category-more' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round' aria-hidden='true'><circle cx='5' cy='12' r='1'/><circle cx='12' cy='12' r='1'/><circle cx='19' cy='12' r='1'/></svg>";
+    list.appendChild(head);
+    g.el = head;
+    g.views.forEach(function (v) {
+      list.appendChild(v.card);
+      v.groupEl = head;
+    });
+  });
 
+  // Figma hero + sidebar sync (3:1934)
+  LAST_ACTIVE_COUNT = activeEmails.length;
+  syncHeroSummary();
+  applyInboxSort();
+  applyInboxVisibility();
+  renderAgentPanel();
   var chips = document.getElementById("demo-chips");
   if (chips) {
     chips.innerHTML = "";
@@ -11525,6 +11839,486 @@ function render() {
   refreshSelectionUi();
   scheduleInboxSave();
 }
+
+// ═══ INBOX PAGE — Figma systems: sort / pills / filter / strip / agent panel ═══
+var MANUAL_PRIORITY_STORAGE = "aurora_manual_priority_v1";
+var TASK_DONE_STORAGE = "aurora_task_done_v1";
+var CUSTOM_TASKS_STORAGE = "aurora_custom_tasks_v1";
+var TASK_STARS_STORAGE = "aurora_task_stars_v1";
+function loadJsonMap(key) {
+  try { var v = JSON.parse(localStorage.getItem(key) || "{}"); return v && typeof v === "object" ? v : {}; } catch (e) { return {}; }
+}
+var MANUAL_PRIORITY = loadJsonMap(MANUAL_PRIORITY_STORAGE);
+var TASK_DONE = loadJsonMap(TASK_DONE_STORAGE);
+var TASK_STARS = loadJsonMap(TASK_STARS_STORAGE);
+var CUSTOM_TASKS = (function () {
+  try { var v = JSON.parse(localStorage.getItem(CUSTOM_TASKS_STORAGE) || "[]"); return Array.isArray(v) ? v : []; } catch (e) { return []; }
+})();
+function saveManualPriority() { try { localStorage.setItem(MANUAL_PRIORITY_STORAGE, JSON.stringify(MANUAL_PRIORITY)); } catch (e) {} }
+function saveTaskDone() { try { localStorage.setItem(TASK_DONE_STORAGE, JSON.stringify(TASK_DONE)); } catch (e) {} }
+function saveTaskStars() { try { localStorage.setItem(TASK_STARS_STORAGE, JSON.stringify(TASK_STARS)); } catch (e) {} }
+function saveCustomTasks() { try { localStorage.setItem(CUSTOM_TASKS_STORAGE, JSON.stringify(CUSTOM_TASKS)); } catch (e) {} }
+
+var STAR_ICON_SVG = "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><polygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2'/></svg>";
+var SPARKLES_SVG = "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d='M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z'/></svg>";
+var LIST_CHECKS_SVG = "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d='m3 17 2 2 4-4'/><path d='m3 7 2 2 4-4'/><path d='M13 6h8'/><path d='M13 12h8'/><path d='M13 18h8'/></svg>";
+var MAIL_SM_SVG = "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><rect width='20' height='16' x='2' y='4' rx='2'/><path d='m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7'/></svg>";
+var ARROW_UP_RIGHT_SVG = "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d='M7 7h10v10'/><path d='M7 17 17 7'/></svg>";
+var CLOCK_SM_SVG = "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><circle cx='12' cy='12' r='10'/><polyline points='12 6 12 12 16 14'/></svg>";
+
+function shortInboxTime(v) {
+  if (!v) return "";
+  var t = Date.parse(String(v).replace(" ", "T"));
+  if (!isNaN(t)) return new Date(t).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  return String(v);
+}
+function senderNameOf(em) { return ((senderById(em.sender_id) || {}).name) || em.gmail_from || ""; }
+function emailTimeOf(em) { var t = Date.parse(String(em.received_at || "").replace(" ", "T")); return isNaN(t) ? 0 : t; }
+function tierRankOf(v) {
+  var t = normalizePriorityTier(priorityForView(v) || (v.em && v.em.smart_urgency) || "");
+  return t ? ["P0", "P1", "P2", "P3"].indexOf(t) : 9;
+}
+
+// ── Unified visibility: priority select + pills + status + search ──────────
+var INBOX_PILL = "all";
+var INBOX_SEARCH_TEXT = "";
+var INBOX_STATUS_FILTER = { unread: false, review: false };
+function pillMatches(view) {
+  if (INBOX_PILL === "all") return true;
+  var em = view.em;
+  var cat = String((SMART_APPLIED && em.smart_cat) || "");
+  var hay = cat + " " + (em.subject || "");
+  if (INBOX_PILL === "attention") return tierRankOf(view) <= 1 || isEscalatedOutcome(view);
+  if (INBOX_PILL === "work") return /work|工作|项目|任务|order|contract|invoice|reorder|quote|proposal|payment|shipment|delivery/i.test(hay);
+  if (INBOX_PILL === "updates") return /update|updates|newsletter|通知|更新|订阅|meeting|schedule|fyi|invitation|invite|walk-through|follow-up/i.test(hay);
+  return true;
+}
+function statusMatches(view) {
+  if (INBOX_STATUS_FILTER.review && !isEscalatedOutcome(view)) return false;
+  if (INBOX_STATUS_FILTER.unread && view.read) return false;
+  return true;
+}
+function searchMatches(view) {
+  if (!INBOX_SEARCH_TEXT) return true;
+  var hay = ((view.em.subject || "") + " " + senderNameOf(view.em) + " " + String(view.em.body || "").slice(0, 200)).toLowerCase();
+  return hay.indexOf(INBOX_SEARCH_TEXT) !== -1;
+}
+function unifiedVisible(view) {
+  return viewMatchesPriorityFilter(view) && pillMatches(view) && statusMatches(view) && searchMatches(view);
+}
+function updatePagination() {
+  var el = document.getElementById("pagination-label");
+  if (!el) return;
+  var vis = CASE_VIEWS.filter(unifiedVisible).length;
+  el.textContent = "Showing " + vis + " of " + CASE_VIEWS.length + " emails";
+}
+function applyInboxVisibility() {
+  CASE_VIEWS.forEach(function (v) {
+    if (v.card) v.card.style.display = unifiedVisible(v) ? "" : "none";
+  });
+  var seen = {};
+  CASE_VIEWS.forEach(function (v) {
+    if (!v.groupEl || seen[v.groupEl.id || v.groupEl._gi]) return;
+    var key = v.groupEl._gi || (v.groupEl._gi = "g" + Math.random().toString(36).slice(2));
+    seen[key] = true;
+    var any = CASE_VIEWS.some(function (w) { return w.groupEl === v.groupEl && unifiedVisible(w); });
+    v.groupEl.style.display = any ? "" : "none";
+  });
+  updatePagination();
+}
+
+// ── Sort (Figma 6:11843 sort menu) ────────────────────────────────────────
+var INBOX_SORT = "priority";
+function applyInboxSort() {
+  var list = document.getElementById("case-list");
+  if (!list) return;
+  var groups = [];
+  var map = {};
+  CASE_VIEWS.forEach(function (v) {
+    var key = v.groupEl || list;
+    if (!map[key._gk]) { key._gk = key._gk || ("g" + groups.length); map[key._gk] = { head: key === list ? null : key, views: [] }; groups.push(map[key._gk]); }
+    map[key._gk].views.push(v);
+  });
+  groups.forEach(function (g) {
+    var views = g.views.slice();
+    if (INBOX_SORT === "priority") views.sort(function (a, b) { return tierRankOf(a) - tierRankOf(b) || emailTimeOf(b.em) - emailTimeOf(a.em); });
+    else if (INBOX_SORT === "newest") views.sort(function (a, b) { return emailTimeOf(b.em) - emailTimeOf(a.em); });
+    else if (INBOX_SORT === "oldest") views.sort(function (a, b) { return emailTimeOf(a.em) - emailTimeOf(b.em); });
+    else if (INBOX_SORT === "sender") views.sort(function (a, b) { return senderNameOf(a.em).localeCompare(senderNameOf(b.em)); });
+    else if (INBOX_SORT === "unread") views.sort(function (a, b) { return (a.read ? 1 : 0) - (b.read ? 1 : 0); });
+    if (g.head) list.appendChild(g.head);
+    views.forEach(function (v) { list.appendChild(v.card); });
+  });
+}
+
+// ── Manual priority + agent reasoning strip (Figma 3:2003) ────────────────
+function setManualPriority(view, tier) {
+  if (!view || !view.em) return;
+  if (tier) MANUAL_PRIORITY[view.em.email_id] = tier;
+  else delete MANUAL_PRIORITY[view.em.email_id];
+  saveManualPriority();
+  updateCaseCardBadge(view);
+}
+var openPrioMenuEl = null;
+function closePrioMenu() { if (openPrioMenuEl) { openPrioMenuEl.remove(); openPrioMenuEl = null; } }
+function openPrioMenu(view) {
+  closePrioMenu();
+  var menu = document.createElement("div");
+  menu.className = "prio-menu";
+  menu.setAttribute("role", "menu");
+  menu.innerHTML = "<div class='menu-heading'>CHANGE PRIORITY</div>";
+  var flagPath = "<path d='M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z'/><line x1='4' x2='4' y1='22' y2='15'/>";
+  var minusPath = "<path d='M5 12h14'/>";
+  var opts = [
+    { tier: "P0", label: "High", desc: "Needs action today", color: "#b75e53", path: flagPath },
+    { tier: "P1", label: "Medium", desc: "Handle this week", color: "#a77831", path: flagPath },
+    { tier: "P2", label: "Low", desc: "Read when time allows", color: "#747884", path: flagPath },
+    { tier: "", label: "Clear", desc: "Back to the agent's priority", color: "#969aa5", path: minusPath }
+  ];
+  opts.forEach(function (o) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "prio-opt";
+    b.innerHTML = "<svg viewBox='0 0 24 24' fill='none' stroke='" + o.color + "' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>" + o.path + "</svg>" +
+      "<span class='opt-copy'><strong>" + o.label + "</strong><span>" + o.desc + "</span></span>";
+    b.addEventListener("click", function (e) { e.stopPropagation(); setManualPriority(view, o.tier); closePrioMenu(); });
+    menu.appendChild(b);
+  });
+  view.card.appendChild(menu);
+  openPrioMenuEl = menu;
+}
+function refreshAgentStrip(view) {
+  if (!view || !view.card) return;
+  var strip = view.card.querySelector(".agent-strip");
+  if (!strip) return;
+  var isActive = view.card.classList.contains("active");
+  var res = view.result;
+  if (!isActive || !res || !res.fields) { strip.hidden = true; strip.innerHTML = ""; return; }
+  var tier = normalizePriorityTier(priorityForView(view) || (view.em && view.em.smart_urgency) || "");
+  var pLabel = tier === "P0" ? "High priority" : tier === "P1" ? "Medium priority" : tier === "P2" ? "Low priority" : "Triage note";
+  var summary = getField(res.fields, "Summary") || "";
+  var reason = (pLabel + ": " + (summary || "triaged — open to review the decision.")).slice(0, 160);
+  strip.hidden = false;
+  strip.innerHTML =
+    "<div class='strip-reason'>" + SPARKLES_SVG + escapeHtml(reason) + "</div>" +
+    "<div class='strip-foot'>" +
+    "<button type='button' class='strip-task'>" + LIST_CHECKS_SVG + "<span>Suggested task: " + escapeHtml(String(view.em.subject || "Review email").slice(0, 60)) + "</span></button>" +
+    "<span class='strip-actions'>" +
+    "<button type='button' class='strip-link cp'>Change priority</button>" +
+    "<button type='button' class='strip-link undo'>Undo</button>" +
+    "</span></div>";
+  strip.querySelector(".strip-task").addEventListener("click", function () { selectCase(view); });
+  strip.querySelector(".cp").addEventListener("click", function (e) { e.stopPropagation(); openPrioMenu(view); });
+  strip.querySelector(".undo").addEventListener("click", function (e) {
+    e.stopPropagation();
+    if (MANUAL_PRIORITY[view.em.email_id]) setManualPriority(view, "");
+    else setTopStatus("info", "No manual priority to undo");
+  });
+}
+
+// ── Agent assistant panel (Figma 3:2193) ──────────────────────────────────
+var AGENT_TASK_TAB = "suggested";
+function taskItems() {
+  var suggested = [], completed = [];
+  CASE_VIEWS.forEach(function (v) {
+    if (!v.result) return;
+    var id = v.em.email_id;
+    var isDone = !!TASK_DONE[id] || /^(Approved|Edited)/i.test(v.humanDone || "");
+    var item = {
+      id: id, view: v, custom: false, done: isDone,
+      title: getField(v.result.fields, "Summary") || v.em.subject || "Review email",
+      source: senderNameOf(v.em) + " · " + String(v.em.subject || "").slice(0, 26),
+      due: (normalizePriorityTier(priorityForView(v) || v.em.smart_urgency || "") === "P0") ? "Today" : "No due date"
+    };
+    (isDone ? completed : suggested).push(item);
+  });
+  CUSTOM_TASKS.forEach(function (t) {
+    (t.done ? completed : suggested).push({ id: t.id, custom: true, done: !!t.done, title: t.title, source: "Added by you", due: "No due date" });
+  });
+  suggested.sort(function (a, b) { return (a.view ? tierRankOf(a.view) : 8) - (b.view ? tierRankOf(b.view) : 8); });
+  return { suggested: suggested, completed: completed };
+}
+function countSuggestedTasks() { return taskItems().suggested.length; }
+var LAST_ACTIVE_COUNT = 0;
+function syncHeroSummary() {
+  var activeCount = LAST_ACTIVE_COUNT || getActiveEmails().length;
+  var triagedCount = CASE_VIEWS.filter(function (v) { return v.result; }).length;
+  var highCount = CASE_VIEWS.filter(function (v) {
+    var t = normalizePriorityTier(priorityForView(v) || (v.em && v.em.smart_urgency) || "");
+    return t === "P0" || t === "P1";
+  }).length;
+  var navInboxCount = document.getElementById("nav-inbox-count");
+  if (navInboxCount) navInboxCount.textContent = String(activeCount);
+  var inboxBadge = document.getElementById("inbox-count-badge");
+  if (inboxBadge) inboxBadge.textContent = String(activeCount);
+  var statusTitle = document.getElementById("triage-status-title");
+  if (statusTitle) statusTitle.textContent = (CASE_VIEWS.length && triagedCount >= CASE_VIEWS.length) ? "You're all triaged" : (CASE_VIEWS.length - triagedCount) + " emails waiting";
+  var statusBadge = document.getElementById("triage-status-badge");
+  if (statusBadge) {
+    statusBadge.textContent = INBOX_SOURCE === "gmail" ? "Live" : "Demo";
+    statusBadge.className = "run-status-badge" + (INBOX_SOURCE === "gmail" ? "" : " demo");
+  }
+  var statusLine = document.getElementById("triage-status-line");
+  if (statusLine) {
+    statusLine.textContent = CASE_VIEWS.length
+      ? triagedCount + " emails organized · " + highCount + " high priority · " + countSuggestedTasks() + " tasks suggested"
+      : "Connect Google in Triage settings, or switch the source to Demo.";
+  }
+  var runstamp = document.getElementById("triage-runstamp-main");
+  if (runstamp) {
+    runstamp.textContent = "Last synced at " + new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  }
+}
+function toggleTaskDone(t) {
+  if (t.custom) {
+    var ct = CUSTOM_TASKS.find(function (x) { return x.id === t.id; });
+    if (ct) { ct.done = !ct.done; saveCustomTasks(); }
+  } else {
+    if (TASK_DONE[t.id]) delete TASK_DONE[t.id]; else TASK_DONE[t.id] = true;
+    saveTaskDone();
+  }
+  renderAgentPanel();
+}
+function removeCustomTask(id) {
+  CUSTOM_TASKS = CUSTOM_TASKS.filter(function (x) { return x.id !== id; });
+  saveCustomTasks();
+  renderAgentPanel();
+}
+function renderAgentPanel() {
+  var wrap = document.getElementById("agent-task-list");
+  if (!wrap) return;
+  var items = taskItems();
+  var list = AGENT_TASK_TAB === "completed" ? items.completed : items.suggested;
+  var sugCount = document.getElementById("task-suggested-count");
+  if (sugCount) sugCount.textContent = String(items.suggested.length);
+  var compCount = document.getElementById("task-completed-count");
+  if (compCount) compCount.textContent = String(items.completed.length);
+  var totalCount = document.getElementById("agent-task-count");
+  if (totalCount) totalCount.textContent = String(items.suggested.length);
+  var navTaskCount = document.getElementById("nav-task-count");
+  if (navTaskCount) navTaskCount.textContent = String(items.suggested.length);
+  wrap.innerHTML = "";
+  if (!list.length) {
+    var p = document.createElement("p");
+    p.className = "task-empty";
+    p.textContent = AGENT_TASK_TAB === "completed"
+      ? "Nothing completed yet."
+      : (CASE_VIEWS.length ? "No suggested to-dos yet — triage an email and next steps appear here." : "Load an inbox first, then triage to see suggested to-dos.");
+    wrap.appendChild(p);
+  }
+  list.slice(0, 8).forEach(function (t, i) {
+    var isTop = AGENT_TASK_TAB === "suggested" && i === 0;
+    var cardEl = document.createElement("div");
+    cardEl.className = "task-card" + (isTop ? " is-top" : "") + (t.done ? " is-done" : "");
+    cardEl.innerHTML =
+      "<div class='task-title-row'>" +
+      "<input type='checkbox' class='task-check'" + (t.done ? " checked" : "") + " aria-label='Complete task'>" +
+      "<span class='task-title'>" + escapeHtml(t.title) + "</span></div>" +
+      "<button type='button' class='task-source'>" + MAIL_SM_SVG + "<span>" + escapeHtml(t.source) + "</span>" + ARROW_UP_RIGHT_SVG + "</button>" +
+      "<div class='task-foot'>" +
+      "<span class='task-due'>" + CLOCK_SM_SVG + escapeHtml(t.due) + "</span>" +
+      "<button type='button' class='task-action" + (isTop ? " primary" : "") + "'>" + (t.custom ? "Remove" : "Open email") + "</button>" +
+      "</div>";
+    cardEl.querySelector(".task-check").addEventListener("change", function () { toggleTaskDone(t); });
+    cardEl.querySelector(".task-source").addEventListener("click", function () { if (t.view) selectCase(t.view); });
+    cardEl.querySelector(".task-action").addEventListener("click", function () {
+      if (t.custom) removeCustomTask(t.id);
+      else if (t.view) selectCase(t.view);
+    });
+    wrap.appendChild(cardEl);
+  });
+  var flagged = CASE_VIEWS.filter(function (v) { return isEscalatedOutcome(v); });
+  var pick = flagged[0];
+  var reviewCard = document.getElementById("decision-review-card");
+  if (reviewCard) {
+    if (pick) {
+      reviewCard.hidden = false;
+      var body = document.getElementById("decision-review-body");
+      var badge = document.getElementById("decision-review-badge");
+      if (body) body.textContent = senderNameOf(pick.em) + " · " + pick.em.subject + " — " + (getField(pick.result && pick.result.fields, "Summary") || "the agent flagged this decision; take a look before it proceeds.");
+      if (badge) badge.textContent = ((pick.em.smart_cat || (pick.result && getField(pick.result.fields, "Category")) || "Triage")) + " · needs review";
+      var link = document.getElementById("decision-review-link");
+      if (link) link.onclick = function () { selectCase(pick); };
+    } else {
+      reviewCard.hidden = true;
+    }
+  }
+}
+function scheduleAgentPanelRender() {
+  if (scheduleAgentPanelRender._pending) return;
+  scheduleAgentPanelRender._pending = true;
+  var run = function () { scheduleAgentPanelRender._pending = false; renderAgentPanel(); };
+  syncHeroSummary();
+  if (window.requestAnimationFrame) requestAnimationFrame(run);
+  else setTimeout(run, 16);
+}
+
+// ── Inbox page controls wiring (pills / sort / filter / tabs / add task) ───
+function initInboxPageFigma() {
+  Array.prototype.forEach.call(document.querySelectorAll(".filter-pill"), function (pill) {
+    pill.addEventListener("click", function () {
+      Array.prototype.forEach.call(document.querySelectorAll(".filter-pill"), function (p) { p.classList.remove("active"); });
+      pill.classList.add("active");
+      INBOX_PILL = pill.getAttribute("data-pill") || "all";
+      applyInboxVisibility();
+    });
+  });
+
+  var sortTrigger = document.getElementById("sort-trigger");
+  var sortMenu = document.getElementById("sort-menu");
+  if (sortTrigger && sortMenu) {
+    sortTrigger.addEventListener("click", function (e) {
+      e.stopPropagation();
+      var closed = sortMenu.hidden;
+      sortMenu.hidden = !closed;
+      sortTrigger.setAttribute("aria-expanded", String(closed));
+    });
+    Array.prototype.forEach.call(sortMenu.querySelectorAll(".sort-option"), function (opt) {
+      opt.addEventListener("click", function () {
+        INBOX_SORT = opt.getAttribute("data-sort") || "priority";
+        Array.prototype.forEach.call(sortMenu.querySelectorAll(".sort-option"), function (o) { o.classList.remove("active"); o.setAttribute("aria-checked", "false"); });
+        opt.classList.add("active");
+        opt.setAttribute("aria-checked", "true");
+        var lbl = document.getElementById("sort-trigger-label");
+        if (lbl) lbl.textContent = opt.textContent.replace(/\s+/g, " ").trim();
+        sortMenu.hidden = true;
+        sortTrigger.setAttribute("aria-expanded", "false");
+        applyInboxSort();
+        applyInboxVisibility();
+      });
+    });
+  }
+
+  var filterTrigger = document.getElementById("filter-trigger");
+  var filterPop = document.getElementById("filter-pop");
+  function readPending() {
+    var checked = filterPop.querySelector("input[name='fp-priority']:checked");
+    return {
+      priority: checked ? checked.value : "all",
+      unread: !!(document.getElementById("fp-unread") || {}).checked,
+      review: !!(document.getElementById("fp-review") || {}).checked
+    };
+  }
+  function writePending(p) {
+    var radio = filterPop.querySelector("input[name='fp-priority'][value='" + p.priority + "']");
+    if (radio) radio.checked = true;
+    var u = document.getElementById("fp-unread"); if (u) u.checked = !!p.unread;
+    var r = document.getElementById("fp-review"); if (r) r.checked = !!p.review;
+  }
+  function pendingCount(p) {
+    return CASE_VIEWS.filter(function (v) {
+      var tier = normalizePriorityTier(priorityForView(v) || (v.em && v.em.smart_urgency) || "");
+      if (p.priority === "none" ? tier : p.priority !== "all" && tier !== p.priority) return false;
+      if (p.review && !isEscalatedOutcome(v)) return false;
+      if (p.unread && v.read) return false;
+      return true;
+    }).length;
+  }
+  function syncMatch() {
+    var el = document.getElementById("filter-match");
+    if (el) el.textContent = pendingCount(readPending()) + " email" + (pendingCount(readPending()) === 1 ? "" : "s") + " match. Inbox counts stay unchanged until Apply.";
+  }
+  if (filterTrigger && filterPop) {
+    filterTrigger.addEventListener("click", function (e) {
+      e.stopPropagation();
+      var closed = filterPop.hidden;
+      if (closed) writePending({ priority: INBOX_PRIORITY_FILTER, unread: INBOX_STATUS_FILTER.unread, review: INBOX_STATUS_FILTER.review });
+      filterPop.hidden = !closed;
+      filterTrigger.setAttribute("aria-expanded", String(closed));
+      if (closed) syncMatch();
+    });
+    filterPop.addEventListener("change", syncMatch);
+    var applyBtn = document.getElementById("filter-apply");
+    if (applyBtn) applyBtn.addEventListener("click", function () {
+      var p = readPending();
+      INBOX_PRIORITY_FILTER = p.priority;
+      var sel = document.getElementById("inbox-priority-filter");
+      if (sel) sel.value = p.priority;
+      INBOX_STATUS_FILTER = { unread: p.unread, review: p.review };
+      filterPop.hidden = true;
+      filterTrigger.setAttribute("aria-expanded", "false");
+      applyInboxVisibility();
+      refreshSelectionUi();
+    });
+    var resetBtn = document.getElementById("filter-reset");
+    if (resetBtn) resetBtn.addEventListener("click", function () {
+      writePending({ priority: "all", unread: false, review: false });
+      syncMatch();
+    });
+    var cancelBtn = document.getElementById("filter-cancel");
+    if (cancelBtn) cancelBtn.addEventListener("click", function () {
+      filterPop.hidden = true;
+      filterTrigger.setAttribute("aria-expanded", "false");
+    });
+  }
+
+  var viewAll = document.getElementById("view-all-btn");
+  if (viewAll) viewAll.addEventListener("click", function () {
+    INBOX_PILL = "all";
+    Array.prototype.forEach.call(document.querySelectorAll(".filter-pill"), function (p) { p.classList.toggle("active", p.getAttribute("data-pill") === "all"); });
+    INBOX_PRIORITY_FILTER = "all";
+    var sel = document.getElementById("inbox-priority-filter");
+    if (sel) sel.value = "all";
+    INBOX_STATUS_FILTER = { unread: false, review: false };
+    if (filterPop) writePending({ priority: "all", unread: false, review: false });
+    INBOX_SEARCH_TEXT = "";
+    var searchInput = document.getElementById("inbox-search");
+    if (searchInput) searchInput.value = "";
+    applyInboxVisibility();
+    refreshSelectionUi();
+  });
+
+  var tabSug = document.getElementById("tab-suggested");
+  var tabComp = document.getElementById("tab-completed");
+  function setTaskTab(tab) {
+    AGENT_TASK_TAB = tab;
+    if (tabSug) { tabSug.classList.toggle("active", tab === "suggested"); tabSug.setAttribute("aria-selected", String(tab === "suggested")); }
+    if (tabComp) { tabComp.classList.toggle("active", tab === "completed"); tabComp.setAttribute("aria-selected", String(tab === "completed")); }
+    renderAgentPanel();
+  }
+  if (tabSug) tabSug.addEventListener("click", function () { setTaskTab("suggested"); });
+  if (tabComp) tabComp.addEventListener("click", function () { setTaskTab("completed"); });
+
+  var addRow = document.getElementById("add-task-row");
+  var addInput = document.getElementById("add-task-input");
+  function showAddInput() {
+    if (!addInput) return;
+    addInput.hidden = false;
+    addInput.value = "";
+    addInput.focus();
+  }
+  if (addRow) {
+    addRow.addEventListener("click", showAddInput);
+    addRow.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); showAddInput(); } });
+  }
+  if (addInput) {
+    addInput.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") { addInput.hidden = true; return; }
+      if (e.key !== "Enter") return;
+      var title = addInput.value.trim();
+      if (!title) return;
+      CUSTOM_TASKS.push({ id: "C" + Date.now(), title: title, done: false });
+      saveCustomTasks();
+      addInput.value = "";
+      addInput.hidden = true;
+      renderAgentPanel();
+    });
+  }
+
+  document.addEventListener("click", function (e) {
+    if (sortMenu && !sortMenu.hidden && !sortMenu.contains(e.target) && !(sortTrigger && sortTrigger.contains(e.target))) { sortMenu.hidden = true; if (sortTrigger) sortTrigger.setAttribute("aria-expanded", "false"); }
+    if (filterPop && !filterPop.hidden && !filterPop.contains(e.target) && !(filterTrigger && filterTrigger.contains(e.target))) { filterPop.hidden = true; if (filterTrigger) filterTrigger.setAttribute("aria-expanded", "false"); }
+    if (openPrioMenuEl && !openPrioMenuEl.contains(e.target)) closePrioMenu();
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") {
+      if (sortMenu && !sortMenu.hidden) { sortMenu.hidden = true; if (sortTrigger) sortTrigger.setAttribute("aria-expanded", "false"); }
+      if (filterPop && !filterPop.hidden) { filterPop.hidden = true; if (filterTrigger) filterTrigger.setAttribute("aria-expanded", "false"); }
+      closePrioMenu();
+    }
+  });
+}
+initInboxPageFigma();
 
 initSettings();
 initPriorityFilter();
@@ -11593,9 +12387,9 @@ renderEvalsTable();
   if (tasksBtn) {
     tasksBtn.addEventListener("click", function () {
       setMainView("work");
-      setSessionOpen(true);
       var pane = document.getElementById("session-pane");
-      if (pane) pane.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      setSessionOpen(!(pane && !pane.hidden));
+      if (pane && !pane.hidden) pane.scrollIntoView({ behavior: "smooth", block: "nearest" });
     });
   }
 
@@ -11633,15 +12427,8 @@ renderEvalsTable();
   var searchInput = document.getElementById("inbox-search");
   if (searchInput) {
     var applySearch = function () {
-      var q = searchInput.value.trim().toLowerCase();
-      CASE_VIEWS.forEach(function (v) {
-        if (!v.card) return;
-        var senderName = ((senderById(v.em.sender_id) || {}).name) || v.em.gmail_from || "";
-        var hay = ((v.em.subject || "") + " " + senderName + " " + String(v.em.body || "").slice(0, 200)).toLowerCase();
-        var matches = !q || hay.indexOf(q) !== -1;
-        v.card.style.display = (matches && viewMatchesPriorityFilter(v)) ? "" : "none";
-      });
-      refreshPriorityFilterEmptyState();
+      INBOX_SEARCH_TEXT = searchInput.value.trim().toLowerCase();
+      applyInboxVisibility();
     };
     searchInput.addEventListener("input", applySearch);
     var prioSelect = document.getElementById("inbox-priority-filter");
