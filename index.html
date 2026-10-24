@@ -2959,25 +2959,34 @@ h1, h2, h3, h4 { letter-spacing: -0.2px; }
 .console[data-layout="reading"] .inbox-columns { display: none; }
 .console[data-layout="reading"] .reading-pane { margin-top: 24px; }
 
-/* F. Ask-assistant = first column, LEFT of the nav; flat card surface; same
-      height as the nav column. The whole page scrolls as one (no local bars). */
-.app-nav {
-  position: static; height: auto; max-height: none; overflow: visible;
-}
+/* F. Ask-assistant = previous card UI, parked in flow LEFT of the nav.
+      The drawer is drag-resizable from its right edge (min = default 340px). */
+.app-nav { position: static; height: auto; max-height: none; overflow: visible; }
 .session-pane { position: static; overflow: visible; }
 .app-shell > .global-chat {
-  position: static; inset: auto;
-  width: 340px; flex: none;
-  height: auto; max-height: none;
-  margin: 0; padding: 0;
-  display: none; flex-direction: column;
+  position: sticky; top: 20px; align-self: start;
+  width: var(--chat-w, 340px); flex: none;
+  height: calc(100vh - 40px); min-height: 440px; max-height: none;
+  margin: 20px 16px 20px 20px; padding: 0;
+  display: none; flex-direction: column; overflow: hidden;
   background: #ffffff;
-  border: 0; border-right: 1px solid var(--line);
-  border-radius: 0; box-shadow: none;
+  border: 1px solid var(--line); border-radius: 16px;
+  box-shadow: 0 24px 64px -24px rgba(36, 39, 51, .35);
   backdrop-filter: none; -webkit-backdrop-filter: none;
 }
-.app-shell:has(.console.chat-open) { grid-template-columns: 340px 216px minmax(0, 1fr); }
+.app-shell:has(.console.chat-open) { grid-template-columns: auto 216px minmax(0, 1fr); }
 .app-shell:has(.console.chat-open) > .global-chat { display: flex; }
+.console.chat-open .chat-launcher { left: auto; right: 20px; }
+.chat-resizer {
+  position: absolute; top: 0; right: 0; width: 8px; height: 100%;
+  cursor: col-resize; z-index: 6; touch-action: none;
+}
+.chat-resizer::after {
+  content: ""; position: absolute; top: 50%; right: 2.5px; transform: translateY(-50%);
+  width: 3px; height: 44px; border-radius: 2px; background: var(--line);
+}
+.chat-resizer:hover::after, body.chat-resizing .chat-resizer::after { background: var(--accent); }
+body.chat-resizing { user-select: none; cursor: col-resize; }
 .console.chat-open .chat-launcher { left: auto; right: 20px; }
 @media (max-width: 900px) {
   .app-shell > .global-chat {
@@ -12467,6 +12476,55 @@ function initInboxPageFigma() {
   });
 }
 initInboxPageFigma();
+
+// ═══ Chat drawer — drag to resize (min = default 340px), persisted ═══
+(function initChatDrawerResize() {
+  var panel = document.getElementById("global-chat");
+  if (!panel) return;
+  var handle = document.createElement("div");
+  handle.className = "chat-resizer";
+  handle.id = "chat-resizer";
+  handle.title = "Drag to resize";
+  handle.setAttribute("role", "separator");
+  handle.setAttribute("aria-orientation", "vertical");
+  panel.appendChild(handle);
+
+  var KEY = "aurora_chat_drawer_w";
+  var MIN = 340;
+  function maxW() { return Math.max(MIN, Math.min(760, window.innerWidth - 560)); }
+  function apply(w) {
+    var px = Math.round(Math.max(MIN, Math.min(w, maxW())));
+    document.documentElement.style.setProperty("--chat-w", px + "px");
+    return px;
+  }
+  try {
+    var saved = Number(localStorage.getItem(KEY));
+    if (saved >= MIN) apply(saved);
+  } catch (e) { /* ignore */ }
+
+  var dragging = false, startX = 0, startW = 0, pointerId = null;
+  handle.addEventListener("pointerdown", function (e) {
+    dragging = true; pointerId = e.pointerId;
+    startX = e.clientX;
+    startW = panel.getBoundingClientRect().width;
+    try { handle.setPointerCapture(pointerId); } catch (err) { /* ignore */ }
+    document.body.classList.add("chat-resizing");
+    e.preventDefault();
+  });
+  handle.addEventListener("pointermove", function (e) {
+    if (!dragging) return;
+    var w = apply(startW + (e.clientX - startX));
+    try { localStorage.setItem(KEY, String(w)); } catch (err) { /* ignore */ }
+  });
+  function end() {
+    if (!dragging) return;
+    dragging = false;
+    document.body.classList.remove("chat-resizing");
+    try { handle.releasePointerCapture(pointerId); } catch (err) { /* ignore */ }
+  }
+  handle.addEventListener("pointerup", end);
+  handle.addEventListener("pointercancel", end);
+})();
 
 initSettings();
 initPriorityFilter();
