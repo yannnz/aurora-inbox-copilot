@@ -2999,6 +2999,8 @@ body.chat-resizing { user-select: none; cursor: col-resize; }
 
 /* G. Read-mode email body with clickable links */
 .mail-read .mail-body { font-size: 13px; line-height: 1.65; }
+.mail-read .mail-body { max-width: 72ch; overflow-wrap: anywhere; }
+.mail-read .mail-headers { line-height: 1.7; }
 .mail-read .mail-body a, .mail-read .mail-headers a {
   color: var(--accent); text-decoration: underline; text-underline-offset: 2px;
   word-break: break-word;
@@ -4550,9 +4552,6 @@ function parseEmailAddress(raw) {
 
 function extractGmailTextBody(payload) {
   if (!payload) return "";
-  if (payload.body && payload.body.data && (!payload.mimeType || /text\/plain/i.test(payload.mimeType))) {
-    return decodeBase64Url(payload.body.data);
-  }
   var parts = payload.parts || [];
   var plain = "";
   var html = "";
@@ -4567,23 +4566,45 @@ function extractGmailTextBody(payload) {
     });
   }
   walk(parts);
-  if (plain) return plain;
+  if (!plain && !html && payload.body && payload.body.data) {
+    var topRaw = decodeBase64Url(payload.body.data);
+    if (/text\/html/i.test(payload.mimeType || "") || /^\s*<(!doctype|html|head|body|div|p|span|table|br|ul|ol|img|a\b)/i.test(topRaw)) {
+      html = topRaw;
+    } else {
+      plain = topRaw;
+    }
+  }
+  if (plain) {
+    return plain.replace(/\r\n?/g, "\n").replace(/[ \t]+\n/g, "\n").trim();
+  }
   if (html) {
     return html
       .replace(/<style[\s\S]*?<\/style>/gi, " ")
       .replace(/<script[\s\S]*?<\/script>/gi, " ")
+      .replace(/<head[\s\S]*?<\/head>/gi, " ")
       .replace(/<br\s*\/?>/gi, "\n")
-      .replace(/<\/p>/gi, "\n")
+      .replace(/<li[^>]*>/gi, "\n- ")
+      .replace(/<\/(p|div|tr|li|h[1-6]|blockquote|table|section|article)>/gi, "\n")
+      .replace(/<hr\s*\/?>/gi, "\n")
       .replace(/<[^>]+>/g, " ")
       .replace(/&nbsp;/g, " ")
-      .replace(/&amp;/g, "&")
       .replace(/&lt;/g, "<")
       .replace(/&gt;/g, ">")
-      .replace(/\s+\n/g, "\n")
+      .replace(/&quot;/gi, "\"")
+      .replace(/&#0?39;/g, "'")
+      .replace(/&apos;/gi, "'")
+      .replace(/&mdash;/gi, "—")
+      .replace(/&ndash;/gi, "–")
+      .replace(/&hellip;/gi, "…")
+      .replace(/&#(\d+);/g, function (m, d) { return String.fromCharCode(Number(d)); })
+      .replace(/&amp;/g, "&")
+      .replace(/\r\n?/g, "\n")
+      .replace(/[ \t]+\n/g, "\n")
+      .replace(/\n[ \t]+/g, "\n")
       .replace(/[ \t]{2,}/g, " ")
+      .replace(/\n{3,}/g, "\n\n")
       .trim();
   }
-  if (payload.body && payload.body.data) return decodeBase64Url(payload.body.data);
   return "";
 }
 
