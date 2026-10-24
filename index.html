@@ -4584,7 +4584,7 @@ function extractGmailTextBody(payload) {
       .replace(/<head[\s\S]*?<\/head>/gi, " ")
       .replace(/<br\s*\/?>/gi, "\n")
       .replace(/<li[^>]*>/gi, "\n- ")
-      .replace(/<\/(p|div|tr|li|h[1-6]|blockquote|table|section|article)>/gi, "\n")
+      .replace(/<\/(p|div|tr|td|ul|ol|h[1-6]|blockquote|table|section|article)>/gi, "\n")
       .replace(/<hr\s*\/?>/gi, "\n")
       .replace(/<[^>]+>/g, " ")
       .replace(/&nbsp;/g, " ")
