@@ -3036,6 +3036,32 @@ body.chat-resizing { user-select: none; cursor: col-resize; }
 .mail-read .mail-body a:hover, .mail-read .mail-headers a:hover { color: var(--accent-deep); }
 }
 </style>
+<style>
+/* ═══ Chat drawer UX — greeting quick actions, option lists, guided input ═══ */
+.chat-quick-row { display: flex; flex-direction: column; gap: 6px; margin: 2px 0 10px; }
+.chat-quick {
+  display: flex; align-items: center; gap: 10px; text-align: left;
+  padding: 9px 12px; border: 1px solid var(--line); border-radius: 10px;
+  background: #fff; cursor: pointer; font-family: inherit;
+  transition: border-color .12s ease, background .12s ease, box-shadow .12s ease;
+}
+.chat-quick:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); background: var(--accent-soft); }
+.chat-quick:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.chat-quick-label { font-size: 12px; font-weight: 600; color: var(--ink); flex: none; }
+.chat-quick-desc { font-size: 10px; color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chat-opt {
+  cursor: pointer; border-radius: 6px; padding: 5px 8px; margin: 1px 0;
+  border: 1px solid transparent; list-style-position: inside;
+  transition: background .12s ease, border-color .12s ease;
+}
+.chat-opt:hover { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 30%, var(--line)); }
+.chat-input-hint {
+  display: inline-block; font-size: 10px; font-weight: 500; color: var(--accent);
+  background: var(--accent-soft); border-radius: 6px; padding: 4px 8px; margin-bottom: 6px;
+}
+.chat-input-hint[hidden] { display: none; }
+.global-chat .email-chat-thread li { margin: 2px 0; }
+</style>
 </head>
 <body>
 <div class="app-shell">
@@ -3178,22 +3204,18 @@ body.chat-resizing { user-select: none; cursor: col-resize; }
           <span class="info-tip-pop" role="tooltip">Ask questions about synthetic morning emails and policies. Stays on every tab. Does not send mail or replace Run agent + Human review.</span>
         </span>
       </div>
-      <div class="global-chat-sub" id="global-chat-focus-label">Focus: whole morning inbox</div>
+      <div class="global-chat-sub">Aurora assistant · classify · draft · to-dos</div>
     </div>
     <button type="button" class="global-chat-close" id="global-chat-close" aria-label="Close chat">×</button>
   </div>
   <div class="global-chat-body">
-    <div class="global-chat-toolbar">
-      <label class="muted" for="global-chat-focus" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">Focus email</label>
-      <select class="field-input" id="global-chat-focus" aria-label="Chat focus email"></select>
-      <button type="button" class="btn" id="global-chat-classify" title="让助手分析并分类当前加载的邮箱，生成行动建议">📊 分类邮箱</button>
-    </div>
     <div class="email-chat-thread" id="global-chat-thread" aria-live="polite"></div>
     <details class="smart-timeline" id="smart-timeline" hidden>
       <summary>最近 AI 动作</summary>
       <ul id="smart-timeline-list"></ul>
     </details>
     <div class="email-chat-compose">
+      <div class="chat-input-hint" id="chat-input-hint" hidden></div>
       <div class="global-chat-compose-row">
         <textarea class="field-input" id="global-chat-input" rows="2" placeholder="Ask a question…"></textarea>
         <button type="button" class="global-chat-send" id="global-chat-send" aria-label="Send">
@@ -9716,6 +9738,149 @@ function updateGlobalChatFocusLabel() {
   }
 }
 
+// ── Chat greeting, quick agent tasks, guided flows, option lists ───────────
+var CHAT_FLOW = null;
+var CHAT_FLOW_STEPS = [
+  { key: "to", label: "收件人", hint: "姓名或邮箱，例如 zhang@example.com", placeholder: "输入收件人（姓名或邮箱）…" },
+  { key: "subject", label: "主题", hint: "这封邮件主要要说什么？", placeholder: "输入邮件主题…" },
+  { key: "points", label: "要点", hint: "想覆盖的要点，用分号分隔；没有可输入“跳过”", placeholder: "要点1；要点2；或输入“跳过”", optional: true }
+];
+var CHAT_QUICK_ACTIONS = [
+  { id: "classify", label: "分类邮箱", desc: "生成分类与行动建议" },
+  { id: "classifyNew", label: "归类新邮件", desc: "新邮件并入已有分类" },
+  { id: "todos", label: "查找重要待办", desc: "高优先级 · 需要你推进" },
+  { id: "summary", label: "总结收件箱", desc: "当前收件箱一览" },
+  { id: "compose", label: "写新邮件", desc: "三步引导起草" }
+];
+function ensureChatGreeting() {
+  if (GLOBAL_CHAT.messages.length) return;
+  GLOBAL_CHAT.messages.push({
+    role: "assistant",
+    greeting: true,
+    content: "你好！我是 Aurora 收件箱助手。可以直接问我任何邮件相关的问题，或从下面的任务开始："
+  });
+}
+function chatTodosDigest() {
+  var items = taskItems().suggested.slice(0, 5);
+  if (!items.length) return "当前没有需要你推进的待办 — 重要、有时限、需要你操作的邮件才会进入这个列表。";
+  return "以下是最需要你处理的待办：\n" + items.map(function (t, i) {
+    return (i + 1) + ". " + t.title + "（" + (t.reason ? t.reason.label + " · " : "") + t.due + "）";
+  }).join("\n") + "\n\n点击任一条可直接填入输入框追问；右侧 Suggested to-dos 的 Open email 可直接打开原邮件。";
+}
+function chatSummaryDigest() {
+  var total = CASE_VIEWS.length;
+  var triaged = CASE_VIEWS.filter(function (v) { return v.result; }).length;
+  var high = CASE_VIEWS.filter(function (v) { return tierRankOf(v) <= 1; }).length;
+  var todos = countSuggestedTasks();
+  var cats = {};
+  CASE_VIEWS.forEach(function (v) {
+    var c = (SMART_APPLIED && v.em.smart_cat) ? v.em.smart_cat : "未分类";
+    cats[c] = (cats[c] || 0) + 1;
+  });
+  var topCats = Object.keys(cats).sort(function (a, b) { return cats[b] - cats[a]; }).slice(0, 3)
+    .map(function (c) { return c + " ×" + cats[c]; }).join(" · ");
+  return "当前收件箱共 " + total + " 封：已分诊 " + triaged + " 封，高优先级 " + high + " 封，建议待办 " + todos + " 项。\n" +
+    "分类分布（前 3）：" + (topCats || "尚未分类") + "。\n" +
+    (total ? "可以问我任意一封的细节，或点下面的任务继续。" : "收件箱为空 — 连接 Gmail 或切换到 Demo 后再来。");
+}
+function chatQuickAction(id) {
+  if (id === "classify" || id === "classifyNew") {
+    if (!getActiveEmails().length) {
+      GLOBAL_CHAT.messages.push({ role: "assistant", content: "当前没有加载邮件。请先在 Triage settings 连接 Gmail（会自动同步近一个月），或把来源切到 Demo，然后再试。" });
+      renderGlobalChatThread();
+      return;
+    }
+    var inputEl = document.getElementById("global-chat-input");
+    if (inputEl) inputEl.value = id === "classifyNew"
+      ? "[[CLASSIFY_NEW]] 请分析新到的邮件：能归入已有类别的归类，不能的建议新类别"
+      : buildClassifyPrompt();
+    sendGlobalChatMessage();
+    return;
+  }
+  if (id === "todos") {
+    GLOBAL_CHAT.messages.push({ role: "assistant", content: chatTodosDigest() });
+    renderGlobalChatThread();
+    return;
+  }
+  if (id === "summary") {
+    GLOBAL_CHAT.messages.push({ role: "assistant", content: chatSummaryDigest() });
+    renderGlobalChatThread();
+    return;
+  }
+  if (id === "compose") {
+    CHAT_FLOW = { step: 0, data: {} };
+    pushChatFlowMessage();
+    renderGlobalChatThread();
+    updateChatInputPlaceholder();
+  }
+}
+function pushChatFlowMessage() {
+  var s = CHAT_FLOW_STEPS[CHAT_FLOW.step];
+  GLOBAL_CHAT.messages.push({
+    role: "assistant",
+    content: "写新邮件 · 第 " + (CHAT_FLOW.step + 1) + "/3 步 — **" + s.label + "**\n" + s.hint,
+    flowStep: true
+  });
+}
+function handleChatFlowStep(text) {
+  var s = CHAT_FLOW_STEPS[CHAT_FLOW.step];
+  var skip = s.optional && /^(跳过|skip|无)$/i.test(text);
+  GLOBAL_CHAT.messages.push({ role: "user", content: s.label + "：" + (skip ? "（跳过）" : text) });
+  CHAT_FLOW.data[s.key] = skip ? "" : text;
+  CHAT_FLOW.step++;
+  if (CHAT_FLOW.step < CHAT_FLOW_STEPS.length) {
+    pushChatFlowMessage();
+    renderGlobalChatThread();
+    updateChatInputPlaceholder();
+    return;
+  }
+  var d = CHAT_FLOW.data;
+  CHAT_FLOW = null;
+  var finalPrompt = "请帮我起草一封新邮件。收件人：" + (d.to || "（未指定）") +
+    "；主题：" + (d.subject || "（未指定）") +
+    "；要点：" + (d.points || "（请自行补全）") +
+    "。请直接输出完整邮件正文（含称呼与落款），仅起草、不发送。";
+  var inputEl = document.getElementById("global-chat-input");
+  if (inputEl) inputEl.value = finalPrompt;
+  renderGlobalChatThread();
+  updateChatInputPlaceholder();
+  sendGlobalChatMessage();
+}
+function updateChatInputPlaceholder() {
+  var input = document.getElementById("global-chat-input");
+  var hint = document.getElementById("chat-input-hint");
+  var ph = "Ask a question…";
+  var ht = "";
+  if (CHAT_FLOW) {
+    var s = CHAT_FLOW_STEPS[CHAT_FLOW.step];
+    ph = s.placeholder;
+    ht = "待回答 · " + s.label + "（" + (CHAT_FLOW.step + 1) + "/3）";
+  } else {
+    var last = GLOBAL_CHAT.messages[GLOBAL_CHAT.messages.length - 1];
+    if (last && last.role === "assistant" && /[?？]\s*$/.test(String(last.content || "").trim())) {
+      ph = "输入你的回答，按 Enter 发送…";
+      ht = "助手在等你的回答";
+    }
+  }
+  if (input) input.placeholder = ph;
+  if (hint) {
+    hint.hidden = !ht;
+    hint.textContent = ht;
+  }
+}
+function makeChatOptionsClickable(bub) {
+  Array.prototype.forEach.call(bub.querySelectorAll("li"), function (li) {
+    li.classList.add("chat-opt");
+    li.title = "点击填入输入框";
+    li.addEventListener("click", function () {
+      var input = document.getElementById("global-chat-input");
+      if (!input) return;
+      input.value = li.textContent.replace(/\s+/g, " ").trim();
+      input.focus();
+    });
+  });
+}
+
 function renderGlobalChatThread() {
   var thread = document.getElementById("global-chat-thread");
   if (!thread) return;
@@ -9747,7 +9912,25 @@ function renderGlobalChatThread() {
       }
     }
     else bub.textContent = m.content || "";
-    if (m.role === "assistant") linkifyEmailRefs(bub);
+    if (m.role === "assistant") {
+      linkifyEmailRefs(bub);
+      makeChatOptionsClickable(bub);
+    }
+    if (m.greeting) {
+      var quick = document.createElement("div");
+      quick.className = "chat-quick-row";
+      CHAT_QUICK_ACTIONS.forEach(function (a) {
+        var chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "chat-quick";
+        chip.innerHTML = "<span class='chat-quick-label'>" + a.label + "</span><span class='chat-quick-desc'>" + a.desc + "</span>";
+        chip.addEventListener("click", function () { chatQuickAction(a.id); });
+        quick.appendChild(chip);
+      });
+      thread.appendChild(bub);
+      thread.appendChild(quick);
+      return;
+    }
     thread.appendChild(bub);
     if (m.role === "assistant" && m.smartJson && SMART_PENDING) {
       // Per-category review cards instead of a single blind "apply" button.
@@ -9775,6 +9958,7 @@ function renderGlobalChatThread() {
   });
   thread.scrollTop = thread.scrollHeight;
   renderSmartTimeline();
+  updateChatInputPlaceholder();
 }
 
 function setGlobalChatOpen(open) {
@@ -9790,10 +9974,11 @@ function setGlobalChatOpen(open) {
     launcher.title = GLOBAL_CHAT.open ? "Close" : "Ask assistant";
   }
   if (GLOBAL_CHAT.open) {
-    syncGlobalChatFocusOptions();
+    ensureChatGreeting();
     renderGlobalChatThread();
     var input = document.getElementById("global-chat-input");
     if (input) input.focus();
+    updateChatInputPlaceholder();
   }
 }
 
@@ -9814,6 +9999,11 @@ async function sendGlobalChatMessage() {
   var sendBtn = document.getElementById("global-chat-send");
   var text = input && input.value ? input.value.trim() : "";
   if (!text) return;
+  if (CHAT_FLOW) {
+    if (input) input.value = "";
+    handleChatFlowStep(text);
+    return;
+  }
   if (!getApiKey()) {
     GLOBAL_CHAT.messages.push({
       role: "error",
@@ -9914,6 +10104,8 @@ function initGlobalChat() {
   if (clearBtn) {
     clearBtn.addEventListener("click", function () {
       GLOBAL_CHAT.messages = [];
+      CHAT_FLOW = null;
+      ensureChatGreeting();
       renderGlobalChatThread();
     });
   }
