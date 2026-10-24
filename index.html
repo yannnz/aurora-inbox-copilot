@@ -2953,6 +2953,34 @@ h1, h2, h3, h4 { letter-spacing: -0.2px; }
 .inbox-pagination { height: 42px; }
 .inbox-heading { height: 59px; min-height: 59px; padding: 0 20px; align-items: center; }
 .inbox-filters { height: 41px; padding: 0 20px 14px; align-items: flex-start; padding-top: 0; }
+
+/* E. Detail page replaces the list — Back to inbox returns (Figma 6:13428) */
+.console[data-layout="reading"] .inbox-intro { display: none; }
+.console[data-layout="reading"] .inbox-columns { display: none; }
+.console[data-layout="reading"] .reading-pane { margin-top: 24px; }
+
+/* F. Ask-assistant = left inline drawer; the workspace narrows to make room */
+.console.chat-open { display: flex; flex-direction: row; align-items: stretch; }
+.console.chat-open > .global-chat {
+  flex: none; width: 340px; max-width: 340px;
+  position: sticky; top: 96px; align-self: flex-start;
+  height: auto; max-height: none;
+  margin: 20px 24px 20px 28px;
+  display: flex; flex-direction: column;
+}
+.console.chat-open > .workspace-col { flex: 1 1 auto; min-width: 0; }
+@media (max-width: 900px) {
+  .console.chat-open { flex-direction: column; }
+  .console.chat-open > .global-chat { position: static; width: auto; max-width: none; margin: 16px; }
+}
+
+/* G. Read-mode email body with clickable links */
+.mail-read .mail-body { font-size: 13px; line-height: 1.65; }
+.mail-read .mail-body a, .mail-read .mail-headers a {
+  color: var(--accent); text-decoration: underline; text-underline-offset: 2px;
+  word-break: break-word;
+}
+.mail-read .mail-body a:hover, .mail-read .mail-headers a:hover { color: var(--accent-deep); }
 }
 </style>
 </head>
@@ -10926,14 +10954,16 @@ function paintWorkArea(view) {
     "<h2 class='mail-subject'>" + escapeHtml(em.subject) + "</h2>" +
     "<div class='mail-headers'>" +
     "<div><span class='hk'>From</span> " + escapeHtml(s.name || "?") +
-    " &lt;" + escapeHtml(s.org || "?") + "&gt;</div>" +
+    " &lt;" + ((s.email || em.gmail_from)
+      ? ("<a href=\"mailto:" + escapeHtml(s.email || em.gmail_from) + "\">" + escapeHtml(s.email || em.gmail_from) + "</a>")
+      : escapeHtml(s.org || "?")) + "&gt;</div>" +
     "<div><span class='hk'>To</span> Ren (Aurora Materials)</div>" +
     "<div><span class='hk'>When</span> " + escapeHtml(em.received_at) +
     " · <code>" + escapeHtml(em.email_id) + "</code>" +
     (prioNow ? (" · Priority <strong>" + escapeHtml(prioNow) + "</strong>") : "") +
     "</div>" +
     "</div>" +
-    "<div class='mail-body'>" + escapeHtml(em.body) + "</div>" +
+    "<div class='mail-body'>" + linkifyEmailBody(em.body) + "</div>" +
     "<div class='mail-attach'>Attachments: " +
     escapeHtml(em.attachments || "(none)") + "</div>";
   stage1.appendChild(mail);
@@ -11959,6 +11989,19 @@ function emailTimeOf(em) { var t = Date.parse(String(em.received_at || "").repla
 function tierRankOf(v) {
   var t = normalizePriorityTier(priorityForView(v) || (v.em && v.em.smart_urgency) || "");
   return t ? ["P0", "P1", "P2", "P3"].indexOf(t) : 9;
+}
+// Read-mode rendering: escape first, then make URLs and emails clickable.
+function linkifyEmailBody(text) {
+  var safe = escapeHtml(String(text || ""));
+  return safe
+    .replace(/https?:\/\/[^\s]+/g, function (m) {
+      var url = m.replace(/[.,;:!?)\]']+$/, "");
+      var tail = m.slice(url.length);
+      return "<a href=\"" + url + "\" target=\"_blank\" rel=\"noopener noreferrer\">" + url + "</a>" + tail;
+    })
+    .replace(/(^|[\s(])((?:[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\.[A-Za-z0-9.-]+))/g, function (m, p1, p2) {
+      return p1 + "<a href=\"mailto:" + p2 + "\">" + p2 + "</a>";
+    });
 }
 
 // ── Unified visibility: priority select + pills + status + search ──────────
