@@ -2882,6 +2882,94 @@ h1, h2, h3, h4 { letter-spacing: -0.2px; }
   .prio-menu { position: fixed; left: 16px; right: 16px; width: auto; }
 }
 </style>
+<style>
+/* ═══ INBOX PAGE FIX — uniform 73px rows + one-screen workspace (Figma 3:1860) ═══ */
+
+/* A. Kill legacy grid padding that inflated rows to 103px */
+.case-card,
+.console[data-layout="list"] .case-card,
+.console[data-layout="reading"] .case-card {
+  position: relative; display: flex; flex-direction: column;
+  margin: 0; padding: 0; min-height: 0; max-height: none;
+  background: #fff; border: 0; border-bottom: 1px solid var(--line); border-radius: 0;
+}
+.case-card .mail-summary {
+  display: flex; align-items: center; gap: 11px;
+  height: 73px; padding: 10px 18px; min-width: 0; box-sizing: border-box;
+}
+.case-card .mail-select,
+.console[data-layout="list"] .case-card .mail-select { width: 13px; height: 13px; margin: 0; flex: none; accent-color: var(--accent); }
+.sender-avatar { margin: 0; width: 30px; height: 30px; flex: none; }
+.case-card .mail-content {
+  flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center;
+  gap: 3px; padding-right: 72px; height: 53px;
+}
+.case-card .from,
+.console[data-layout="list"] .case-card .from {
+  height: 15px; display: flex; align-items: center; gap: 6px; margin: 0;
+  font-size: 11px; font-weight: 600; line-height: 15px; min-width: 0;
+}
+.from-name { line-height: 15px; }
+.case-card .subject-line { height: 20px; display: flex; align-items: center; gap: 8px; min-width: 0; }
+.case-card .title,
+.console[data-layout="list"] .case-card .title {
+  flex: 1 1 auto; min-width: 0; margin: 0; max-width: none;
+  font-size: 12px; font-weight: 600; line-height: 15px;
+}
+.case-card .preview,
+.console[data-layout="list"] .case-card .preview {
+  height: 12px; margin: 0; flex: none; font-size: 10px; line-height: 12px; color: var(--ink-2);
+}
+.case-card .mail-when,
+.console[data-layout="list"] .case-card .mail-when {
+  position: absolute; top: 12px; right: 44px; margin: 0; grid-column: auto;
+  height: 13px; font-size: 9px; line-height: 13px; color: var(--ink-3);
+  white-space: nowrap; text-align: right;
+}
+.mail-star { top: 12px; width: 14px; height: 13px; }
+.case-card .prio,
+.console[data-layout="list"] .case-card .prio { top: 12px; height: 13px; line-height: 13px; right: 82px; }
+.smart-cat-badge, .subject-line .badge { height: 20px; }
+.noise-kind-badge { height: 20px; padding: 3px 7px; line-height: 14px; }
+.case-card .flag-line,
+.console[data-layout="list"] .case-card .flag-line { display: none !important; margin: 0; }
+.agent-strip { padding: 0 18px 14px 59px; }
+.strip-reason, .strip-task, .strip-link, .strip-actions { height: 14px; line-height: 14px; }
+
+/* B. Legacy pane caps removed everywhere */
+.inbox-pane, .reading-pane, .session-pane { max-height: none; }
+
+/* C. Reading mode = reply-workspace overlay (Figma 6:13428); list stays mounted
+      so the 3:1860 selected row + reasoning strip shows after Back. */
+
+/* D. One-screen workspace on desktop: fixed header + hero, list scrolls inside its card */
+@media (min-width: 1281px) {
+  html, body { height: 100%; overflow: hidden; }
+  .app-shell { height: 100vh; }
+  .app-main { height: 100vh; overflow: hidden; }
+  .workspace-col { height: 100%; overflow: hidden; }
+  .searchbar { flex: none; position: static; }
+  .inbox-intro { flex: none; }
+  .workspace-col { position: relative; }
+  .console[data-layout="reading"] .inbox-intro { display: none; }
+  .reading-pane {
+    position: absolute; left: 28px; right: 28px; top: 76px; bottom: 24px;
+    margin: 0; z-index: 30; overflow-y: auto;
+    display: flex; flex-direction: column;
+    box-shadow: 0 24px 64px -24px rgba(36, 39, 51, .35);
+  }
+  .reading-pane .panel-body { overflow: visible; }
+  .inbox-columns { flex: 1 1 auto; min-height: 0; overflow: hidden; align-items: stretch; }
+  .inbox-pane { display: flex; flex-direction: column; overflow: hidden; }
+  .inbox-heading, .inbox-filters, .inbox-pagination { flex: none; }
+  .inbox-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+  .session-pane { position: static; overflow-y: auto; overscroll-behavior: contain; }
+}
+@media (max-width: 1280px) {
+  .inbox-scroll { overflow: visible; }
+  .reading-pane { overflow-y: auto; }
+}
+</style>
 </head>
 <body>
 <div class="app-shell">
@@ -3203,14 +3291,16 @@ h1, h2, h3, h4 { letter-spacing: -0.2px; }
       </div>
     </div>
 
-    <div id="case-list" aria-label="Email list"></div>
-    <div id="noise-panel" hidden>
-      <p class="muted" id="noise-status" style="padding: 12px 20px; margin: 0;"></p>
-      <div class="row-actions" id="noise-actions" style="padding: 0 20px 12px;" hidden>
-        <button type="button" class="btn danger" id="noise-delete-all-btn">Delete all spam &amp; ads</button>
-        <button type="button" class="btn" id="noise-refresh-btn">Refresh filter</button>
+    <div class="inbox-scroll" id="inbox-scroll">
+      <div id="case-list" aria-label="Email list"></div>
+      <div id="noise-panel" hidden>
+        <p class="muted" id="noise-status" style="padding: 12px 20px; margin: 0;"></p>
+        <div class="row-actions" id="noise-actions" style="padding: 0 20px 12px;" hidden>
+          <button type="button" class="btn danger" id="noise-delete-all-btn">Delete all spam &amp; ads</button>
+          <button type="button" class="btn" id="noise-refresh-btn">Refresh filter</button>
+        </div>
+        <div id="noise-list" aria-label="Spam and ads list"></div>
       </div>
-      <div id="noise-list" aria-label="Spam and ads list"></div>
     </div>
     <div class="inbox-pagination" id="inbox-pagination">
       <span class="pagination-label" id="pagination-label">Showing 0 of 0 emails</span>
@@ -4848,6 +4938,7 @@ function renderNoiseList() {
     card.className = "case-card noise-card is-read";
     card.innerHTML =
       "<div class='mail-summary'>" +
+      "<input type='checkbox' class='mail-select' disabled aria-hidden='true' tabindex='-1'>" +
       "<span class='sender-avatar' aria-hidden='true'>" + escapeHtml(initials) + "</span>" +
       "<div class='mail-content'>" +
       "<div class='from'><span class='from-name'>" + escapeHtml(senderName) + "</span>" +
