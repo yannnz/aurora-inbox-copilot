@@ -7,6 +7,7 @@
   "scripts": {
     "start": "node proxy.js",
     "proxy": "node proxy.js",
+    "trace:phoenix": "uvx --from arize-phoenix phoenix serve --host 127.0.0.1 --port 6006",
     "eval:e04": "node evals/e04-calendar-conflict.eval.js"
   },
   "dependencies": {

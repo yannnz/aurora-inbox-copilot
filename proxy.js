@@ -12,6 +12,13 @@
  *   http 443 / grpc 8443) so a plain `node proxy.js` keeps tracing. For
  *   self-hosted Laminar set LMNR_BASE_URL=http://localhost LMNR_HTTP_PORT=8000
  *   LMNR_GRPC_PORT=8001. DeepSeek/OpenAI keys are never written into this file.
+ *
+ * Optional local Phoenix tracing (https://github.com/Arize-ai/phoenix):
+ *   Enabled by default and does not need an API key. Start Phoenix first with
+ *   `uvx --from arize-phoenix phoenix serve --host 127.0.0.1 --port 6006`.
+ *   Override with PHOENIX_URL / PHOENIX_PROJECT_NAME, or disable with
+ *   PHOENIX_ENABLED=0. Phoenix receives one OpenInference LLM span per Jev,
+ *   DeepSeek, and OpenAI request. API keys are never exported.
  */
 
 const http = require("http");
@@ -36,6 +43,14 @@ const OPENAI_HTTP_PROXY =
   process.env.HTTP_PROXY ||
   "http://127.0.0.1:10808";
 
+const PHOENIX_ENABLED = process.env.PHOENIX_ENABLED !== "0";
+const PHOENIX_BASE_URL =
+  String(process.env.PHOENIX_URL || "http://127.0.0.1:6006").replace(/\/+$/, "");
+const PHOENIX_TRACE_URL =
+  process.env.PHOENIX_TRACE_URL || PHOENIX_BASE_URL + "/v1/traces";
+const PHOENIX_PROJECT_NAME =
+  process.env.PHOENIX_PROJECT_NAME || process.env.PHOENIX_PROJECT || "aurora-inbox";
+
 const MIME = {
   ".html": "text/html; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
@@ -55,6 +70,9 @@ var laminarReady = false;
 var laminarInitKey = "";
 var laminarInitEndpoint = "";
 var laminarIgnoredKey = "";
+var phoenixProvider = null;
+var phoenixTracer = null;
+var phoenixReady = false;
 
 function laminarConfig() {
   var baseUrl = String(process.env.LMNR_BASE_URL || "https://api.lmnr.ai").trim();
@@ -109,6 +127,88 @@ function ensureLaminar(apiKeyFromHeader) {
     console.warn("Laminar unavailable:", e && e.message ? e.message : e);
     console.warn("Run npm install, then restart with LMNR_PROJECT_API_KEY or Settings key.");
     return false;
+  }
+}
+
+function initPhoenix() {
+  if (!PHOENIX_ENABLED || phoenixReady) return phoenixReady;
+  try {
+    var BasicTracerProvider = require("@opentelemetry/sdk-trace-base").BasicTracerProvider;
+    var SimpleSpanProcessor = require("@opentelemetry/sdk-trace-base").SimpleSpanProcessor;
+    var Resource = require("@opentelemetry/resources").Resource;
+    var OTLPTraceExporter = require("@opentelemetry/exporter-trace-otlp-proto").OTLPTraceExporter;
+
+    phoenixProvider = new BasicTracerProvider({
+      resource: new Resource({
+        "service.name": "aurora-inbox-copilot",
+        "openinference.project.name": PHOENIX_PROJECT_NAME
+      })
+    });
+    phoenixProvider.addSpanProcessor(
+      new SimpleSpanProcessor(
+        new OTLPTraceExporter({
+          url: PHOENIX_TRACE_URL,
+          headers: { "x-project-name": PHOENIX_PROJECT_NAME },
+          timeoutMillis: 2000
+        })
+      )
+    );
+    phoenixTracer = phoenixProvider.getTracer("aurora-inbox-proxy");
+    phoenixReady = true;
+    console.log(
+      "Phoenix tracing enabled → " + PHOENIX_TRACE_URL +
+      " | project " + PHOENIX_PROJECT_NAME + " | UI " + PHOENIX_BASE_URL + "/"
+    );
+    return true;
+  } catch (e) {
+    console.warn("Phoenix unavailable:", e && e.message ? e.message : e);
+    console.warn("Run npm install to restore OpenTelemetry packages, or set PHOENIX_ENABLED=0.");
+    return false;
+  }
+}
+
+function phoenixJson(value, limit) {
+  try {
+    var text = JSON.stringify(value === undefined ? null : value);
+    var max = limit || 65536;
+    return text.length > max ? text.slice(0, max) + "…[truncated]" : text;
+  } catch (e) {
+    return JSON.stringify({ note: "unserializable value" });
+  }
+}
+
+async function withPhoenixSpan(options, operation) {
+  if (!phoenixReady || !phoenixTracer) return await operation();
+
+  var span = phoenixTracer.startSpan(options.name || "aurora.llm");
+  span.setAttribute("openinference.span.kind", "LLM");
+  Object.keys(options.attributes || {}).forEach(function (key) {
+    var value = options.attributes[key];
+    if (value !== undefined && value !== null && value !== "") span.setAttribute(key, value);
+  });
+  if (options.input !== undefined) span.setAttribute("input.value", phoenixJson(options.input));
+
+  try {
+    var result = await operation();
+    var recorded = options.recordResult ? options.recordResult(result) : {};
+    if (recorded.status) {
+      span.setAttribute("http.status_code", Number(recorded.status) || 0);
+      span.setStatus({
+        code: Number(recorded.status) >= 200 && Number(recorded.status) < 400 ? 1 : 2,
+        message: Number(recorded.status) >= 400 ? "Upstream HTTP " + recorded.status : undefined
+      });
+    } else {
+      span.setStatus({ code: 1 });
+    }
+    if (recorded.via) span.setAttribute("aurora.transport", String(recorded.via));
+    if (recorded.output !== undefined) span.setAttribute("output.value", phoenixJson(recorded.output));
+    span.end();
+    return result;
+  } catch (e) {
+    span.recordException(e);
+    span.setStatus({ code: 2, message: String(e && e.message ? e.message : e) });
+    span.end();
+    throw e;
   }
 }
 
@@ -315,33 +415,61 @@ function handleTypeSafePost(req, res) {
     var emailId = String(req.headers["x-aurora-email-id"] || "").trim();
     var sessionId = String(req.headers["x-aurora-session-id"] || "").trim();
     var tracing = ensureLaminar(String(req.headers["x-lmnr-project-api-key"] || "").trim());
+    var phoenix = initPhoenix();
     var spanInput = { note: "unparseable request body" };
     try {
       var parsedReq = JSON.parse(body.toString("utf8"));
       spanInput = { provider: "typesafe", model: parsedReq.model || "", state: parsedReq.state, questions: parsedReq.questions };
     } catch (e) { /* keep note */ }
     try {
-      var out;
-      if (tracing && observe) {
-        out = await observe(
-          {
-            name: "aurora.jev",
-            sessionId: sessionId || undefined,
-            spanType: "LLM",
-            tags: ["aurora-inbox", "jev"].concat(emailId ? [emailId] : []),
-            metadata: { email_id: emailId || null, role: "jev", provider: "typesafe", model: spanInput.model || null },
-            input: spanInput
-          },
-          async function () {
-            var r = await postTypeSafe(headers, body);
-            var answers = null;
-            try { answers = JSON.parse(r.upstream.text || "").answers || null; } catch (e) { /* raw */ }
-            return { upstream: r.upstream, via: r.via, response: answers || String(r.upstream.text || "").slice(0, 2000) };
-          }
-        );
-      } else {
-        out = await postTypeSafe(headers, body);
+      async function runTypeSafe() {
+        if (tracing && observe) {
+          return await observe(
+            {
+              name: "aurora.jev",
+              sessionId: sessionId || undefined,
+              spanType: "LLM",
+              tags: ["aurora-inbox", "jev"].concat(emailId ? [emailId] : []),
+              metadata: { email_id: emailId || null, role: "jev", provider: "typesafe", model: spanInput.model || null },
+              input: spanInput
+            },
+            async function () {
+              var r = await postTypeSafe(headers, body);
+              var answers = null;
+              try { answers = JSON.parse(r.upstream.text || "").answers || null; } catch (e) { /* raw */ }
+              return { upstream: r.upstream, via: r.via, response: answers || String(r.upstream.text || "").slice(0, 2000) };
+            }
+          );
+        }
+        return await postTypeSafe(headers, body);
       }
+
+      var out = phoenix
+        ? await withPhoenixSpan(
+            {
+              name: "aurora.jev",
+              input: spanInput,
+              attributes: {
+                "email.id": emailId || null,
+                "session.id": sessionId || null,
+                "aurora.role": "jev",
+                "llm.model_name": spanInput.model || null,
+                "llm.provider": "typesafe"
+              },
+              recordResult: function (result) {
+                var upstream = result && result.upstream ? result.upstream : { status: 0, text: "" };
+                var answers = null;
+                try { answers = JSON.parse(upstream.text || "").answers || null; } catch (e) { /* raw */ }
+                return {
+                  status: upstream.status,
+                  via: result && result.via,
+                  output: answers || { preview: String(upstream.text || "").slice(0, 2000) }
+                };
+              }
+            },
+            runTypeSafe
+          )
+        : await runTypeSafe();
       setCors(res);
       res.setHeader("Content-Type", "application/json");
       res.writeHead(out.upstream.status || 502);
@@ -476,6 +604,7 @@ function handleApiPost(req, res) {
     var sessionId = String(req.headers["x-aurora-session-id"] || "").trim();
     var lmnrKey = String(req.headers["x-lmnr-project-api-key"] || "").trim();
     var tracing = ensureLaminar(lmnrKey);
+    var phoenix = initPhoenix();
     var spanInput = redactLlmPayload(body, useVpn);
 
     async function runUpstream() {
@@ -489,40 +618,66 @@ function handleApiPost(req, res) {
     }
 
     try {
-      var packed;
-      if (tracing && observe) {
-        packed = await observe(
-          {
-            name: role === "reviewer" ? "aurora.reviewer" : "aurora.worker",
-            sessionId: sessionId || undefined,
-            spanType: "LLM",
-            tags: ["aurora-inbox", role].concat(emailId ? [emailId] : []),
-            metadata: {
-              email_id: emailId || null,
-              role: role,
-              provider: useVpn ? "openai" : "kimi",
-              model: spanInput.model || null
+      async function runLlmRequest() {
+        if (tracing && observe) {
+          return await observe(
+            {
+              name: role === "reviewer" ? "aurora.reviewer" : "aurora.worker",
+              sessionId: sessionId || undefined,
+              spanType: "LLM",
+              tags: ["aurora-inbox", role].concat(emailId ? [emailId] : []),
+              metadata: {
+                email_id: emailId || null,
+                role: role,
+                provider: useVpn ? "openai" : "kimi",
+                model: spanInput.model || null
+              },
+              input: spanInput
             },
-            input: spanInput
-          },
-          async function () {
-            var out = await runUpstream();
-            return {
-              status: out.upstream.status,
-              via: out.via,
-              text: out.upstream.text,
-              response: summarizeUpstream(out.upstream.text)
-            };
-          }
-        );
-      } else {
+            async function () {
+              var out = await runUpstream();
+              return {
+                status: out.upstream.status,
+                via: out.via,
+                text: out.upstream.text,
+                response: summarizeUpstream(out.upstream.text)
+              };
+            }
+          );
+        }
         var plain = await runUpstream();
-        packed = {
+        return {
           status: plain.upstream.status,
           via: plain.via,
-          text: plain.upstream.text
+          text: plain.upstream.text,
+          upstream: plain.upstream
         };
       }
+
+      var packed = phoenix
+        ? await withPhoenixSpan(
+            {
+              name: role === "reviewer" ? "aurora.reviewer" : "aurora.worker",
+              input: spanInput,
+              attributes: {
+                "email.id": emailId || null,
+                "session.id": sessionId || null,
+                "aurora.role": role,
+                "llm.model_name": spanInput.model || null,
+                "llm.provider": useVpn ? "openai" : "deepseek"
+              },
+              recordResult: function (result) {
+                var raw = result && result.upstream ? result.upstream : { status: result && result.status, text: result && result.text };
+                return {
+                  status: raw.status,
+                  via: result && result.via,
+                  output: summarizeUpstream(raw.text)
+                };
+              }
+            },
+            runLlmRequest
+          )
+        : await runLlmRequest();
 
       setCors(res);
       res.setHeader("Content-Type", "application/json");
@@ -581,6 +736,11 @@ server.listen(PORT, "127.0.0.1", function () {
   console.log("  POST /       → DeepSeek direct, then via " + OPENAI_HTTP_PROXY + " if needed");
   console.log("  POST /openai → OpenAI via " + OPENAI_HTTP_PROXY);
   console.log("  POST /typesafe → TypeSafe Jev direct, then via " + OPENAI_HTTP_PROXY + " if needed");
+  if (PHOENIX_ENABLED) {
+    initPhoenix();
+  } else {
+    console.log("  Phoenix tracing: disabled (PHOENIX_ENABLED=0)");
+  }
   console.log("  Laminar: " + laminarConfig().endpointLabel + " | UI " + laminarUiUrl(laminarConfig()));
   if (process.env.LMNR_PROJECT_API_KEY) {
     ensureLaminar(process.env.LMNR_PROJECT_API_KEY);
