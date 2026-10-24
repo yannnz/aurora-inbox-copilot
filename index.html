@@ -2750,7 +2750,10 @@ h1, h2, h3, h4 { letter-spacing: -0.2px; }
 .filter-pop-title { font-size: 17px; font-weight: 600; color: var(--ink); }
 .filter-pop-sub { font-size: 12px; color: var(--ink-2); margin: 4px 0 16px; }
 .filter-groups { display: flex; gap: 20px; }
+.filter-groups { flex-wrap: wrap; }
 .filter-group { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+.filter-group.fp-cats-group { flex: 1 1 100%; }
+.fp-cats { display: flex; flex-direction: column; gap: 8px; max-height: 176px; overflow-y: auto; }
 .filter-group-label { font-size: 10px; font-weight: 600; color: var(--ink-3); letter-spacing: .06em; }
 .filter-opt { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ink); cursor: pointer; }
 .filter-opt input { accent-color: var(--accent); margin: 0; }
@@ -2761,6 +2764,10 @@ h1, h2, h3, h4 { letter-spacing: -0.2px; }
 
 /* Category heading (3:1996) */
 .category-heading { display: flex; align-items: center; gap: 7px; min-height: 39px; padding: 0 18px; background: #fafafc; border-bottom: 1px solid var(--line); }
+.category-heading { cursor: pointer; user-select: none; }
+.category-heading:hover { background: #f4f4f8; }
+.category-chevron { transition: transform .15s ease; }
+.category-heading.collapsed .category-chevron { transform: rotate(-90deg); }
 .category-chevron { width: 12px; height: 12px; color: var(--ink-2); flex: none; }
 .category-marker { width: 6px; height: 6px; border-radius: 999px; flex: none; }
 .category-name { font-size: 11px; font-weight: 600; color: var(--ink); }
@@ -3323,6 +3330,10 @@ body.chat-resizing { user-select: none; cursor: col-resize; }
             <div class="filter-group-label">STATUS</div>
             <label class="filter-opt"><input type="checkbox" id="fp-unread"><span>Unread only</span></label>
             <label class="filter-opt"><input type="checkbox" id="fp-review"><span>Needs review</span></label>
+          </div>
+          <div class="filter-group fp-cats-group">
+            <div class="filter-group-label">CATEGORY</div>
+            <div id="fp-categories" class="fp-cats"></div>
           </div>
         </div>
         <div class="menu-divider" aria-hidden="true"></div>
@@ -11962,9 +11973,28 @@ function render() {
       "<svg class='category-more' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round' aria-hidden='true'><circle cx='5' cy='12' r='1'/><circle cx='12' cy='12' r='1'/><circle cx='19' cy='12' r='1'/></svg>";
     list.appendChild(head);
     g.el = head;
+    head.dataset.cat = g.key;
+    head.classList.toggle("collapsed", !!COLLAPSED_CATS[g.key]);
+    head.setAttribute("role", "button");
+    head.setAttribute("tabindex", "0");
+    head.setAttribute("aria-expanded", COLLAPSED_CATS[g.key] ? "false" : "true");
+    function toggleCollapsed() {
+      var key = head.dataset.cat;
+      if (COLLAPSED_CATS[key]) delete COLLAPSED_CATS[key];
+      else COLLAPSED_CATS[key] = true;
+      saveCollapsedCats();
+      head.classList.toggle("collapsed", !!COLLAPSED_CATS[key]);
+      head.setAttribute("aria-expanded", COLLAPSED_CATS[key] ? "false" : "true");
+      applyInboxVisibility();
+    }
+    head.addEventListener("click", toggleCollapsed);
+    head.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleCollapsed(); }
+    });
     included.forEach(function (v) {
       list.appendChild(v.card);
       v.groupEl = head;
+      v.catKey = g.key;
     });
   });
 
@@ -12008,18 +12038,21 @@ var MANUAL_PRIORITY_STORAGE = "aurora_manual_priority_v1";
 var TASK_DONE_STORAGE = "aurora_task_done_v1";
 var CUSTOM_TASKS_STORAGE = "aurora_custom_tasks_v1";
 var TASK_STARS_STORAGE = "aurora_task_stars_v1";
+var COLLAPSED_CATS_STORAGE = "aurora_collapsed_cats_v1";
 function loadJsonMap(key) {
   try { var v = JSON.parse(localStorage.getItem(key) || "{}"); return v && typeof v === "object" ? v : {}; } catch (e) { return {}; }
 }
 var MANUAL_PRIORITY = loadJsonMap(MANUAL_PRIORITY_STORAGE);
 var TASK_DONE = loadJsonMap(TASK_DONE_STORAGE);
 var TASK_STARS = loadJsonMap(TASK_STARS_STORAGE);
+var COLLAPSED_CATS = loadJsonMap(COLLAPSED_CATS_STORAGE);
 var CUSTOM_TASKS = (function () {
   try { var v = JSON.parse(localStorage.getItem(CUSTOM_TASKS_STORAGE) || "[]"); return Array.isArray(v) ? v : []; } catch (e) { return []; }
 })();
 function saveManualPriority() { try { localStorage.setItem(MANUAL_PRIORITY_STORAGE, JSON.stringify(MANUAL_PRIORITY)); } catch (e) {} }
 function saveTaskDone() { try { localStorage.setItem(TASK_DONE_STORAGE, JSON.stringify(TASK_DONE)); } catch (e) {} }
 function saveTaskStars() { try { localStorage.setItem(TASK_STARS_STORAGE, JSON.stringify(TASK_STARS)); } catch (e) {} }
+function saveCollapsedCats() { try { localStorage.setItem(COLLAPSED_CATS_STORAGE, JSON.stringify(COLLAPSED_CATS)); } catch (e) {} }
 function saveCustomTasks() { try { localStorage.setItem(CUSTOM_TASKS_STORAGE, JSON.stringify(CUSTOM_TASKS)); } catch (e) {} }
 
 var STAR_ICON_SVG = "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><polygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2'/></svg>";
@@ -12090,14 +12123,18 @@ function updatePagination() {
 }
 function applyInboxVisibility() {
   CASE_VIEWS.forEach(function (v) {
-    if (v.card) v.card.style.display = unifiedVisible(v) ? "" : "none";
+    if (v.card) {
+      var collapsed = v.catKey && COLLAPSED_CATS[v.catKey];
+      v.card.style.display = (unifiedVisible(v) && !collapsed) ? "" : "none";
+    }
   });
   var seen = {};
   CASE_VIEWS.forEach(function (v) {
     if (!v.groupEl || seen[v.groupEl.id || v.groupEl._gi]) return;
     var key = v.groupEl._gi || (v.groupEl._gi = "g" + Math.random().toString(36).slice(2));
     seen[key] = true;
-    var any = CASE_VIEWS.some(function (w) { return w.groupEl === v.groupEl && unifiedVisible(w); });
+    var any = COLLAPSED_CATS[v.catKey] ||
+      CASE_VIEWS.some(function (w) { return w.groupEl === v.groupEl && unifiedVisible(w); });
     v.groupEl.style.display = any ? "" : "none";
   });
   updatePagination();
@@ -12416,12 +12453,57 @@ function initInboxPageFigma() {
 
   var filterTrigger = document.getElementById("filter-trigger");
   var filterPop = document.getElementById("filter-pop");
+  function catFilterList() {
+    var counts = {};
+    getActiveEmails().forEach(function (em) {
+      var c = em.smart_cat || "未分类";
+      counts[c] = (counts[c] || 0) + 1;
+    });
+    var cats = SMART_APPLIED && SMART_APPLIED.categories
+      ? SMART_APPLIED.categories.map(function (c) { return c.name; })
+      : [];
+    Object.keys(counts).forEach(function (c) { if (cats.indexOf(c) < 0) cats.push(c); });
+    return { cats: cats, counts: counts };
+  }
+  function buildCatChecks() {
+    var wrap = document.getElementById("fp-categories");
+    if (!wrap) return;
+    var info = catFilterList();
+    wrap.innerHTML = "";
+    if (!info.cats.length) {
+      var p = document.createElement("p");
+      p.className = "filter-match";
+      p.style.margin = "0";
+      p.textContent = "尚无分类 — 用助手「分类邮箱」后，这里会列出全部分类选项。";
+      wrap.appendChild(p);
+      return;
+    }
+    info.cats.forEach(function (c) {
+      var label = document.createElement("label");
+      label.className = "filter-opt";
+      var box = document.createElement("input");
+      box.type = "checkbox";
+      box.className = "fp-cat";
+      box.value = c;
+      box.checked = SMART_FILTER_SELECTED[c] !== false;
+      label.appendChild(box);
+      var span = document.createElement("span");
+      span.textContent = c + " (" + (info.counts[c] || 0) + ")";
+      label.appendChild(span);
+      wrap.appendChild(label);
+    });
+  }
   function readPending() {
     var checked = filterPop.querySelector("input[name='fp-priority']:checked");
+    var cats = {};
+    Array.prototype.forEach.call(filterPop.querySelectorAll(".fp-cat"), function (box) {
+      cats[box.value] = box.checked;
+    });
     return {
       priority: checked ? checked.value : "all",
       unread: !!(document.getElementById("fp-unread") || {}).checked,
-      review: !!(document.getElementById("fp-review") || {}).checked
+      review: !!(document.getElementById("fp-review") || {}).checked,
+      cats: cats
     };
   }
   function writePending(p) {
@@ -12429,6 +12511,9 @@ function initInboxPageFigma() {
     if (radio) radio.checked = true;
     var u = document.getElementById("fp-unread"); if (u) u.checked = !!p.unread;
     var r = document.getElementById("fp-review"); if (r) r.checked = !!p.review;
+    Array.prototype.forEach.call(filterPop.querySelectorAll(".fp-cat"), function (box) {
+      if (p.cats && box.value in p.cats) box.checked = !!p.cats[box.value];
+    });
   }
   function pendingCount(p) {
     return CASE_VIEWS.filter(function (v) {
@@ -12447,7 +12532,10 @@ function initInboxPageFigma() {
     filterTrigger.addEventListener("click", function (e) {
       e.stopPropagation();
       var closed = filterPop.hidden;
-      if (closed) writePending({ priority: INBOX_PRIORITY_FILTER, unread: INBOX_STATUS_FILTER.unread, review: INBOX_STATUS_FILTER.review });
+      if (closed) {
+        buildCatChecks();
+        writePending({ priority: INBOX_PRIORITY_FILTER, unread: INBOX_STATUS_FILTER.unread, review: INBOX_STATUS_FILTER.review, cats: SMART_FILTER_SELECTED });
+      }
       filterPop.hidden = !closed;
       filterTrigger.setAttribute("aria-expanded", String(closed));
       if (closed) syncMatch();
@@ -12460,14 +12548,29 @@ function initInboxPageFigma() {
       var sel = document.getElementById("inbox-priority-filter");
       if (sel) sel.value = p.priority;
       INBOX_STATUS_FILTER = { unread: p.unread, review: p.review };
+      var catChanged = false;
+      var info = catFilterList();
+      info.cats.forEach(function (c) {
+        var next = p.cats[c] !== false;
+        if (SMART_FILTER_SELECTED[c] !== next) catChanged = true;
+        SMART_FILTER_SELECTED[c] = next;
+      });
       filterPop.hidden = true;
       filterTrigger.setAttribute("aria-expanded", "false");
-      applyInboxVisibility();
-      refreshSelectionUi();
+      if (catChanged) {
+        renderSmartFilterControl();
+        render();
+      } else {
+        applyInboxVisibility();
+        refreshSelectionUi();
+      }
     });
     var resetBtn = document.getElementById("filter-reset");
     if (resetBtn) resetBtn.addEventListener("click", function () {
-      writePending({ priority: "all", unread: false, review: false });
+      var info = catFilterList();
+      var catsAll = {};
+      info.cats.forEach(function (c) { catsAll[c] = true; });
+      writePending({ priority: "all", unread: false, review: false, cats: catsAll });
       syncMatch();
     });
     var cancelBtn = document.getElementById("filter-cancel");
@@ -12484,6 +12587,11 @@ function initInboxPageFigma() {
       render();
       return;
     }
+    var info = catFilterList();
+    var catCleared = false;
+    info.cats.forEach(function (c) {
+      if (SMART_FILTER_SELECTED[c] === false) { SMART_FILTER_SELECTED[c] = true; catCleared = true; }
+    });
     INBOX_PILL = "all";
     Array.prototype.forEach.call(document.querySelectorAll(".filter-pill"), function (p) { p.classList.toggle("active", p.getAttribute("data-pill") === "all"); });
     INBOX_PRIORITY_FILTER = "all";
@@ -12494,8 +12602,13 @@ function initInboxPageFigma() {
     INBOX_SEARCH_TEXT = "";
     var searchInput = document.getElementById("inbox-search");
     if (searchInput) searchInput.value = "";
-    applyInboxVisibility();
-    refreshSelectionUi();
+    if (catCleared) {
+      renderSmartFilterControl();
+      render();
+    } else {
+      applyInboxVisibility();
+      refreshSelectionUi();
+    }
   });
 
   var tabSug = document.getElementById("tab-suggested");
