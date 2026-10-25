@@ -2387,6 +2387,8 @@ h1, h2, h3, h4 { letter-spacing: -0.2px; }
 .nav-section-label svg { width: 13px; height: 13px; color: var(--ink-3); }
 .nav-labels { display: flex; flex-direction: column; gap: 12px; padding-left: 12px; }
 .nav-label-item { display: flex; align-items: center; gap: 12px; font-size: 12px; color: var(--ink-2); }
+button.nav-label-item { width: 100%; border: 0; background: none; padding: 0; font: inherit; text-align: left; cursor: pointer; }
+button.nav-label-item:hover { color: var(--ink); }
 .nav-label-marker { width: 8px; height: 8px; border-radius: 999px; }
 .nav-account { margin-top: auto; display: flex; flex-direction: column; gap: 14px; padding-top: 18px; border-top: 1px solid var(--line); }
 .nav-connection { display: flex; flex-direction: column; gap: 5px; padding: 0 12px; }
@@ -2642,6 +2644,25 @@ h1, h2, h3, h4 { letter-spacing: -0.2px; }
 /* ── Full pages: settings / evals / traces / matrix / rules / jobs ───── */
 .evals-view { display: none; }
 .evals-view.visible { display: block; padding: 0 28px 60px; }
+.gmail-folder-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin: 0 0 16px; }
+.gmail-folder-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 11px; color: var(--ink-2); }
+.gmail-folder-list { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 12px; background: #fff; overflow: hidden; }
+.gmail-folder-card { display: flex; min-height: 72px; align-items: center; gap: 12px; padding: 12px 18px; border-bottom: 1px solid var(--line); }
+.gmail-folder-card:last-child { border-bottom: 0; }
+.gmail-folder-card .sender-avatar { width: 30px; height: 30px; }
+.gmail-folder-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.gmail-folder-top { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.gmail-folder-from { min-width: 130px; max-width: 190px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 600; color: var(--ink); }
+.gmail-folder-subject { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; color: var(--ink); }
+.gmail-folder-preview { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; color: var(--ink-3); }
+.gmail-folder-when { width: 112px; flex: none; text-align: right; font-size: 10px; color: var(--ink-3); }
+.gmail-label-table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.gmail-label-table th, .gmail-label-table td { padding: 12px 16px; border-bottom: 1px solid var(--line); text-align: left; font-size: 12px; }
+.gmail-label-table th { background: #fafafc; color: var(--ink-2); font-size: 10px; text-transform: uppercase; letter-spacing: .04em; }
+.gmail-label-table tr:last-child td { border-bottom: 0; }
+#nav-gmail-label-list { display: contents; }
+.agent-task-page { max-width: 820px; }
+.agent-task-page .todo-card { border: 1px solid var(--line); border-radius: 12px; background: #fff; padding: 22px; }
 .section-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 27px 0 20px; border: 0; margin: 0; }
 .section-title-row .panel-head, .evals-view > .section-title-row > .panel-head {
   padding: 0; border: 0; font-size: 28px; font-weight: 600; color: var(--ink);
@@ -3084,34 +3105,34 @@ body.chat-resizing { user-select: none; cursor: col-resize; }
       <span class="nav-label">Inbox</span>
       <span class="nav-count" id="nav-inbox-count">0</span>
     </button>
-    <button type="button" class="nav-item" id="inbox-view-noise" data-view="noise" title="Spam &amp; ads filtered out of triage">
+    <button type="button" class="nav-item" id="inbox-view-noise" data-gmail-folder="spamads" title="Gmail Spam, Promotions and Social">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>
       <span class="nav-label">Spam &amp; ads</span>
       <span class="nav-count" id="noise-count-badge">0</span>
     </button>
-    <button type="button" class="nav-item nav-demo" data-demo="Starred">
+    <button type="button" class="nav-item" id="nav-gmail-starred" data-gmail-folder="starred" title="Gmail Starred">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      <span class="nav-label">Starred</span><span class="nav-count">8</span>
+      <span class="nav-label">Starred</span><span class="nav-count" id="nav-starred-count">0</span>
     </button>
-    <button type="button" class="nav-item nav-demo" data-demo="Snoozed">
+    <button type="button" class="nav-item" id="nav-gmail-snoozed" data-gmail-folder="snoozed" title="Gmail Snoozed">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      <span class="nav-label">Snoozed</span>
+      <span class="nav-label">Snoozed</span><span class="nav-count" id="nav-snoozed-count">0</span>
     </button>
-    <button type="button" class="nav-item nav-demo" data-demo="Sent">
+    <button type="button" class="nav-item" id="nav-gmail-sent" data-gmail-folder="sent" title="Gmail Sent">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
-      <span class="nav-label">Sent</span>
+      <span class="nav-label">Sent</span><span class="nav-count" id="nav-sent-count">0</span>
     </button>
-    <button type="button" class="nav-item nav-demo" data-demo="Drafts">
+    <button type="button" class="nav-item" id="nav-gmail-drafts" data-gmail-folder="drafts" title="Gmail Drafts">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>
-      <span class="nav-label">Drafts</span><span class="nav-count">3</span>
+      <span class="nav-label">Drafts</span><span class="nav-count" id="nav-drafts-count">0</span>
     </button>
-    <button type="button" class="nav-item nav-demo" data-demo="All mail">
+    <button type="button" class="nav-item" id="nav-gmail-allmail" data-gmail-folder="allmail" title="Gmail All Mail">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
-      <span class="nav-label">All mail</span>
+      <span class="nav-label">All mail</span><span class="nav-count" id="nav-allmail-count">0</span>
     </button>
-    <button type="button" class="nav-item nav-demo" data-demo="More">
+    <button type="button" class="nav-item" id="nav-gmail-labels" data-gmail-folder="labels" title="Gmail labels">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
-      <span class="nav-label">More</span>
+      <span class="nav-label">More</span><span class="nav-count" id="nav-labels-count">0</span>
     </button>
   </nav>
 
@@ -3159,9 +3180,7 @@ body.chat-resizing { user-select: none; cursor: col-resize; }
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
     </div>
     <div class="nav-labels">
-      <span class="nav-label-item"><span class="nav-label-marker" style="background:#5752c9"></span>Projects</span>
-      <span class="nav-label-item"><span class="nav-label-marker" style="background:#39806b"></span>People</span>
-      <span class="nav-label-item"><span class="nav-label-marker" style="background:#a77831"></span>Finance</span>
+      <div id="nav-gmail-label-list"></div>
     </div>
   </div>
 
@@ -3177,7 +3196,7 @@ body.chat-resizing { user-select: none; cursor: col-resize; }
         <span class="nav-account-mail">ren@aurora.example</span>
       </span>
     </div>
-    <div class="nav-build" id="nav-build">build 2026-10-24 · pills-v2</div>
+    <div class="nav-build" id="nav-build">build 2026-10-25 · gmail-folders-v1</div>
   </div>
 </aside>
 <main class="app-main">
@@ -3397,14 +3416,6 @@ body.chat-resizing { user-select: none; cursor: col-resize; }
 
     <div class="inbox-scroll" id="inbox-scroll">
       <div id="case-list" aria-label="Email list"></div>
-      <div id="noise-panel" hidden>
-        <p class="muted" id="noise-status" style="padding: 12px 20px; margin: 0;"></p>
-        <div class="row-actions" id="noise-actions" style="padding: 0 20px 12px;" hidden>
-          <button type="button" class="btn danger" id="noise-delete-all-btn">Delete all spam &amp; ads</button>
-          <button type="button" class="btn" id="noise-refresh-btn">Refresh filter</button>
-        </div>
-        <div id="noise-list" aria-label="Spam and ads list"></div>
-      </div>
     </div>
     <div class="inbox-pagination" id="inbox-pagination">
       <span class="pagination-label" id="pagination-label">Showing 0 of 0 emails</span>
@@ -3474,17 +3485,23 @@ body.chat-resizing { user-select: none; cursor: col-resize; }
     </div>
   </aside>
 
-  <!-- Session drawer (hidden by default; open from rail) -->
-  <aside class="panel right-scroll session-pane" id="session-pane" hidden>
+  </div><!-- /.inbox-columns -->
+  </div><!-- /.workspace-col -->
+</div>
+
+<section class="evals-view agent-tasks-view" id="agent-tasks-view" aria-label="Suggested tasks">
+  <div class="section-title-row">
+    <div>
+      <div class="panel-head">Agent · Suggested tasks</div>
+      <p class="page-sub">High-priority, time-sensitive, and action-needed emails from your synced Gmail. Nothing is sent without your approval.</p>
+    </div>
+    <span class="count-badge" id="agent-task-count">0</span>
+  </div>
+  <div class="agent-task-page">
     <div class="todo-card">
       <div class="tasks-heading">
-        <div class="tasks-title">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/><path d="M13 6h8"/><path d="M13 12h8"/><path d="M13 18h8"/></svg>
-          Suggested to-dos
-        </div>
-        <span class="count-badge" id="agent-task-count">0</span>
+        <div class="tasks-title">Next actions</div>
       </div>
-      <p class="tasks-sub">Your next steps, pulled from your inbox. Nothing is sent without your approval.</p>
       <div class="task-tabs" role="tablist">
         <button type="button" class="task-tab active" id="tab-suggested" role="tab" aria-selected="true">Suggested <span class="task-tab-count" id="task-suggested-count">0</span></button>
         <button type="button" class="task-tab" id="tab-completed" role="tab" aria-selected="false">Completed <span class="task-tab-count" id="task-completed-count">0</span></button>
@@ -3513,11 +3530,25 @@ body.chat-resizing { user-select: none; cursor: col-resize; }
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
       <span>You're in control. Every triage action is reversible.</span>
     </div>
-  </aside>
-  </div><!-- /.inbox-columns -->
-  </div><!-- /.workspace-col -->
-</div>
+  </div>
+</section>
 
+<section class="evals-view gmail-folder-view" id="gmail-folder-view" aria-label="Gmail folder">
+  <div class="section-title-row">
+    <div>
+      <div class="panel-head" id="gmail-folder-title">Gmail folder</div>
+      <p class="page-sub" id="gmail-folder-description">Messages synced directly from Gmail.</p>
+    </div>
+    <div class="row-actions">
+      <button type="button" class="btn danger" id="gmail-folder-delete-all-btn" hidden>Delete all</button>
+      <button type="button" class="btn" id="gmail-folder-refresh-btn">Refresh Gmail</button>
+    </div>
+  </div>
+  <div class="gmail-folder-toolbar">
+    <div class="gmail-folder-meta" id="gmail-folder-meta">Not synced yet</div>
+  </div>
+  <div id="gmail-folder-content"></div>
+</section>
 <section class="evals-view" id="evals-view" aria-label="Evals">
   <div class="section-title-row">
     <div class="panel-head">Evals · case runner</div>
@@ -3981,8 +4012,59 @@ const REVIEWER_MODE_STORAGE = "aurora_reviewer_mode";
 var GMAIL_EMAILS = [];
 var GMAIL_NOISE_EMAILS = []; // spam / ads / promotions / social (separate from triage)
 var GMAIL_SENDERS = {}; // sender_id → sender record for live mail
+var GMAIL_FOLDER_EMAILS = {}; // Gmail folder key → exact messages returned by Gmail
+var GMAIL_LABELS = [];
+var GMAIL_CURRENT_FOLDER = "";
 var DEMO_NOISE_DELETED = {}; // email_id → true (demo-only soft delete)
 var DEMO_TRIAGE_HIDDEN = {}; // email_id → true; never saved, so demo/eval emails return on reload
+const GMAIL_FOLDER_SPECS = {
+  spamads: {
+    title: "Spam & ads",
+    description: "Exact Gmail Spam messages plus Gmail Promotions and Social inbox categories from the last 30 days.",
+    queries: [
+      "in:spam " + GMAIL_LOOKBACK_QUERY,
+      "in:inbox " + GMAIL_LOOKBACK_QUERY + " category:promotions",
+      "in:inbox " + GMAIL_LOOKBACK_QUERY + " category:social"
+    ],
+    max: GMAIL_NOISE_MAX,
+    canDelete: true
+  },
+  starred: {
+    title: "Starred",
+    description: "Gmail Starred messages from the last 30 days.",
+    queries: ["is:starred " + GMAIL_LOOKBACK_QUERY],
+    max: GMAIL_NOISE_MAX
+  },
+  snoozed: {
+    title: "Snoozed",
+    description: "Gmail Snoozed messages from the last 30 days.",
+    queries: ["in:snoozed " + GMAIL_LOOKBACK_QUERY],
+    max: GMAIL_NOISE_MAX
+  },
+  sent: {
+    title: "Sent",
+    description: "Gmail Sent messages from the last 30 days.",
+    queries: ["in:sent " + GMAIL_LOOKBACK_QUERY],
+    max: GMAIL_NOISE_MAX
+  },
+  drafts: {
+    title: "Drafts",
+    description: "Gmail Draft messages from the last 30 days.",
+    queries: ["in:drafts " + GMAIL_LOOKBACK_QUERY],
+    max: GMAIL_NOISE_MAX
+  },
+  allmail: {
+    title: "All mail",
+    description: "Gmail All Mail messages from the last 30 days, excluding Spam and Trash just like Gmail.",
+    queries: ["in:anywhere " + GMAIL_LOOKBACK_QUERY + " -in:spam -in:trash"],
+    max: GMAIL_INBOX_MAX
+  },
+  labels: {
+    title: "Labels",
+    description: "Labels synced directly from this Gmail account.",
+    labelsOnly: true
+  }
+};
 
 // =====================================================================
 // LAYER 1: THE WORLD - synthetic data, converted from data/*.csv and
@@ -4740,12 +4822,7 @@ function mapGmailMessageToEmail(msg, noiseMeta) {
   var body = extractGmailTextBody(msg.payload).slice(0, 12000);
   var attachments = attachmentNamesFromPayload(msg.payload);
   var labelIds = msg.labelIds || [];
-  var noiseKind = (noiseMeta && noiseMeta.kind) || classifyNoiseKind({
-    subject: subject,
-    body: body,
-    from: fromRaw,
-    labelIds: labelIds
-  });
+  var noiseKind = (noiseMeta && noiseMeta.kind) || exactGmailNoiseKind(labelIds);
   return {
     email_id: "GM-" + msg.id,
     source: "gmail",
@@ -4762,6 +4839,84 @@ function mapGmailMessageToEmail(msg, noiseMeta) {
     attachments: attachments,
     body: body || "(empty body or unsupported MIME)"
   };
+}
+
+function exactGmailNoiseKind(labelIds, fallbackKind) {
+  var labels = labelIds || [];
+  if (labels.indexOf("SPAM") >= 0) return "spam";
+  if (labels.indexOf("CATEGORY_PROMOTIONS") >= 0) return "promo";
+  if (labels.indexOf("CATEGORY_SOCIAL") >= 0) return "social";
+  return fallbackKind || "";
+}
+
+function gmailFolderEmails(key) {
+  return (GMAIL_FOLDER_EMAILS[key] || []).slice();
+}
+
+function renderGmailNavLabels() {
+  var wrap = document.getElementById("nav-gmail-label-list");
+  if (!wrap) return;
+  var colors = ["#5752c9", "#39806b", "#a77831", "#b75e53", "#747884"];
+  var labels = GMAIL_LABELS.filter(function (label) { return label.type === "user"; })
+    .slice(0, 3);
+  wrap.innerHTML = "";
+  if (!labels.length) {
+    var empty = document.createElement("span");
+    empty.className = "nav-label-item";
+    empty.textContent = "No Gmail labels";
+    wrap.appendChild(empty);
+    return;
+  }
+  labels.forEach(function (label, index) {
+    var item = document.createElement("button");
+    item.type = "button";
+    item.className = "nav-label-item";
+    item.title = "Open Gmail labels";
+    item.innerHTML =
+      "<span class='nav-label-marker' style='background:" + colors[index % colors.length] + "'></span>" +
+      escapeHtml(label.name || "(unnamed)");
+    item.addEventListener("click", function () { setGmailFolder("labels"); });
+    wrap.appendChild(item);
+  });
+}
+
+function updateGmailNavCounts() {
+  var pairs = [
+    ["nav-inbox-count", "inbox"],
+    ["noise-count-badge", "spamads"],
+    ["nav-starred-count", "starred"],
+    ["nav-snoozed-count", "snoozed"],
+    ["nav-sent-count", "sent"],
+    ["nav-drafts-count", "drafts"],
+    ["nav-allmail-count", "allmail"],
+    ["nav-labels-count", "labels"]
+  ];
+  pairs.forEach(function (pair) {
+    var el = document.getElementById(pair[0]);
+    if (!el) return;
+    var n = pair[0] === "nav-inbox-count"
+      ? GMAIL_EMAILS.length
+      : pair[1] === "labels"
+      ? GMAIL_LABELS.filter(function (label) { return label.type === "user"; }).length
+      : gmailFolderEmails(pair[1]).length;
+    el.textContent = String(n);
+  });
+  renderGmailNavLabels();
+}
+
+async function listGmailFolderRefs(spec, queryKinds) {
+  var byId = {};
+  var queries = spec.queries || [];
+  for (var i = 0; i < queries.length; i++) {
+    var refs = await listGmailMessageRefs(queries[i], spec.max || GMAIL_NOISE_MAX);
+    refs.forEach(function (ref) {
+      if (ref && ref.id) {
+        if (queryKinds && queryKinds[i]) ref.__gmailNoiseKind = queryKinds[i];
+        byId[ref.id] = ref;
+      }
+    });
+  }
+  return Object.keys(byId).map(function (id) { return byId[id]; });
 }
 
 /** Heuristic + Gmail label classifier. Returns kind string or "". */
@@ -4854,7 +5009,7 @@ async function trashGmailMessage(gmailId) {
 }
 
 function getNoiseEmails() {
-  if (INBOX_SOURCE === "gmail") return GMAIL_NOISE_EMAILS.slice();
+  if (INBOX_SOURCE === "gmail") return gmailFolderEmails("spamads");
   return EMAILS.filter(function (em) {
     if (DEMO_NOISE_DELETED[em.email_id]) return false;
     return !!classifyNoiseKind({
@@ -5081,6 +5236,100 @@ function renderNoiseList() {
   syncInboxListViewUi();
 }
 
+function renderGmailFolderView() {
+  var key = GMAIL_CURRENT_FOLDER || "spamads";
+  var spec = GMAIL_FOLDER_SPECS[key] || GMAIL_FOLDER_SPECS.spamads;
+  var title = document.getElementById("gmail-folder-title");
+  var desc = document.getElementById("gmail-folder-description");
+  var meta = document.getElementById("gmail-folder-meta");
+  var content = document.getElementById("gmail-folder-content");
+  var del = document.getElementById("gmail-folder-delete-all-btn");
+  if (title) title.textContent = spec.title || "Gmail folder";
+  if (desc) desc.textContent = spec.description || "Messages synced directly from Gmail.";
+  if (del) del.hidden = !spec.canDelete || !gmailFolderEmails(key).length;
+  if (!content) return;
+
+  content.innerHTML = "";
+  if (INBOX_SOURCE !== "gmail") {
+    content.innerHTML = "<p class='page-sub'>Gmail folders are available after you switch the inbox source to Gmail and connect Google.</p>";
+    if (meta) meta.textContent = "Demo source";
+    return;
+  }
+  if (!getGoogleAccessToken()) {
+    content.innerHTML = "<p class='page-sub'>Connect Google in Triage settings, then refresh Gmail to sync this folder.</p>";
+    if (meta) meta.textContent = "Google not connected";
+    return;
+  }
+
+  var syncedAt = GMAIL_LOADED_AT ? new Date(GMAIL_LOADED_AT).toLocaleString() : "not synced yet";
+  if (key === "labels") {
+    if (meta) meta.textContent = GMAIL_LABELS.length + " labels · synced " + syncedAt;
+    var wrap = document.createElement("div");
+    wrap.style.overflowX = "auto";
+    var table = document.createElement("table");
+    table.className = "gmail-label-table";
+    table.innerHTML =
+      "<thead><tr><th>Label</th><th>Type</th><th>Total</th><th>Unread</th><th>ID</th></tr></thead>";
+    var body = document.createElement("tbody");
+    var labels = GMAIL_LABELS.slice().sort(function (a, b) {
+      return String(a.name || "").localeCompare(String(b.name || ""));
+    });
+    if (!labels.length) {
+      var row = document.createElement("tr");
+      row.innerHTML = "<td colspan='5'>No labels returned yet. Refresh Gmail.</td>";
+      body.appendChild(row);
+    } else {
+      labels.forEach(function (label) {
+        var tr = document.createElement("tr");
+        tr.innerHTML =
+          "<td>" + escapeHtml(label.name || "(unnamed)") + "</td>" +
+          "<td>" + escapeHtml(label.type || "") + "</td>" +
+          "<td>" + escapeHtml(String((label.messagesTotal === undefined ? "—" : label.messagesTotal))) + "</td>" +
+          "<td>" + escapeHtml(String((label.messagesUnread === undefined ? "—" : label.messagesUnread))) + "</td>" +
+          "<td>" + escapeHtml(label.id || "") + "</td>";
+        body.appendChild(tr);
+      });
+    }
+    table.appendChild(body);
+    wrap.appendChild(table);
+    content.appendChild(wrap);
+    return;
+  }
+
+  var emails = gmailFolderEmails(key).sort(function (a, b) {
+    return emailTimeOf(b) - emailTimeOf(a);
+  });
+  if (meta) meta.textContent = emails.length + " messages · last 30 days · synced " + syncedAt;
+  if (!emails.length) {
+    var empty = document.createElement("p");
+    empty.className = "page-sub";
+    empty.textContent = "Gmail returned no messages for this folder in the last 30 days.";
+    content.appendChild(empty);
+    return;
+  }
+
+  var list = document.createElement("div");
+  list.className = "gmail-folder-list";
+  emails.forEach(function (em) {
+    var senderName = senderNameOf(em) || em.gmail_from || "Unknown";
+    var initials = (senderName.replace(/[^A-Za-z\u00C0-\u024F]+/g, " ").trim().split(/\s+/).slice(0, 2)
+      .map(function (w) { return w.charAt(0); }).join("") || "?").toUpperCase();
+    var preview = String(em.body || "").replace(/\s+/g, " ").trim().slice(0, 120);
+    if ((em.body || "").length > 120) preview += "…";
+    var card = document.createElement("div");
+    card.className = "gmail-folder-card";
+    card.innerHTML =
+      "<span class='sender-avatar' aria-hidden='true'>" + escapeHtml(initials) + "</span>" +
+      "<div class='gmail-folder-main'>" +
+      "<div class='gmail-folder-top'><span class='gmail-folder-from'>" + escapeHtml(senderName) + "</span>" +
+      "<span class='gmail-folder-subject'>" + escapeHtml(em.subject || "(no subject)") + "</span></div>" +
+      "<span class='gmail-folder-preview'>" + escapeHtml(preview) + "</span>" +
+      "</div><div class='gmail-folder-when'>" + escapeHtml(em.received_at || "") + "</div>";
+    list.appendChild(card);
+  });
+  content.appendChild(list);
+}
+
 // Moves messages to Gmail Trash one by one. Callers remove only r.trashedIds from their lists,
 // so the UI never claims a delete Gmail did not confirm.
 async function trashGmailEmails(list, onProgress) {
@@ -5139,8 +5388,8 @@ async function deleteAllNoiseEmails() {
     : ("Remove " + noise.length + " demo spam/ads from this list? (Demo only — not a real mailbox.)");
   if (!confirm(confirmMsg)) return;
 
-  var btn = document.getElementById("noise-delete-all-btn");
-  var statusEl = document.getElementById("noise-status");
+  var btn = document.getElementById("gmail-folder-delete-all-btn");
+  var statusEl = document.getElementById("gmail-folder-meta");
   if (btn) {
     btn.disabled = true;
     btn.textContent = "Deleting…";
@@ -5160,7 +5409,14 @@ async function deleteAllNoiseEmails() {
       GMAIL_NOISE_EMAILS = GMAIL_NOISE_EMAILS.filter(function (em) {
         return !r.trashedIds[em.gmail_id];
       });
+      Object.keys(GMAIL_FOLDER_EMAILS).forEach(function (folderKey) {
+        GMAIL_FOLDER_EMAILS[folderKey] = (GMAIL_FOLDER_EMAILS[folderKey] || []).filter(function (em) {
+          return !r.trashedIds[em.gmail_id];
+        });
+      });
       renderNoiseList();
+      updateGmailNavCounts();
+      if (GMAIL_CURRENT_FOLDER) renderGmailFolderView();
       if (statusEl) statusEl.textContent = trashResultMessage(r);
       setTopStatus(r.failed.length ? "warn" : "ok",
         "Gmail Trash · " + r.ok + " moved" + (r.failed.length ? " · " + r.failed.length + " failed" : ""));
@@ -5173,7 +5429,7 @@ async function deleteAllNoiseEmails() {
   } finally {
     if (btn) {
       btn.disabled = false;
-      btn.textContent = "Delete all spam & ads";
+      btn.textContent = "Delete all";
     }
   }
 }
@@ -5222,129 +5478,99 @@ async function loadGmailInbox(opts) {
   GMAIL_SYNC_IN_FLIGHT = true;
   var statusEl = document.getElementById("gmail-inbox-status");
   try {
-    // Incremental sync: anything already stored is never re-fetched.
+    // Incremental details + exact folder membership. Gmail's current query result
+    // is authoritative for every folder; only unseen message bodies are fetched.
     var known = {};
-    GMAIL_EMAILS.forEach(function (em) { if (em.gmail_id) known[em.gmail_id] = true; });
-    GMAIL_NOISE_EMAILS.forEach(function (em) { if (em.gmail_id) known[em.gmail_id] = true; });
+    function remember(em) { if (em && em.gmail_id) known[em.gmail_id] = em; }
+    GMAIL_EMAILS.forEach(remember);
+    GMAIL_NOISE_EMAILS.forEach(remember);
+    Object.keys(GMAIL_FOLDER_EMAILS).forEach(function (key) {
+      (GMAIL_FOLDER_EMAILS[key] || []).forEach(remember);
+    });
 
     if (statusEl) {
       statusEl.hidden = false;
-      statusEl.textContent = (opts.quiet ? "Syncing" : "Loading") + " last 30 days of Gmail…";
+      statusEl.textContent = (opts.quiet ? "Syncing" : "Loading") + " Gmail folders (last 30 days)…";
     }
-    setTopStatus("info", (opts.quiet ? "Syncing" : "Loading") + " Gmail (30 days)");
+    setTopStatus("info", (opts.quiet ? "Syncing" : "Loading") + " Gmail folders");
 
-    var triageQ =
-      "in:inbox " + GMAIL_LOOKBACK_QUERY +
-      " -category:promotions -category:social -in:spam";
-    var triageRefs = await listGmailMessageRefs(triageQ, GMAIL_INBOX_MAX);
+    var labelData = await gmailApi("/labels?maxResults=250");
+    GMAIL_LABELS = Array.isArray(labelData.labels) ? labelData.labels : [];
 
-    var noiseQueryParts = [
-      "in:inbox " + GMAIL_LOOKBACK_QUERY + " category:promotions",
-      "in:inbox " + GMAIL_LOOKBACK_QUERY + " category:social",
-      "in:spam " + GMAIL_LOOKBACK_QUERY
-    ];
-    var noiseRefMap = {};
-    for (var qi = 0; qi < noiseQueryParts.length; qi++) {
-      if (statusEl) {
-        statusEl.textContent = "Listing spam/ads sources… (" + (qi + 1) + "/" + noiseQueryParts.length + ")";
+    var syncSpecs = [{
+      key: "inbox",
+      title: "Inbox",
+      queries: ["in:inbox " + GMAIL_LOOKBACK_QUERY],
+      max: GMAIL_INBOX_MAX
+    }].concat(Object.keys(GMAIL_FOLDER_SPECS).map(function (key) {
+      return Object.assign({ key: key }, GMAIL_FOLDER_SPECS[key]);
+    }));
+
+    var folderRefs = {};
+    for (var si = 0; si < syncSpecs.length; si++) {
+      var spec = syncSpecs[si];
+      if (spec.labelsOnly) {
+        folderRefs[spec.key] = [];
+        continue;
       }
-      var partRefs = await listGmailMessageRefs(noiseQueryParts[qi], GMAIL_NOISE_MAX);
-      partRefs.forEach(function (r) {
-        if (r && r.id) noiseRefMap[r.id] = r;
+      if (statusEl) statusEl.textContent = "Listing Gmail " + spec.title + "…";
+      folderRefs[spec.key] = await listGmailFolderRefs(
+        spec,
+        spec.key === "spamads" ? ["spam", "promo", "social"] : null
+      );
+    }
+
+    var allRefs = {};
+    syncSpecs.forEach(function (spec) {
+      (folderRefs[spec.key] || []).forEach(function (ref) {
+        if (ref && ref.id) allRefs[ref.id] = ref;
       });
-    }
-    var noiseRefs = Object.keys(noiseRefMap).map(function (id) { return noiseRefMap[id]; });
+    });
+    var newRefs = Object.keys(allRefs).filter(function (id) { return !known[id]; })
+      .map(function (id) { return allRefs[id]; });
+    var skipped = Object.keys(allRefs).length - newRefs.length;
 
-    var newTriageRefs = triageRefs.filter(function (r) { return r && r.id && !known[r.id]; });
-    var newNoiseRefs = noiseRefs.filter(function (r) { return r && r.id && !known[r.id]; });
-    var skipped = (triageRefs.length + noiseRefs.length) - (newTriageRefs.length + newNoiseRefs.length);
-
-    if (!newTriageRefs.length && !newNoiseRefs.length) {
-      GMAIL_LOADED_AT = new Date().toISOString();
-      if (!triageRefs.length && !noiseRefs.length && !GMAIL_EMAILS.length && !GMAIL_NOISE_EMAILS.length) {
-        if (statusEl) statusEl.textContent = "No inbox / spam mail in the last 30 days.";
-        setTopStatus("warn", "Gmail empty");
-      } else {
-        if (statusEl) statusEl.textContent = "Up to date — no new mail. " + (GMAIL_EMAILS.length + GMAIL_NOISE_EMAILS.length) + " emails stay stored in this browser.";
-        setTopStatus("ok", "Gmail up to date · " + GMAIL_EMAILS.length + " triage");
-      }
-      render();
-      renderNoiseList();
-      scheduleInboxSave();
-      return;
+    if (newRefs.length) {
+      var fetched = await fetchGmailEmailsFromRefs(newRefs, statusEl, "Fetching new Gmail messages");
+      fetched.forEach(remember);
     }
 
-    var triageEmails = await fetchGmailEmailsFromRefs(newTriageRefs, statusEl, "Fetching new triage");
-    var noiseEmails = await fetchGmailEmailsFromRefs(newNoiseRefs, statusEl, "Fetching new spam/ads");
+    // Rebuild every folder from Gmail's current refs. This also removes messages
+    // that were moved/deleted/unstarred in Gmail without dropping cached details.
+    syncSpecs.forEach(function (spec) {
+      GMAIL_FOLDER_EMAILS[spec.key] = (folderRefs[spec.key] || []).map(function (ref) {
+        var em = known[ref.id];
+        if (!em) return null;
+        if (spec.key === "spamads") {
+          em.noise_kind = ref.__gmailNoiseKind ||
+            exactGmailNoiseKind(em.gmail_label_ids, "spam");
+        }
+        return em;
+      }).filter(Boolean);
+    });
 
-    var clean = [];
-    var moved = [];
-    triageEmails.forEach(function (em) {
-      if (isJobOpportunityEmail(em)) {
-        clean.push(em); // job opportunities always stay in Triage
-        return;
-      }
-      var kind = em.noise_kind || classifyNoiseKind({
-        subject: em.subject,
-        body: em.body,
-        from: em.gmail_from,
-        labelIds: em.gmail_label_ids
-      });
-      if (kind) {
-        em.noise_kind = kind;
-        moved.push(em);
-      } else {
-        clean.push(em);
-      }
+    // The agent inbox excludes only Gmail's own Promotions/Social/Spam labels.
+    // No local subject/body heuristic may move mail out of the Gmail inbox.
+    GMAIL_EMAILS = gmailFolderEmails("inbox").filter(function (em) {
+      var labels = em.gmail_label_ids || [];
+      return labels.indexOf("SPAM") === -1 &&
+        labels.indexOf("CATEGORY_PROMOTIONS") === -1 &&
+        labels.indexOf("CATEGORY_SOCIAL") === -1;
     });
-    var rescued = [];
-    noiseEmails.forEach(function (em) {
-      if (isJobOpportunityEmail(em)) {
-        em.noise_kind = "";
-        rescued.push(em); // rescue misfiled job mail from Spam & ads
-        return;
-      }
-      if (!em.noise_kind) {
-        em.noise_kind = classifyNoiseKind({
-          subject: em.subject,
-          body: em.body,
-          from: em.gmail_from,
-          labelIds: em.gmail_label_ids
-        }) || "promo";
-      }
-    });
-    clean = clean.concat(rescued);
-
-    // Merge new into stored (dedupe by gmail_id) — stored mail is never dropped.
-    var triageMap = {};
-    GMAIL_EMAILS.forEach(function (em) { if (em.gmail_id) triageMap[em.gmail_id] = em; });
-    clean.forEach(function (em) { if (em.gmail_id) triageMap[em.gmail_id] = em; });
-    var noiseMap = {};
-    noiseEmails.concat(moved).forEach(function (em) {
-      if (em.noise_kind && em.gmail_id) noiseMap[em.gmail_id] = em;
-    });
-    GMAIL_NOISE_EMAILS.forEach(function (em) {
-      if (em.gmail_id && !noiseMap[em.gmail_id]) noiseMap[em.gmail_id] = em;
-    });
-    GMAIL_EMAILS = Object.keys(triageMap).map(function (k) { return triageMap[k]; });
-    GMAIL_NOISE_EMAILS = Object.keys(noiseMap).map(function (k) { return noiseMap[k]; });
+    GMAIL_NOISE_EMAILS = gmailFolderEmails("spamads");
     GMAIL_LOADED_AT = new Date().toISOString();
 
-    var fetchedNew = triageEmails.length + noiseEmails.length;
     if (statusEl) {
       statusEl.textContent =
-        "Synced +" + fetchedNew + " new · " + skipped + " already stored (skipped). Now " +
-        GMAIL_EMAILS.length + " triage · " + GMAIL_NOISE_EMAILS.length +
-        " spam/ads (last 30 days). Triage sends bodies to DeepSeek/OpenAI.";
+        "Gmail folders synced +" + newRefs.length + " new · " + skipped + " cached. Inbox " +
+        gmailFolderEmails("inbox").length + " · Spam & ads " + gmailFolderEmails("spamads").length +
+        " · Starred " + gmailFolderEmails("starred").length + " · Sent " + gmailFolderEmails("sent").length + ".";
     }
-    setTopStatus("ok", "Gmail +" + fetchedNew + " new · " + GMAIL_EMAILS.length + " triage · " + GMAIL_NOISE_EMAILS.length + " noise");
-    if (rescued.length) {
-      logSmartAction("rescue", "从 Spam & ads 救回 " + rescued.length + " 封求职相关邮件到收件箱");
-      showSmartToast("已从 Spam & ads 救回 " + rescued.length + " 封求职相关邮件");
-    }
+    setTopStatus("ok", "Gmail folders synced · Inbox " + gmailFolderEmails("inbox").length + " · Spam & ads " + gmailFolderEmails("spamads").length);
     handleNewEmailsAfterLoad();
     render();
-    renderNoiseList();
+    updateGmailNavCounts();
+    if (GMAIL_CURRENT_FOLDER) renderGmailFolderView();
     scheduleInboxSave();
     syncInboxSourceUi();
   } finally {
@@ -5359,7 +5585,10 @@ function maybeAutoSyncGmail(force) {
   if (INBOX_SOURCE !== "gmail") return false;
   if (GMAIL_SYNC_IN_FLIGHT) return false;
   if (!force && GMAIL_LOADED_AT && (Date.now() - new Date(GMAIL_LOADED_AT).getTime()) < 5 * 60 * 1000) return false;
-  loadGmailInbox({ quiet: true });
+  loadGmailInbox({ quiet: true }).catch(function (err) {
+    console.warn("Gmail auto-sync failed:", err);
+    setTopStatus("danger", "Gmail sync failed — " + String(err && err.message ? err.message : err));
+  });
   return true;
 }
 
@@ -5417,6 +5646,7 @@ function syncInboxSourceUi() {
   }
   if (statusEl) statusEl.hidden = INBOX_SOURCE !== "gmail";
   if (chipsFold) chipsFold.hidden = INBOX_SOURCE === "gmail";
+  updateGmailNavCounts();
   renderSmartFilterControl();
 }
 
@@ -5449,30 +5679,30 @@ function initInboxSourceControls() {
   var sel = document.getElementById("inbox-source");
   var refreshBtn = document.getElementById("gmail-refresh-btn");
   var exportBtn = document.getElementById("gmail-export-btn");
-  var triageBtn = document.getElementById("inbox-view-triage");
-  var noiseBtn = document.getElementById("inbox-view-noise");
-  var delAll = document.getElementById("noise-delete-all-btn");
-  var noiseRefresh = document.getElementById("noise-refresh-btn");
-  if (triageBtn) {
-    triageBtn.addEventListener("click", function () {
-      INBOX_LIST_VIEW = "triage";
-      syncInboxListViewUi();
+  var folderRefresh = document.getElementById("gmail-folder-refresh-btn");
+  var folderDelete = document.getElementById("gmail-folder-delete-all-btn");
+  if (folderRefresh) {
+    folderRefresh.addEventListener("click", async function () {
+      try {
+        folderRefresh.disabled = true;
+        await loadGmailInbox();
+      } catch (err) {
+        alert(String(err.message || err));
+        setTopStatus("danger", "Gmail folder sync failed");
+      } finally {
+        folderRefresh.disabled = false;
+      }
     });
   }
-  if (noiseBtn) {
-    noiseBtn.addEventListener("click", function () {
-      INBOX_LIST_VIEW = "noise";
-      renderNoiseList();
-      syncInboxListViewUi();
-    });
-  }
-  if (delAll) delAll.addEventListener("click", function () { deleteAllNoiseEmails(); });
+  if (folderDelete) folderDelete.addEventListener("click", function () { deleteAllNoiseEmails(); });
   if (exportBtn) {
     exportBtn.addEventListener("click", function () {
       var payload = {
         exported_at: new Date().toISOString(),
         triage: GMAIL_EMAILS,
-        noise: GMAIL_NOISE_EMAILS
+        noise: GMAIL_NOISE_EMAILS,
+        folders: GMAIL_FOLDER_EMAILS,
+        labels: GMAIL_LABELS
       };
       var blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
       var dump = document.getElementById("gmail-export-dump");
@@ -5490,24 +5720,6 @@ function initInboxSourceControls() {
       a.click();
       a.remove();
       setTimeout(function () { URL.revokeObjectURL(a.href); }, 5000);
-    });
-  }
-  if (noiseRefresh) {
-    noiseRefresh.addEventListener("click", async function () {
-      if (INBOX_SOURCE === "gmail") {
-        try {
-          noiseRefresh.disabled = true;
-          await loadGmailInbox();
-          INBOX_LIST_VIEW = "noise";
-          syncInboxListViewUi();
-        } catch (err) {
-          alert(String(err.message || err));
-        } finally {
-          noiseRefresh.disabled = false;
-        }
-      } else {
-        renderNoiseList();
-      }
     });
   }
   if (sel) {
@@ -6551,15 +6763,12 @@ async function handleNewEmailsAfterLoad() {
 
 function setSessionOpen(open) {
   var consoleEl = document.getElementById("work-view");
-  var pane = document.getElementById("session-pane");
   var btn = document.getElementById("session-toggle");
   var label = document.getElementById("session-toggle-label");
   if (!consoleEl) return;
-  consoleEl.classList.toggle("session-open", !!open);
-  if (pane) {
-    if (open) pane.removeAttribute("hidden");
-    else pane.setAttribute("hidden", "");
-  }
+  // Suggested tasks is now a full Agent page rather than a third inbox column.
+  if (open) setMainView("tasks");
+  else consoleEl.classList.remove("session-open");
   if (btn) {
     btn.setAttribute("aria-expanded", open ? "true" : "false");
     btn.title = open ? "Hide session" : "Show session";
@@ -6581,9 +6790,8 @@ function initSessionToggle() {
       paintWelcome();
     });
   }
-  // Figma 3:1860 shows the Agent assistant panel as part of the workspace —
-  // open it by default on wide screens, collapse on narrow ones.
-  setSessionOpen(window.matchMedia("(min-width: 1280px)").matches);
+  // The inbox remains a full-width Gmail table; Agent pages open independently.
+  setSessionOpen(false);
   setWorkLayout("list");
 }
 
@@ -7905,6 +8113,8 @@ function initJobBoardControls() {
 function setMainView(name) {
   var work = document.getElementById("work-view");
   var evals = document.getElementById("evals-view");
+  var agentTasks = document.getElementById("agent-tasks-view");
+  var gmailFolder = document.getElementById("gmail-folder-view");
   var traces = document.getElementById("traces-view");
   var matrix = document.getElementById("matrix-view");
   var rules = document.getElementById("rules-view");
@@ -7916,9 +8126,12 @@ function setMainView(name) {
   var tabMatrix = document.getElementById("tab-matrix");
   var tabRules = document.getElementById("tab-rules");
   var tabJobs = document.getElementById("tab-jobs");
+  var navTasks = document.getElementById("nav-tasks-btn");
   var navSettings = document.getElementById("nav-settings-btn");
   if (work) work.classList.toggle("hidden", name !== "work");
   if (evals) evals.classList.toggle("visible", name === "evals");
+  if (agentTasks) agentTasks.classList.toggle("visible", name === "tasks");
+  if (gmailFolder) gmailFolder.classList.toggle("visible", name === "folder");
   if (traces) traces.classList.toggle("visible", name === "traces");
   if (matrix) matrix.classList.toggle("visible", name === "matrix");
   if (rules) rules.classList.toggle("visible", name === "rules");
@@ -7930,13 +8143,26 @@ function setMainView(name) {
   if (tabMatrix) tabMatrix.classList.toggle("active", name === "matrix");
   if (tabRules) tabRules.classList.toggle("active", name === "rules");
   if (tabJobs) tabJobs.classList.toggle("active", name === "jobs");
+  if (navTasks) navTasks.classList.toggle("active", name === "tasks");
   if (navSettings) navSettings.classList.toggle("active", name === "settings");
+  Array.prototype.forEach.call(document.querySelectorAll("[data-gmail-folder]"), function (el) {
+    el.classList.toggle("active", name === "folder" && el.getAttribute("data-gmail-folder") === GMAIL_CURRENT_FOLDER);
+  });
   var banner = document.getElementById("first-run-banner");
   if (banner) banner.style.display = name === "work" ? "" : "none";
   if (name === "traces") renderTracesView();
+  if (name === "tasks") renderAgentPanel();
+  if (name === "folder") renderGmailFolderView();
   if (name === "matrix") syncMatrixFromWorkRuns({ quiet: true });
   if (name === "rules") renderRuleStudio();
   if (name === "jobs") renderJobBoardCandidates();
+}
+
+function setGmailFolder(folderKey) {
+  if (!GMAIL_FOLDER_SPECS[folderKey]) return;
+  GMAIL_CURRENT_FOLDER = folderKey;
+  setMainView("folder");
+  if (getGoogleAccessToken() && INBOX_SOURCE === "gmail") maybeAutoSyncGmail(false);
 }
 
 function initViewTabs() {
@@ -11999,16 +12225,21 @@ function saveInboxSnapshot() {
   var keep = {};
   EMAILS.forEach(function (em) { keep[em.email_id] = true; });
   GMAIL_EMAILS.forEach(function (em) { keep[em.email_id] = true; });
+  Object.keys(GMAIL_FOLDER_EMAILS).forEach(function (key) {
+    (GMAIL_FOLDER_EMAILS[key] || []).forEach(function (em) { keep[em.email_id] = true; });
+  });
   Object.keys(VIEW_STATE_CACHE).forEach(function (id) {
     if (!keep[id]) delete VIEW_STATE_CACHE[id];
   });
   inboxDbPut(INBOX_SNAPSHOT_KEY, {
-    version: 1,
+    version: 2,
     saved_at: new Date().toISOString(),
     inbox_source: INBOX_SOURCE,
     gmail_loaded_at: GMAIL_LOADED_AT,
     gmail_emails: GMAIL_EMAILS,
     gmail_noise_emails: GMAIL_NOISE_EMAILS,
+    gmail_folder_emails: GMAIL_FOLDER_EMAILS,
+    gmail_labels: GMAIL_LABELS,
     gmail_senders: GMAIL_SENDERS,
     demo_noise_deleted: DEMO_NOISE_DELETED,
     view_state: VIEW_STATE_CACHE,
@@ -12019,7 +12250,7 @@ function saveInboxSnapshot() {
 
 async function restoreInboxSnapshot() {
   var snap = await inboxDbGet(INBOX_SNAPSHOT_KEY);
-  if (!snap || snap.version !== 1) {
+  if (!snap || (snap.version !== 1 && snap.version !== 2)) {
     INBOX_RESTORED = true;
     scheduleInboxSave();
     return;
@@ -12027,16 +12258,34 @@ async function restoreInboxSnapshot() {
   VIEW_STATE_CACHE = snap.view_state || {};
   if (Array.isArray(snap.gmail_emails)) GMAIL_EMAILS = snap.gmail_emails;
   if (Array.isArray(snap.gmail_noise_emails)) GMAIL_NOISE_EMAILS = snap.gmail_noise_emails;
-  // Rescue job opportunities that an older snapshot left in Spam & ads.
-  if (GMAIL_NOISE_EMAILS.length) {
-    var rescuedNoise = GMAIL_NOISE_EMAILS.filter(isJobOpportunityEmail);
-    if (rescuedNoise.length) {
-      rescuedNoise.forEach(function (em) { em.noise_kind = ""; });
-      GMAIL_EMAILS = GMAIL_EMAILS.concat(rescuedNoise);
-      var rescuedIds = {};
-      rescuedNoise.forEach(function (em) { rescuedIds[em.gmail_id] = true; });
-      GMAIL_NOISE_EMAILS = GMAIL_NOISE_EMAILS.filter(function (em) { return !rescuedIds[em.gmail_id]; });
-    }
+  if (snap.gmail_folder_emails && typeof snap.gmail_folder_emails === "object") {
+    GMAIL_FOLDER_EMAILS = snap.gmail_folder_emails;
+  }
+  if (Array.isArray(snap.gmail_labels)) GMAIL_LABELS = snap.gmail_labels;
+
+  // Migrate v1 snapshots. Spam & ads must be based on Gmail labels only;
+  // messages moved there by the old subject/body heuristic return to Inbox.
+  if (snap.version === 1) {
+    var exactNoise = [], restoredInbox = [];
+    GMAIL_NOISE_EMAILS.forEach(function (em) {
+      var kind = exactGmailNoiseKind(em.gmail_label_ids);
+      if (kind) {
+        em.noise_kind = kind;
+        exactNoise.push(em);
+      } else {
+        em.noise_kind = "";
+        restoredInbox.push(em);
+      }
+    });
+    GMAIL_NOISE_EMAILS = exactNoise;
+    GMAIL_EMAILS = GMAIL_EMAILS.concat(restoredInbox);
+    var inboxById = {};
+    GMAIL_FOLDER_EMAILS.inbox = GMAIL_EMAILS.concat(exactNoise).filter(function (em) {
+      if (!em.gmail_id || inboxById[em.gmail_id]) return false;
+      inboxById[em.gmail_id] = true;
+      return (em.gmail_label_ids || []).indexOf("INBOX") !== -1;
+    });
+    GMAIL_FOLDER_EMAILS.spamads = exactNoise;
   }
   if (snap.gmail_senders) GMAIL_SENDERS = snap.gmail_senders;
   if (snap.demo_noise_deleted) DEMO_NOISE_DELETED = snap.demo_noise_deleted;
@@ -12051,6 +12300,7 @@ async function restoreInboxSnapshot() {
   render();
   syncInboxListViewUi();
   syncInboxSourceUi();
+  updateGmailNavCounts();
 
   var statusEl = document.getElementById("gmail-inbox-status");
   if (statusEl && INBOX_SOURCE === "gmail" && GMAIL_EMAILS.length) {
@@ -12677,6 +12927,12 @@ function toggleTaskDone(t) {
   }
   renderAgentPanel();
 }
+
+function openTaskEmail(view) {
+  if (!view) return;
+  selectCase(view);
+  setMainView("work");
+}
 function removeCustomTask(id) {
   CUSTOM_TASKS = CUSTOM_TASKS.filter(function (x) { return x.id !== id; });
   saveCustomTasks();
@@ -12722,10 +12978,10 @@ function renderAgentPanel() {
       "<button type='button' class='task-action" + (isTop ? " primary" : "") + "'>" + (t.custom ? "Remove" : (t.actionLabel || "Open email")) + "</button>" +
       "</div>";
     cardEl.querySelector(".task-check").addEventListener("change", function () { toggleTaskDone(t); });
-    cardEl.querySelector(".task-source").addEventListener("click", function () { if (t.view) selectCase(t.view); });
+    cardEl.querySelector(".task-source").addEventListener("click", function () { openTaskEmail(t.view); });
     cardEl.querySelector(".task-action").addEventListener("click", function () {
       if (t.custom) removeCustomTask(t.id);
-      else if (t.view) selectCase(t.view);
+      else openTaskEmail(t.view);
     });
     wrap.appendChild(cardEl);
   });
@@ -12740,7 +12996,7 @@ function renderAgentPanel() {
       if (body) body.textContent = senderNameOf(pick.em) + " · " + pick.em.subject + " — " + (getField(pick.result && pick.result.fields, "Summary") || "the agent flagged this decision; take a look before it proceeds.");
       if (badge) badge.textContent = ((pick.em.smart_cat || (pick.result && getField(pick.result.fields, "Category")) || "Triage")) + " · needs review";
       var link = document.getElementById("decision-review-link");
-      if (link) link.onclick = function () { selectCase(pick); };
+      if (link) link.onclick = function () { openTaskEmail(pick); };
     } else {
       reviewCard.hidden = true;
     }
@@ -13102,6 +13358,8 @@ renderEvalsTable();
   else if (hash === "jobs" || hash === "job-board" || hash === "jobboard") setMainView("jobs");
   else if (hash === "rules" || hash === "rule-builder") setMainView("rules");
   else if (hash === "settings") setMainView("settings");
+  else if (hash === "tasks" || hash === "suggested-tasks") setMainView("tasks");
+  else if (GMAIL_FOLDER_SPECS[hash]) setGmailFolder(hash);
   else setMainView("work");
 })();
 
@@ -13134,20 +13392,16 @@ renderEvalsTable();
       }
     });
   }
-  // Spam & ads list lives inside the Work view.
-  var noiseBtn = document.getElementById("inbox-view-noise");
-  if (noiseBtn) noiseBtn.addEventListener("click", function () { setMainView("work"); });
-
-  // Suggested tasks → agent assistant panel.
-  var tasksBtn = document.getElementById("nav-tasks-btn");
-  if (tasksBtn) {
-    tasksBtn.addEventListener("click", function () {
-      setMainView("work");
-      var pane = document.getElementById("session-pane");
-      setSessionOpen(!(pane && !pane.hidden));
-      if (pane && !pane.hidden) pane.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  // Gmail folders are independent pages backed by exact Gmail query results.
+  Array.prototype.forEach.call(document.querySelectorAll("[data-gmail-folder]"), function (el) {
+    el.addEventListener("click", function () {
+      setGmailFolder(el.getAttribute("data-gmail-folder"));
     });
-  }
+  });
+
+  // Suggested tasks → independent Agent page.
+  var tasksBtn = document.getElementById("nav-tasks-btn");
+  if (tasksBtn) tasksBtn.addEventListener("click", function () { setMainView("tasks"); });
 
   // Settings entry points.
   ["nav-settings-btn", "search-settings-btn", "hero-settings-btn"].forEach(function (id) {
@@ -13156,13 +13410,6 @@ renderEvalsTable();
   });
   var settingsBack = document.getElementById("settings-back-btn");
   if (settingsBack) settingsBack.addEventListener("click", function () { setMainView("work"); });
-
-  // Design-reference folders (Starred / Snoozed / …) stay visual only.
-  Array.prototype.forEach.call(document.querySelectorAll(".nav-demo"), function (el) {
-    el.addEventListener("click", function () {
-      setTopStatus("info", (el.getAttribute("data-demo") || "This folder") + " — design reference only");
-    });
-  });
 
   // Search bar date.
   var dateEl = document.getElementById("search-date");
