@@ -2743,6 +2743,7 @@ button.nav-label-item:hover { color: var(--ink); }
 .icon-btn:hover:not(:disabled) { background: var(--bg-inset); color: var(--ink); }
 .icon-btn:disabled { opacity: .35; cursor: not-allowed; }
 .icon-btn svg { width: 14px; height: 14px; }
+.icon-btn.is-loading svg { animation: spin .8s linear infinite; }
 .inbox-divider { width: 1px; height: 15px; background: var(--line); flex: none; }
 .triage-run-btn {
   height: 26px; padding: 0 10px; border: 0; border-radius: 8px;
@@ -4385,6 +4386,73 @@ function setGoogleAccessToken(token, expiresInSec, grantedScope) {
   else localStorage.removeItem(GOOGLE_TOKEN_SCOPE_STORAGE);
 }
 
+async function waitForGoogleGisClient() {
+  for (var i = 0; i < 40; i++) {
+    if (window.google && google.accounts && google.accounts.oauth2) return true;
+    await new Promise(function (resolve) { setTimeout(resolve, 250); });
+  }
+  return !!(window.google && google.accounts && google.accounts.oauth2);
+}
+
+function requestGoogleAccessTokenViaGis(clientId) {
+  return new Promise(async function (resolve, reject) {
+    var ready = await waitForGoogleGisClient();
+    if (!ready) {
+      reject(new Error("Google sign-in script is unavailable. Reload the page, then try Refresh Gmail again."));
+      return;
+    }
+    var settled = false;
+    var timer = setTimeout(function () {
+      if (settled) return;
+      settled = true;
+      reject(new Error("Google did not return an access token. Reconnect Google in Triage settings."));
+    }, 45000);
+    try {
+      var client = google.accounts.oauth2.initTokenClient({
+        client_id: clientId,
+        scope: GOOGLE_OAUTH_SCOPES,
+        callback: function (response) {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          if (response && response.access_token) resolve(response);
+          else reject(new Error("Google did not return an access token. Reconnect Google in Triage settings."));
+        },
+        error_callback: function (error) {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          reject(new Error("Google token refresh failed" + (error && error.type ? " (" + error.type + ")" : "") + ". Reconnect Google in Triage settings."));
+        }
+      });
+      client.requestAccessToken({ prompt: "" });
+    } catch (e) {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      reject(e);
+    }
+  });
+}
+
+async function ensureGoogleAccessTokenForGmailRefresh() {
+  if (getGoogleAccessToken()) return true;
+  var clientId = getGoogleClientId();
+  if (!clientId || !isValidGoogleClientId(clientId)) {
+    throw new Error("Google is not connected. Save a Google Client ID and Connect Google in Triage settings.");
+  }
+  setGmailSyncFeedback("Renewing Google access…");
+  var response = await requestGoogleAccessTokenViaGis(clientId);
+  setGoogleAccessToken(
+    response.access_token,
+    Number(response.expires_in) || 3600,
+    response.scope || GOOGLE_OAUTH_SCOPES
+  );
+  refreshGoogleStatus();
+  syncInboxSourceUi();
+  return true;
+}
+
 // "" = unknown (token from before scopes were recorded); otherwise the space-separated granted scopes.
 function getGoogleGrantedScope() {
   return localStorage.getItem(GOOGLE_TOKEN_SCOPE_STORAGE) || "";
@@ -4406,7 +4474,7 @@ function refreshGoogleStatus() {
     st.className = "badge warn";
   }
   var refreshBtn = document.getElementById("gmail-refresh-btn");
-  if (refreshBtn) refreshBtn.disabled = !tok;
+  if (refreshBtn) refreshBtn.disabled = INBOX_SOURCE !== "gmail";
 }
 
 function refreshOriginBanner() {
@@ -4970,10 +5038,12 @@ async function listGmailMessageRefs(query, maxResults) {
 async function fetchGmailEmailsFromRefs(refs, statusEl, labelPrefix) {
   var emails = [];
   for (var i = 0; i < refs.length; i++) {
+    var progressMessage = (labelPrefix || "Loading") + " " + (i + 1) + " / " + refs.length + "…";
     if (statusEl) {
       statusEl.textContent =
-        (labelPrefix || "Loading") + " " + (i + 1) + " / " + refs.length + "…";
+        progressMessage;
     }
+    setGmailSyncFeedback(progressMessage);
     var full = await gmailApi("/messages/" + encodeURIComponent(refs[i].id) + "?format=full");
     emails.push(mapGmailMessageToEmail(full));
   }
@@ -5472,10 +5542,10 @@ async function gmailApi(path, opts) {
 }
 
 var GMAIL_SYNC_IN_FLIGHT = false;
-async function loadGmailInbox(opts) {
+var GMAIL_SYNC_PROMISE = null;
+var GMAIL_MANUAL_REFRESH_ACTIVE = false;
+async function runGmailInboxSync(opts) {
   opts = opts || {};
-  if (GMAIL_SYNC_IN_FLIGHT) return;
-  GMAIL_SYNC_IN_FLIGHT = true;
   var statusEl = document.getElementById("gmail-inbox-status");
   try {
     // Incremental details + exact folder membership. Gmail's current query result
@@ -5492,7 +5562,7 @@ async function loadGmailInbox(opts) {
       statusEl.hidden = false;
       statusEl.textContent = (opts.quiet ? "Syncing" : "Loading") + " Gmail folders (last 30 days)…";
     }
-    setTopStatus("info", (opts.quiet ? "Syncing" : "Loading") + " Gmail folders");
+    setGmailSyncFeedback((opts.quiet ? "Syncing" : "Refreshing") + " Gmail folders…", "info");
 
     var labelData = await gmailApi("/labels?maxResults=250");
     GMAIL_LABELS = Array.isArray(labelData.labels) ? labelData.labels : [];
@@ -5513,7 +5583,7 @@ async function loadGmailInbox(opts) {
         folderRefs[spec.key] = [];
         continue;
       }
-      if (statusEl) statusEl.textContent = "Listing Gmail " + spec.title + "…";
+      setGmailSyncFeedback("Listing Gmail " + spec.title + "…");
       folderRefs[spec.key] = await listGmailFolderRefs(
         spec,
         spec.key === "spamads" ? ["spam", "promo", "social"] : null
@@ -5560,12 +5630,11 @@ async function loadGmailInbox(opts) {
     GMAIL_NOISE_EMAILS = gmailFolderEmails("spamads");
     GMAIL_LOADED_AT = new Date().toISOString();
 
-    if (statusEl) {
-      statusEl.textContent =
-        "Gmail folders synced +" + newRefs.length + " new · " + skipped + " cached. Inbox " +
-        gmailFolderEmails("inbox").length + " · Spam & ads " + gmailFolderEmails("spamads").length +
-        " · Starred " + gmailFolderEmails("starred").length + " · Sent " + gmailFolderEmails("sent").length + ".";
-    }
+    setGmailSyncFeedback(
+      "Gmail refreshed +" + newRefs.length + " new · " + skipped + " cached · " +
+      gmailFolderEmails("inbox").length + " inbox",
+      "ok"
+    );
     setTopStatus("ok", "Gmail folders synced · Inbox " + gmailFolderEmails("inbox").length + " · Spam & ads " + gmailFolderEmails("spamads").length);
     handleNewEmailsAfterLoad();
     render();
@@ -5574,8 +5643,56 @@ async function loadGmailInbox(opts) {
     scheduleInboxSave();
     syncInboxSourceUi();
   } finally {
+    // GMAIL_SYNC_IN_FLIGHT is owned by the loadGmailInbox wrapper.
+  }
+}
+
+async function loadGmailInbox(opts) {
+  opts = opts || {};
+  if (GMAIL_SYNC_IN_FLIGHT) return GMAIL_SYNC_PROMISE;
+  GMAIL_SYNC_IN_FLIGHT = true;
+  GMAIL_SYNC_PROMISE = runGmailInboxSync(opts);
+  try {
+    return await GMAIL_SYNC_PROMISE;
+  } finally {
+    GMAIL_SYNC_PROMISE = null;
     GMAIL_SYNC_IN_FLIGHT = false;
   }
+}
+
+function setGmailSyncFeedback(message, tone) {
+  setTopStatus(tone || "info", message);
+  var runstamp = document.getElementById("triage-runstamp-main");
+  if (runstamp) runstamp.textContent = message;
+  var statusEl = document.getElementById("gmail-inbox-status");
+  if (statusEl) {
+    statusEl.hidden = false;
+    statusEl.textContent = message;
+  }
+}
+
+async function waitForGmailSyncToFinish() {
+  var waited = 0;
+  while (GMAIL_SYNC_IN_FLIGHT && waited < 120000) {
+    try {
+      if (GMAIL_SYNC_PROMISE) await GMAIL_SYNC_PROMISE;
+      else await new Promise(function (resolve) { setTimeout(resolve, 250); });
+    } catch (e) {
+      // The caller will immediately run a fresh sync and surface any new error.
+    }
+    await new Promise(function (resolve) { setTimeout(resolve, 0); });
+    waited += 250;
+  }
+}
+
+async function refreshGmailInboxNow(opts) {
+  opts = opts || {};
+  if (INBOX_SOURCE !== "gmail") throw new Error("Switch the inbox source to Gmail first.");
+  if (GMAIL_SYNC_IN_FLIGHT) {
+    setGmailSyncFeedback("Gmail sync already running — queuing this refresh…");
+    await waitForGmailSyncToFinish();
+  }
+  return await loadGmailInbox(Object.assign({ quiet: false, manual: true }, opts));
 }
 
 // Auto-sync: run quietly once per session when Gmail is connected (or forced
@@ -5631,14 +5748,16 @@ function syncInboxSourceUi() {
   if (sel && sel.value !== INBOX_SOURCE) sel.value = INBOX_SOURCE;
   if (refreshBtn) {
     refreshBtn.hidden = INBOX_SOURCE !== "gmail";
-    var refreshLabel = GMAIL_EMAILS.length ? "Refresh Gmail" : "Load Gmail";
+    var refreshLabel = getGoogleAccessToken()
+      ? (GMAIL_EMAILS.length ? "Refresh Gmail" : "Load Gmail")
+      : "Renew Google and refresh Gmail";
     if (refreshBtn.querySelector("svg")) {
       refreshBtn.title = refreshLabel;
       refreshBtn.setAttribute("aria-label", refreshLabel);
     } else {
       refreshBtn.textContent = refreshLabel;
     }
-    refreshBtn.disabled = !getGoogleAccessToken();
+    refreshBtn.disabled = GMAIL_MANUAL_REFRESH_ACTIVE;
   }
   var exportBtn = document.getElementById("gmail-export-btn");
   if (exportBtn) {
@@ -5675,6 +5794,37 @@ function initReviewerModeControls() {
   }
 }
 
+async function performManualGmailRefresh(button) {
+  var oldLabel = button ? button.textContent : "";
+  try {
+    if (INBOX_SOURCE !== "gmail") throw new Error("Switch the inbox source to Gmail first.");
+    if (button) {
+      button.disabled = true;
+      GMAIL_MANUAL_REFRESH_ACTIVE = true;
+      button.classList.add("is-loading");
+      if (!button.querySelector("svg")) button.textContent = "Refreshing…";
+    }
+    setGmailSyncFeedback("Refreshing Gmail…");
+    await ensureGoogleAccessTokenForGmailRefresh();
+    await refreshGmailInboxNow({ quiet: false });
+    saveInboxSnapshot();
+  } catch (err) {
+    var message = String(err && err.message ? err.message : err);
+    setGmailSyncFeedback("Gmail refresh failed — " + message, "danger");
+    if (/Google is not connected|Google token refresh failed|Google did not return/.test(message)) {
+      setMainView("settings");
+    }
+  } finally {
+    if (button) {
+      button.disabled = false;
+      GMAIL_MANUAL_REFRESH_ACTIVE = false;
+      button.classList.remove("is-loading");
+      if (!button.querySelector("svg")) button.textContent = oldLabel || "Refresh Gmail";
+    }
+    syncInboxSourceUi();
+  }
+}
+
 function initInboxSourceControls() {
   var sel = document.getElementById("inbox-source");
   var refreshBtn = document.getElementById("gmail-refresh-btn");
@@ -5682,17 +5832,7 @@ function initInboxSourceControls() {
   var folderRefresh = document.getElementById("gmail-folder-refresh-btn");
   var folderDelete = document.getElementById("gmail-folder-delete-all-btn");
   if (folderRefresh) {
-    folderRefresh.addEventListener("click", async function () {
-      try {
-        folderRefresh.disabled = true;
-        await loadGmailInbox();
-      } catch (err) {
-        alert(String(err.message || err));
-        setTopStatus("danger", "Gmail folder sync failed");
-      } finally {
-        folderRefresh.disabled = false;
-      }
-    });
+    folderRefresh.addEventListener("click", function () { performManualGmailRefresh(folderRefresh); });
   }
   if (folderDelete) folderDelete.addEventListener("click", function () { deleteAllNoiseEmails(); });
   if (exportBtn) {
@@ -5751,17 +5891,7 @@ function initInboxSourceControls() {
     });
   }
   if (refreshBtn) {
-    refreshBtn.addEventListener("click", async function () {
-      try {
-        refreshBtn.disabled = true;
-        await loadGmailInbox();
-      } catch (err) {
-        alert(String(err.message || err));
-        setTopStatus("danger", "Gmail load failed");
-      } finally {
-        syncInboxSourceUi();
-      }
-    });
+    refreshBtn.addEventListener("click", function () { performManualGmailRefresh(refreshBtn); });
   }
   syncInboxSourceUi();
 }
