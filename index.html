@@ -4294,7 +4294,7 @@ If a proposed date overlaps a calendar item (Confirmed or Tentative):
 OUTPUT - reply using EXACTLY these labeled fields, each on its own line, in this order:
 Priority: [P0 | P1 | P2]
 Domain: [Company | University]
-Category: [e.g., Customer, Supplier, Investor/Board, Partner, Internal/Lab, Travel/Meeting, University-Student, University-Admin, Noise]
+Category: [Use exactly one operator-confirmed category supplied in the context. Never use Aurora demo categories. If none fits, use 待分类 — needs DeepSeek/new-category review.]
 From: [sender name, org, relationship]
 Summary: [1-2 sentences]
 Urgency reason: [why this tier - name the deadline, stakes, or their absence]
@@ -4321,7 +4321,7 @@ ESCALATION - when a trigger fires, state the reason and do NOT prepare calendar/
 
 // Q&A chat (global sticky dock — does not triage and does not send).
 const CHAT_SYSTEM_PROMPT = `ROLE
-You are Ren's inbox Q&A assistant for Aurora Inbox Copilot (fictional Aurora Materials). Ren is CEO + professor. The user can ask about inbox emails and policies from any screen in the prototype.
+You are the current mailbox operator's AI inbox assistant in Aurora Inbox Copilot. For live Gmail, learn categories from the operator's real mail and the human-confirmed category system in context; do not apply the fictional Aurora/Ren demo taxonomy unless the user explicitly selects Demo mode.
 
 REAL CLOCK
 A REAL CLOCK block is prepended at runtime with the operator's actual current date and time. Use that for "today" / "now". Do not use a frozen demo date.
@@ -6186,6 +6186,14 @@ function classifySmartEmail(em) {
   var body = String(em.body || "");
   var isNoreply = /noreply|no-reply|notification|service@|donotreply|automated/.test(from);
 
+  if (/noreply@tm\.openai\.com/.test(from) &&
+      /岗位|职位|招聘|job|position|role|opportunity/i.test(subj + " " + body.slice(0, 1000))) {
+    return {
+      cat: "求职信息流 · ⭐匹配你的偏好",
+      act: "评估岗位匹配度并决定是否投递",
+      hot: true
+    };
+  }
  if (from.indexOf("mail8.lietou-edm.com") >= 0)
    return { cat: "今天行动 · 招聘方触达", act: "今天就回复（回复窗口最长）", hot: true };
   if (/updated invitation|invitation:|calendar.*invite/.test(subj) && !isNoreply)
@@ -6232,6 +6240,8 @@ function isJobOpportunityEmail(em) {
   var subj = String((em && em.subject) || "").toLowerCase();
   if (/lietou-edm\.com|liepin\.com|51job\.com|zhaopin\.com|bosszhipin\.com/.test(from)) return true;
   if (/对您很感兴趣|邀您沟通|招聘|内推/.test(subj)) return true;
+  if (/noreply@tm\.openai\.com/.test(from) &&
+      /岗位|职位|招聘|job|position|role|opportunit/i.test(subj)) return true;
   if (/@linkedin\.com/.test(from)) {
     if (/(is )?hiring|hired near you|\bjobs?\b|next steps|position|vacanc|opportunit/.test(subj)) return true;
   }
@@ -6335,6 +6345,35 @@ var SMART_APPLIED = null;      // { categories:[{name,action}], map:{email_id:ca
 var SMART_FILTER_SELECTED = {};// cat name -> true
 var SMART_PENDING_MODE = "replace"; // "replace" | "merge"
 var SMART_STORAGE_KEY = "aurora_smart_classification_v1";
+var LEGACY_AURORA_CATEGORIES = {
+  "Customer": true,
+  "Supplier": true,
+  "Investor/Board": true,
+  "Partner": true,
+  "Internal/Lab": true,
+  "Travel/Meeting": true,
+  "University-Student": true,
+  "University-Admin": true,
+  "Noise": true,
+  "Other": true
+};
+
+function stripLegacyAuroraClassification(obj) {
+  if (!obj || !Array.isArray(obj.categories)) return obj;
+  obj.categories = obj.categories.filter(function (c) {
+    return c && c.name && !LEGACY_AURORA_CATEGORIES[c.name];
+  });
+  Object.keys(obj.map || {}).forEach(function (id) {
+    if (LEGACY_AURORA_CATEGORIES[obj.map[id]]) {
+      delete obj.map[id];
+      if (obj.urgency) delete obj.urgency[id];
+    }
+  });
+  Object.keys(obj.selected || {}).forEach(function (name) {
+    if (LEGACY_AURORA_CATEGORIES[name]) delete obj.selected[name];
+  });
+  return obj;
+}
 
 function saveSmartClassification() {
   if (!SMART_APPLIED) return;
@@ -6353,7 +6392,8 @@ function restoreSmartClassification() {
   try {
     var raw = localStorage.getItem(SMART_STORAGE_KEY);
     if (!raw) return;
-    var obj = JSON.parse(raw);
+    var obj = stripLegacyAuroraClassification(JSON.parse(raw));
+    if (!obj.categories.length) return;
     if (!obj || !Array.isArray(obj.categories) || !obj.emails && !obj.map) return;
     SMART_APPLIED = { categories: obj.categories, map: obj.map || obj.emails, urgency: obj.urgency || {} };
     SMART_FILTER_SELECTED = obj.selected || {};
@@ -6379,7 +6419,7 @@ function buildClassifyPrompt() {
     var body = String(em.body || "").replace(/\s+/g, " ").trim().slice(0, 160);
     return em.email_id + " | " + from + " | " + em.subject + " | " + body;
   }).join("\n");
-  return "[[CLASSIFY_INBOX]]\n请把下面这批真实邮件按内容分类（不要使用 Aurora demo 的公司/大学规则）。要求：\n" +
+  return "[[CLASSIFY_INBOX]]\n请把下面这批真实邮件按内容分类。数据来源是当前用户 Gmail 近一个月的邮件（不要使用 Aurora demo 的公司/大学规则，也不要使用任何固定 mock category）。要求：\n" +
     "1. 分成 5-10 个对用户有行动意义的类别（例如：需今天回复的招聘触达、真人会议需确认、安全警报、投递管线、账单、值得读的行业内容、求职信息流、可退订噪音等，按实际内容定）；\n" +
     "2. 每个类别给一句行动建议；\n" +
     "3. 每封邮件归入且只归入一个类别；正文里提到具体邮件时必须带上它的 email_id（如 GM-xxx），界面会把它渲染成可点击的邮件链接；\n" +
@@ -6472,7 +6512,7 @@ function renderSmartFilterControl() {
   if (!SMART_APPLIED) {
     // New user: classification not built yet — chip shows 0.
     if (cnt) cnt.textContent = "0";
-    pop.innerHTML = '<p class="muted" style="margin:var(--sp-2);">尚无分类。点击「分类」即会自动打开助手，读取近 14 天邮件并生成分类建议；确认后这里会展示选项。</p>';
+    pop.innerHTML = '<p class="muted" style="margin:var(--sp-2);">尚无分类。点击「分类」即会自动打开助手，读取近一个月邮件并生成分类建议；确认后这里会展示选项。</p>';
     return;
   }
   // counts
@@ -6534,7 +6574,7 @@ function smartFilterActive() {
 var SMART_FLOW = { step: null, error: null }; // null | connect | load | analyze | confirm | error
 var SMART_FLOW_STEPS = [
   { id: "connect", label: "连接 Gmail（OAuth 授权）" },
-  { id: "load",    label: "读取近 14 天邮件" },
+  { id: "load",    label: "读取近一个月邮件" },
   { id: "analyze", label: "AI 分析与分类中" },
   { id: "confirm", label: "确认分类方案" }
 ];
@@ -6744,7 +6784,7 @@ function showSmartToast(msg) {
 }
 
 // First click on the 分类 chip (no classification yet): auto-run the whole flow —
-// open the chat drawer, load the last 14 days of mail, and start AI classification.
+// open the chat drawer, load the last month of mail, and start AI classification.
 var SMART_AUTO_RUNNING = false;
 async function startFirstTimeClassification() {
   if (SMART_AUTO_RUNNING) return;
@@ -6759,7 +6799,7 @@ async function startFirstTimeClassification() {
     }
     if (!getGoogleAccessToken()) {
       GLOBAL_CHAT.messages = GLOBAL_CHAT.messages.filter(function (m) {
-        return !(m.role === "assistant" && /正在读取近 14 天/.test(m.content || ""));
+        return !(m.role === "assistant" && /正在读取近一个月/.test(m.content || ""));
       });
       GLOBAL_CHAT.messages.push({
         role: "error",
@@ -6883,6 +6923,7 @@ function buildClassifyNewPrompt(unknown) {
     "4. 提到邮件必须带 email_id（界面会渲染成可点击链接）；\n" +
     "5. 最后输出 ```classify 代码块，严格 JSON（只包含下面这些新邮件的归类，新类别也要出现在 categories 里）：\n" +
     '```classify\n{"categories":[{"name":"类别名","action":"行动建议"}],"emails":{"<email_id>":"类别名"},"urgency":{"<email_id>":"P0|P1|P2|P3"}}\n```\n\n' +
+    "人工确认后，已有类别和新建类别都会合并回 Jev 的 known_categories 列表。\n\n" +
     "新邮件清单（email_id | 发件人 | 主题 | 正文摘要）：\n" + digest;
 }
 
@@ -6890,10 +6931,9 @@ function buildClassifyNewPrompt(unknown) {
 // { ok, category, urgency, confidence, noneOfTheAbove } or { ok:false }.
 async function classifyEmailWithJev(em) {
   if (!getJevKey()) return { ok: false, noKey: true };
-  var cats = SMART_APPLIED.categories;
-  var criteria = {};
-  cats.forEach(function (c) { criteria[c.name] = c.action || c.name; });
-  criteria["__none__"] = "None of the listed categories fits this email; it likely needs a new category.";
+  var cats = confirmedJevCategories();
+  if (!cats.length) return { ok: false, noCategories: true };
+  var criteria = buildJevCategoryCriteria();
   var urgencyCriteria = {
     P0: "Must be acted on today: a real deadline within ~48h with real consequence, a meeting to confirm, a security alert to verify, or a recruiter/sender waiting on a reply.",
     P1: "Important this week: application pipeline updates, developer tasks with deadlines, billing to verify, job matches worth opening.",
@@ -6909,12 +6949,14 @@ async function classifyEmailWithJev(em) {
       subject: em.subject || "",
       body: String(em.body || "").slice(0, 3000)
     },
-    known_categories: cats.map(function (c) { return { name: c.name, action: c.action || "" }; })
+    known_categories: cats.map(function (c) {
+      return { name: c.name, action: c.action || "", confirmed_by_user: true };
+    })
   };
   var questions = {
     category: {
       type: "choice",
-      instructions: "Which `known_categories` entry does `email` belong to by content? Choose __none__ only if no listed category truly fits.",
+      instructions: "Which user-confirmed `known_categories` entry does `email` belong to by content? Never invent a category and never use the old Aurora demo taxonomy. Automated job/task updates with actionable role matches must not be forced into a noise/notification category; if no confirmed category fits, choose __none__.",
       criteria: criteria
     },
     urgency: {
@@ -10070,7 +10112,7 @@ function buildUserMessage(em) {
     : "RULE SOURCE: Aurora demo policies for Ren.\n\n";
 
   var gmailNote = isGmailEmail(em)
-    ? "MAIL SOURCE: live Gmail message (real mailbox, last-14-days sync window). Apply the same triage policies. " +
+    ? "MAIL SOURCE: live Gmail message (real mailbox, last-month sync window). " +
       "Do not invent Aurora record IDs that are not in context. " +
       "Score urgency using REAL CLOCK below and this message's received_at / body deadlines.\n\n"
     : "MAIL SOURCE: demo synthetic inbox (story emails may use May 2026 dates). " +
@@ -10080,6 +10122,12 @@ function buildUserMessage(em) {
     "Triage the following email according to your instructions. Use ONLY the context below.\n\n" +
     liveNote +
     gmailNote +
+    (
+      confirmedJevCategories().length
+        ? "OPERATOR-CONFIRMED CATEGORIES (the only allowed Category values; if none fits use 待分类 — needs DeepSeek/new-category review):\n" +
+          JSON.stringify(confirmedJevCategories(), null, 2) + "\n\n"
+        : "OPERATOR-CONFIRMED CATEGORIES: none yet. Category must be 待分类 — needs DeepSeek/new-category review; do not use Aurora demo categories.\n\n"
+    ) +
     realClockPromptBlock() + "\n" +
     "EMAIL TO TRIAGE:\n" +
     "email_id: " + em.email_id + "\n" +
@@ -10119,6 +10167,9 @@ function buildChatContextBlock(focusEmailId) {
 
   var parts = [
     realClockPromptBlock().trim(),
+    "",
+    "OPERATOR-CONFIRMED CATEGORY SYSTEM:",
+    JSON.stringify(confirmedJevCategories(), null, 2),
     "",
     "INBOX INDEX (currently loaded source):",
     JSON.stringify(inboxIndex, null, 2)
@@ -11244,6 +11295,21 @@ function clipForJev(text) {
   return t.length > JEV_STATE_BODY_MAX ? t.slice(0, JEV_STATE_BODY_MAX) + " …[truncated]" : t;
 }
 
+function confirmedJevCategories() {
+  return (SMART_APPLIED && Array.isArray(SMART_APPLIED.categories))
+    ? SMART_APPLIED.categories.filter(function (c) { return c && c.name; })
+    : [];
+}
+
+function buildJevCategoryCriteria() {
+  var criteria = {};
+  confirmedJevCategories().forEach(function (cat) {
+    criteria[cat.name] = cat.action || ("Mail that belongs to the operator-confirmed category " + cat.name + ".");
+  });
+  criteria["__none__"] = "None of the operator-confirmed categories fits. Choose this when the email needs DeepSeek classification or a new category.";
+  return criteria;
+}
+
 function buildJevState(em) {
   var policies = getActivePolicies();
   var s = senderById(em.sender_id) || {};
@@ -11261,7 +11327,7 @@ function buildJevState(em) {
     real_clock: realClockPromptBlock().trim(),
     operator: customRulesAreLive()
       ? "Operator-approved custom rule pack is active; follow `policies` over any default wording."
-      : "Ren — founder-CEO of Aurora Materials (fictional) and university professor.",
+      : "The current mailbox operator. Category names were learned from this operator's real Gmail, not from the Aurora demo taxonomy.",
     email: {
       email_id: em.email_id,
       received_at: em.received_at,
@@ -11274,7 +11340,10 @@ function buildJevState(em) {
     policies: {
       priority_rules: policies["priority_rules.md"] || "",
       escalation_rules: policies["escalation_rules.md"] || ""
-    }
+    },
+    confirmed_categories: confirmedJevCategories().map(function (c) {
+      return { name: c.name, action: c.action || "", confirmed_by_user: true };
+    })
   };
 }
 
@@ -11316,30 +11385,11 @@ function buildJevQuestions() {
         academic_sensitive: "A student matter touching grades, misconduct, disputes, or recommendation letters."
       }
     },
-    domain: {
+    category: confirmedJevCategories().length ? {
       type: "choice",
-      instructions: "Which side of the operator's work does `email` belong to?",
-      criteria: {
-        Company: "The company business: customers, suppliers, investors, partners, internal team, travel for the company, or vendor/noise mail.",
-        University: "The university role: students, academic administration, research collaboration, teaching."
-      }
-    },
-    category: {
-      type: "choice",
-      instructions: "Which category best describes `email`?",
-      criteria: {
-        "Customer": "A customer or prospective customer of the company.",
-        "Supplier": "A supplier, vendor, or logistics provider the company buys from.",
-        "Investor/Board": "An investor or board member.",
-        "Partner": "A business or research partner (not a customer or supplier).",
-        "Internal/Lab": "An employee, the internal team, or lab operations.",
-        "Travel/Meeting": "Travel bookings, meeting logistics, or event invitations.",
-        "University-Student": "A student writing about their studies or supervision.",
-        "University-Admin": "University administration, committees, or academic services.",
-        "Noise": "Newsletters, promotions, cold sales, or automated notifications.",
-        "Other": "None of the above fits."
-      }
-    }
+      instructions: "Which operator-confirmed category in `confirmed_categories` best describes `email`? Never invent a category and never use the old Aurora demo taxonomy. Choose __none__ when no confirmed category fits — for example, a high-value automated job/task update that belongs in a job category.",
+      criteria: buildJevCategoryCriteria()
+    } : undefined
   };
 }
 
@@ -11440,6 +11490,7 @@ async function callJev(em, opts) {
   var replyProb = Number(a.needs_reply.noul || 0);
   var trigger = a.escalation.choice || "none";
   var refuse = JEV_REFUSE_TRIGGERS.indexOf(trigger) !== -1;
+  var rawCategory = (a.category && a.category.choice) || "";
   var result = {
     ok: true,
     text: JSON.stringify(data.answers, null, 2),
@@ -11453,8 +11504,9 @@ async function callJev(em, opts) {
     triggerProb: a.escalation.probabilities ? a.escalation.probabilities[trigger] : null,
     refuse: refuse,
     handOff: replyProb >= JEV_REPLY_THRESHOLD && !refuse,
-    domain: (a.domain && a.domain.choice) || "",
-    category: (a.category && a.category.choice) || ""
+    domain: "Current mailbox",
+    category: rawCategory === "__none__" ? "待分类" : (rawCategory || (em.smart_cat || "待分类")),
+    needsNewCategory: rawCategory === "__none__"
   };
   traceMeta.model = result.model;
   recordApiTrace(traceMeta, result);
@@ -11489,14 +11541,16 @@ function buildJevOnlyText(em, jev) {
     : triggerLabel + " (Jev, " + Math.round(Number(jev.triggerProb || 0) * 100) + "%)";
   return [
     "Priority: " + jev.priority,
-    "Domain: " + (jev.domain || "Company"),
-    "Category: " + (jev.category || "Other"),
+    "Domain: Current mailbox",
+    "Category: " + (jev.needsNewCategory ? "待分类 — needs DeepSeek category review" : (jev.category || em.smart_cat || "待分类")),
     "From: " + [s.name, s.org].filter(Boolean).join(", "),
     "Summary: Subject \"" + (em.subject || "") + "\" — triaged by Jev; no reply drafted.",
     "Urgency reason: Jev priority " + jev.priority + " (" + formatJevProbs(jev.priorityProbs) + ").",
     "Recommended route: " + (jev.refuse
-      ? "Ren — escalated by Jev, handle personally"
-      : "Ren — no reply expected; dismiss or archive after review"),
+      ? "Operator — escalated by Jev, handle personally"
+      : (jev.needsNewCategory
+        ? "Operator / DeepSeek — classify this mail before dismissing it"
+        : "Operator — no reply expected; review the suggested action")),
     "Inbox relationship: not checked (no reply drafted)",
     "Draft reply: " + (jev.refuse ? "none - escalated" : "none - no reply needed"),
     "Prepared action: none",
