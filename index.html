@@ -13259,8 +13259,19 @@ function actionInfoForView(view) {
   var smart = em.smart_cat ? null : classifySmartEmail(em);
   var smartAct = smart && smart.act ? smart.act : "";
   var hot = tier === "P0" || tier === "P1" || em.smart_urgency === "P0" || em.smart_urgency === "P1" || !!(smart && smart.hot);
-  var hay = ((em.subject || "") + " " + String(em.body || "").slice(0, 400)).toLowerCase();
+  var hay = ((em.subject || "") + " " + String(em.body || "").slice(0, 1600)).toLowerCase();
   var timeLabel = "";
+  var dateMatch = hay.match(/(\d{4})[-/年](\d{1,2})[月/-](\d{1,2})/);
+  if (dateMatch) {
+    var scheduled = new Date(Number(dateMatch[1]), Number(dateMatch[2]) - 1, Number(dateMatch[3]));
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+    var dayMs = 24 * 60 * 60 * 1000;
+    var diff = Math.round((scheduled.getTime() - today.getTime()) / dayMs);
+    if (diff === 0) timeLabel = "Today";
+    else if (diff === 1) timeLabel = "Tomorrow";
+    else if (diff >= 0 && diff <= 7) timeLabel = "This week";
+  }
   if (/(today|tonight|by eod|end of day|今天|今晚|当天)/i.test(hay)) timeLabel = "Today";
   else if (/(tomorrow|明天)/i.test(hay)) timeLabel = "Tomorrow";
   else if (/(this week|by friday|by thursday|本周|这周|周五前)/i.test(hay)) timeLabel = "This week";
@@ -13271,9 +13282,11 @@ function actionInfoForView(view) {
   if (tier === "P0") reasons.push({ kind: "priority", label: "High priority" });
   else if (tier === "P1") reasons.push({ kind: "priority", label: "Medium priority" });
   if (timeLabel && !fyi) reasons.push({ kind: "time", label: "Time-sensitive · " + timeLabel });
+  var actionNeeded = /面试|interview|yes \/ no|confirm|reschedul|确认参加|是否参加|改期/.test(hay);
+  if (actionNeeded && !fyi) reasons.push({ kind: "action", label: "Action needed" });
   if (draft) reasons.push({ kind: "reply", label: "Reply drafted" });
   if (!reasons.length && hot && !fyi) reasons.push({ kind: "hot", label: "Needs action" });
-  var order = { review: 0, priority: 1, time: 2, reply: 3, hot: 4 };
+  var order = { review: 0, time: 1, action: 2, priority: 3, reply: 4, hot: 5 };
   reasons.sort(function (a, b) { return order[a.kind] - order[b.kind]; });
   return {
     reasons: reasons,
@@ -13284,6 +13297,18 @@ function actionInfoForView(view) {
     actionable: reasons.length > 0
   };
 }
+
+function taskSortRank(item) {
+  if (!item || !item.view) return 90;
+  var info = actionInfoForView(item.view);
+  var kinds = {};
+  info.reasons.forEach(function (reason) { kinds[reason.kind] = true; });
+  var action = !!(kinds.review || kinds.action || kinds.reply);
+  var time = !!kinds.time;
+  var block = time && action ? 0 : time ? 1 : action ? 2 : 3;
+  return block * 10 + tierRankOf(item.view);
+}
+
 function taskItems() {
   var suggested = [], completed = [];
   CASE_VIEWS.forEach(function (v) {
@@ -13306,7 +13331,7 @@ function taskItems() {
   CUSTOM_TASKS.forEach(function (t) {
     (t.done ? completed : suggested).push({ id: t.id, custom: true, done: !!t.done, title: t.title, source: "Added by you", due: "No due date" });
   });
-  suggested.sort(function (a, b) { return (a.view ? tierRankOf(a.view) : 8) - (b.view ? tierRankOf(b.view) : 8); });
+  suggested.sort(function (a, b) { return taskSortRank(a) - taskSortRank(b); });
   return { suggested: suggested, completed: completed };
 }
 function countSuggestedTasks() { return taskItems().suggested.length; }
