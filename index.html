@@ -402,6 +402,33 @@ body {
   border-bottom: var(--border-w) solid var(--line);
   font-size: var(--fs-1);
 }
+.mail-header-row {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 10px;
+  align-items: baseline;
+  min-width: 0;
+}
+.mail-header-value {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  color: var(--ink);
+}
+.mail-address-name { font-weight: 600; }
+.mail-address-link {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid var(--line);
+  font-size: 10px;
+  color: var(--accent);
+}
 .mail-read .mail-headers .hk {
   color: var(--ink-3);
   font-size: var(--fs-0);
@@ -412,11 +439,16 @@ body {
   display: inline-block;
 }
 .mail-read .mail-body {
-  white-space: pre-wrap;
+  white-space: normal;
   font-size: var(--fs-1);
   line-height: var(--lh);
   color: var(--ink);
 }
+.mail-read .mail-body p {
+  margin: 0 0 12px;
+  min-width: 0;
+}
+.mail-read .mail-body p:last-child { margin-bottom: 0; }
 .mail-read .mail-attach {
   margin-top: var(--sp-3);
   font-size: var(--fs-0);
@@ -2725,6 +2757,8 @@ button.nav-label-item:hover { color: var(--ink); }
   .searchbar { padding: 0 16px; }
   .page-heading { flex-direction: column; }
   .mail-content { padding-right: 56px; }
+  .mail-header-row { grid-template-columns: 1fr; gap: 3px; }
+  .mail-read .mail-body { font-size: 12px; }
 }
 </style>
 <style>
@@ -3056,6 +3090,10 @@ body.chat-resizing { user-select: none; cursor: col-resize; }
   word-break: break-word;
 }
 .mail-read .mail-body a:hover, .mail-read .mail-headers a:hover { color: var(--accent-deep); }
+.mail-address-link {
+  text-decoration: none;
+}
+.mail-address-link:hover { border-color: var(--accent); }
 }
 </style>
 <style>
@@ -4758,17 +4796,110 @@ function gmailHeader(headers, name) {
   return "";
 }
 
+const EMAIL_ADDRESS_PATTERN = /[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+)*@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+/;
+
+function decodeReadableAddressText(value) {
+  var s = String(value || "");
+  if (/&(lt|gt|quot|#0?39|apos|amp);/i.test(s)) {
+    s = s
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&quot;/gi, '"')
+      .replace(/&#0?39;/g, "'")
+      .replace(/&apos;/gi, "'")
+      .replace(/&amp;/g, "&");
+  }
+  return s
+    .replace(/\\([\\<>[\]()])/g, "$1")
+    .replace(/\u00a0/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function firstEmailAddress(value) {
+  var match = decodeReadableAddressText(value).match(EMAIL_ADDRESS_PATTERN);
+  return match ? match[0] : "";
+}
+
+function readableAddressName(raw, email) {
+  var s = decodeReadableAddressText(raw);
+  // Prefer the human-readable prefix before the first address wrapper. This
+  // also handles malformed/nested mailto Markdown emitted by notification mail.
+  var prefix = s.split(/<|\[|mailto:/i)[0] || "";
+  prefix = prefix.replace(/^["']+|["',;:]+$/g, "").trim();
+  if (prefix && (!email || prefix.toLowerCase() !== email.toLowerCase())) return prefix;
+  if (email) {
+    var local = email.split("@")[0];
+    return local || email;
+  }
+  return s || "Unknown";
+}
+
 function parseEmailAddress(raw) {
-  var s = String(raw || "").trim();
+  var s = decodeReadableAddressText(raw);
   var m = s.match(/^(.*)<([^>]+)>\s*$/);
   if (m) {
+    var email = firstEmailAddress(m[2]) || m[2].trim();
     return {
-      name: m[1].replace(/^["']|["']$/g, "").trim() || m[2].trim(),
-      email: m[2].trim()
+      name: readableAddressName(m[1] || raw, email),
+      email: EMAIL_ADDRESS_PATTERN.test(email) ? email : ""
     };
   }
-  if (/@/.test(s)) return { name: s, email: s };
+  var looseEmail = firstEmailAddress(s);
+  if (looseEmail) {
+    return { name: readableAddressName(s, looseEmail), email: looseEmail };
+  }
   return { name: s || "Unknown", email: "" };
+}
+
+function splitEmailAddressList(raw) {
+  var s = decodeReadableAddressText(raw);
+  var out = [];
+  var current = "";
+  var inQuotes = false;
+  for (var i = 0; i < s.length; i++) {
+    var ch = s[i];
+    if (ch === '"') inQuotes = !inQuotes;
+    if (!inQuotes && (ch === "," || ch === ";")) {
+      if (current.trim()) out.push(current.trim());
+      current = "";
+      continue;
+    }
+    current += ch;
+  }
+  if (current.trim()) out.push(current.trim());
+  return out.length ? out : [s || "Unknown"];
+}
+
+function escapeHtmlAttribute(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function emailParticipantHtml(raw, fallbackName) {
+  var parsed = parseEmailAddress(raw);
+  var name = parsed.name || fallbackName || "Unknown";
+  if (!parsed.email) {
+    return "<span class='mail-address-name'>" + escapeHtml(name) + "</span>";
+  }
+  return (
+    "<span class='mail-address-name'>" + escapeHtml(name) + "</span>" +
+    "<a class='mail-address-link' href='mailto:" + escapeHtmlAttribute(parsed.email) + "'>" +
+    escapeHtml(parsed.email) + "</a>"
+  );
+}
+
+function emailParticipantListHtml(raw, fallbackName) {
+  var list = splitEmailAddressList(raw || "");
+  var shown = list.slice(0, 3).map(function (item) {
+    return emailParticipantHtml(item, fallbackName);
+  });
+  if (list.length > shown.length) shown.push("<span class='muted'>+" + (list.length - shown.length) + " more</span>");
+  return shown.join("");
 }
 
 function extractGmailTextBody(payload) {
@@ -5282,9 +5413,8 @@ function renderNoiseList() {
   if (actions) actions.hidden = !noise.length;
   noise.forEach(function (em) {
     var s = senderById(em.sender_id) || {};
-    var preview = String(em.body || "").replace(/\s+/g, " ").trim().slice(0, 90);
-    if ((em.body || "").length > 90) preview += "…";
-    var senderName = s.name || em.gmail_from || "Unknown";
+    var preview = readableEmailPreview(em.body, 90);
+    var senderName = senderNameOf(em) || s.name || "Unknown";
     var initials = (senderName.replace(/[^A-Za-z\u00C0-\u024F]+/g, " ").trim().split(/\s+/).slice(0, 2)
       .map(function (w) { return w.charAt(0); }).join("") || "?").toUpperCase();
     var card = document.createElement("div");
@@ -5384,8 +5514,7 @@ function renderGmailFolderView() {
     var senderName = senderNameOf(em) || em.gmail_from || "Unknown";
     var initials = (senderName.replace(/[^A-Za-z\u00C0-\u024F]+/g, " ").trim().split(/\s+/).slice(0, 2)
       .map(function (w) { return w.charAt(0); }).join("") || "?").toUpperCase();
-    var preview = String(em.body || "").replace(/\s+/g, " ").trim().slice(0, 120);
-    if ((em.body || "").length > 120) preview += "…";
+    var preview = readableEmailPreview(em.body, 120);
     var card = document.createElement("div");
     card.className = "gmail-folder-card";
     card.innerHTML =
@@ -11634,18 +11763,21 @@ function paintWorkArea(view) {
   mail.className = "mail-read";
   mail.setAttribute("aria-label", "Email " + em.email_id);
   var prioNow = priorityForView(view);
+  var fromDisplay = em.gmail_from ||
+    (s.email ? ((s.name || "Unknown") + " <" + s.email + ">") : (s.name || "Unknown"));
+  var toDisplay = em.gmail_to || "Ren (Aurora Materials)";
   mail.innerHTML =
     "<h2 class='mail-subject'>" + escapeHtml(em.subject) + "</h2>" +
     "<div class='mail-headers'>" +
-    "<div><span class='hk'>From</span> " + escapeHtml(s.name || "?") +
-    " &lt;" + ((s.email || em.gmail_from)
-      ? ("<a href=\"mailto:" + escapeHtml(s.email || em.gmail_from) + "\">" + escapeHtml(s.email || em.gmail_from) + "</a>")
-      : escapeHtml(s.org || "?")) + "&gt;</div>" +
-    "<div><span class='hk'>To</span> Ren (Aurora Materials)</div>" +
-    "<div><span class='hk'>When</span> " + escapeHtml(em.received_at) +
+    "<div class='mail-header-row'><span class='hk'>From</span><span class='mail-header-value'>" +
+    emailParticipantHtml(fromDisplay, s.name || "Unknown") + "</span></div>" +
+    "<div class='mail-header-row'><span class='hk'>To</span><span class='mail-header-value'>" +
+    emailParticipantListHtml(toDisplay, "Ren (Aurora Materials)") + "</span></div>" +
+    "<div class='mail-header-row'><span class='hk'>When</span><span class='mail-header-value'>" +
+    escapeHtml(em.received_at) +
     " · <code>" + escapeHtml(em.email_id) + "</code>" +
     (prioNow ? (" · Priority <strong>" + escapeHtml(prioNow) + "</strong>") : "") +
-    "</div>" +
+    "</span></div>" +
     "</div>" +
     "<div class='mail-body'>" + linkifyEmailBody(em.body) + "</div>" +
     "<div class='mail-attach'>Attachments: " +
@@ -11658,7 +11790,9 @@ function paintWorkArea(view) {
   stage2.innerHTML =
     "<div class='stage' data-n='2'>Context</div>" +
     "<div class='field'><div class='k'>Sender</div><div class='v'>" +
-    escapeHtml((s.name || "?") + " · " + (s.org || "?") + " · " + (s.relationship || "?") +
+    escapeHtml(((parseEmailAddress(fromDisplay).name || s.name || "?") +
+      (firstEmailAddress(fromDisplay) ? " · " + firstEmailAddress(fromDisplay) : "")) +
+      " · " + (firstEmailAddress(fromDisplay) || s.org || "?") + " · " + (s.relationship || "?") +
     " · " + (s.domain || "?") + " · last_handled_by " + (s.last_handled_by || "none")) +
     "</div></div>" +
     "<div class='field'><div class='k'>Policies</div><div class='v'>" +
@@ -12497,9 +12631,8 @@ function render() {
   });
   activeEmails.forEach(function (em) {
     var s = senderById(em.sender_id) || {};
-    var preview = String(em.body || "").replace(/\s+/g, " ").trim().slice(0, 90);
-    if ((em.body || "").length > 90) preview += "…";
-    var senderName = s.name || em.gmail_from || "Unknown";
+    var preview = readableEmailPreview(em.body, 90);
+    var senderName = senderNameOf(em) || s.name || "Unknown";
     var initials = (senderName.replace(/[^A-Za-z\u00C0-\u024F]+/g, " ").trim().split(/\s+/).slice(0, 2)
       .map(function (w) { return w.charAt(0); }).join("") || "?").toUpperCase();
     var card = document.createElement("div");
@@ -12732,24 +12865,121 @@ function shortInboxTime(v) {
   if (!isNaN(t)) return new Date(t).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
   return String(v);
 }
-function senderNameOf(em) { return ((senderById(em.sender_id) || {}).name) || em.gmail_from || ""; }
+function senderNameOf(em) {
+  var raw = em && em.gmail_from;
+  if (raw) return parseEmailAddress(raw).name || raw;
+  return ((senderById(em && em.sender_id) || {}).name) || "";
+}
 function emailTimeOf(em) { var t = Date.parse(String(em.received_at || "").replace(" ", "T")); return isNaN(t) ? 0 : t; }
 function tierRankOf(v) {
   var t = normalizePriorityTier(priorityForView(v) || (v.em && v.em.smart_urgency) || "");
   return t ? ["P0", "P1", "P2", "P3"].indexOf(t) : 9;
 }
-// Read-mode rendering: escape first, then make URLs and emails clickable.
-function linkifyEmailBody(text) {
-  var safe = escapeHtml(String(text || ""));
-  return safe
-    .replace(/https?:\/\/[^\s]+/g, function (m) {
+function normalizeEmailBodyText(text) {
+  return String(text || "")
+    .replace(/\u00a0/g, " ")
+    .replace(/\r\n?/g, "\n")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+function readableEmailPreview(text, length) {
+  var extracted = extractMarkdownLinks(normalizeEmailBodyText(text).replace(/\n+/g, " "));
+  var plain = extracted.text.replace(/\u0001(\d+)\u0001/g, function (m, index) {
+    var link = extracted.links[Number(index)];
+    return link ? decodeReadableAddressText(link.label || link.destination) : "";
+  })
+    .replace(/\*\*([^*]+)\*\*/g, "$1")
+    .replace(/\s+/g, " ")
+    .trim();
+  var max = length || 120;
+  return plain.length > max ? plain.slice(0, max) + "…" : plain;
+}
+
+function extractMarkdownLinks(text) {
+  var links = [];
+  var output = String(text || "");
+  var re = /\[([^\]\n]+)\]\(/g;
+  var match;
+  while ((match = re.exec(output))) {
+    var labelStart = match.index + 1;
+    var labelEnd = output.indexOf("]", labelStart);
+    if (labelEnd < 0 || output.charAt(labelEnd + 1) !== "(") continue;
+    var open = labelEnd + 1;
+    var depth = 0;
+    var close = -1;
+    for (var i = open; i < output.length; i++) {
+      if (output[i] === "(") depth++;
+      else if (output[i] === ")") {
+        depth--;
+        if (!depth) { close = i; break; }
+      }
+    }
+    if (close < 0) continue;
+    var label = output.slice(labelStart, labelEnd);
+    var destination = output.slice(open + 1, close).trim();
+    if (destination.charAt(0) === "<" && destination.charAt(destination.length - 1) === ">") {
+      destination = destination.slice(1, -1).trim();
+    }
+    links.push({ label: label, destination: destination });
+    output = output.slice(0, match.index) + "\u0001" + (links.length - 1) + "\u0001" + output.slice(close + 1);
+    re.lastIndex = match.index;
+  }
+  return { text: output, links: links };
+}
+
+function markdownLinkHtml(link) {
+  if (!link) return "";
+  var destination = decodeReadableAddressText(link.destination);
+  var label = decodeReadableAddressText(link.label);
+  if (/^mailto:/i.test(destination)) {
+    var email = firstEmailAddress(destination);
+    if (!email) return escapeHtml(label || destination.replace(/^mailto:/i, ""));
+    var display = label || email;
+    if (!EMAIL_ADDRESS_PATTERN.test(display)) display = display + " <" + email + ">";
+    return "<a class='mail-address-link' href='mailto:" + escapeHtmlAttribute(email) + "'>" +
+      escapeHtml(display) + "</a>";
+  }
+  if (/^https?:\/\//i.test(destination)) {
+    var href = destination.replace(/["'<>]/g, "");
+    return "<a href='" + escapeHtmlAttribute(href) + "' target='_blank' rel='noopener noreferrer'>" +
+      escapeHtml(label || destination) + "</a>";
+  }
+  return escapeHtml(label || destination);
+}
+
+function renderEmailInlineText(text) {
+  var extracted = extractMarkdownLinks(text);
+  var safe = escapeHtml(extracted.text)
+    .replace(/https?:\/\/[^\s<]+/g, function (m) {
       var url = m.replace(/[.,;:!?)\]']+$/, "");
       var tail = m.slice(url.length);
-      return "<a href=\"" + url + "\" target=\"_blank\" rel=\"noopener noreferrer\">" + url + "</a>" + tail;
+      return "<a href='" + escapeHtmlAttribute(url) + "' target='_blank' rel='noopener noreferrer'>" +
+        escapeHtml(url) + "</a>" + tail;
     })
     .replace(/(^|[\s(])((?:[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\.[A-Za-z0-9.-]+))/g, function (m, p1, p2) {
-      return p1 + "<a href=\"mailto:" + p2 + "\">" + p2 + "</a>";
-    });
+      return p1 + "<a class='mail-address-link' href='mailto:" + escapeHtmlAttribute(p2) + "'>" + escapeHtml(p2) + "</a>";
+    })
+    .replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/(^|\s)\*([^*\n]+)\*(?=\s|$|[.,;:!?])/g, "$1<em>$2</em>");
+  return safe.replace(/\u0001(\d+)\u0001/g, function (m, index) {
+    return markdownLinkHtml(extracted.links[Number(index)]);
+  });
+}
+
+// Read-mode rendering: normalize paragraphs first, escape inline text, then
+// restore only safe http, https, and mailto links.
+function renderReadableEmailBody(text) {
+  var normalized = normalizeEmailBodyText(text);
+  if (!normalized) return "";
+  return normalized.split(/\n{2,}/).map(function (block) {
+    return "<p>" + renderEmailInlineText(block).replace(/\n/g, "<br>") + "</p>";
+  }).join("");
+}
+
+function linkifyEmailBody(text) {
+  return renderReadableEmailBody(text);
 }
 
 // ── Unified visibility: priority select + pills + status + search ──────────
