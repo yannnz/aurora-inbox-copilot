@@ -4,7 +4,7 @@
  * GET  /*           → static files (open http://localhost:8787/ for Google OAuth)
  * POST /            → DeepSeek Anthropic-compatible (direct, then VPN fallback)
  * POST /openai      → OpenAI via Shadowsocks HTTP proxy (default 127.0.0.1:10808)
- * POST /typesafe    → TypeSafe Jev System One (direct, then VPN fallback)
+ * POST /typesafe    → TypeSafe Jev System One (always via the local VPN proxy)
  *
  * Optional Laminar tracing (https://github.com/lmnr-ai/lmnr):
  *   Set LMNR_PROJECT_API_KEY when starting this process, and/or paste a project
@@ -392,15 +392,17 @@ async function postDeepSeek(headers, body) {
 
 async function postTypeSafe(headers, body) {
   try {
-    var direct = await postJson(TYPESAFE_URL, headers, body, null);
-    return { upstream: direct, via: "direct" };
+    // TypeSafe's API geoblocks the local direct egress as CN even when the
+    // browser can open platform.typesafe.ai. Node does not inherit the Windows
+    // system proxy, so Jev must always use the explicit local VPN proxy.
+    var upstream = await postJson(TYPESAFE_URL, headers, body, OPENAI_HTTP_PROXY);
+    return { upstream: upstream, via: OPENAI_HTTP_PROXY };
   } catch (e1) {
-    try {
-      var proxied = await postJson(TYPESAFE_URL, headers, body, OPENAI_HTTP_PROXY);
-      return { upstream: proxied, via: OPENAI_HTTP_PROXY + " (fallback)" };
-    } catch (e2) {
-      throw new Error(String(e1.message || e1) + " | fallback: " + String(e2.message || e2));
-    }
+    throw new Error(
+      String(e1 && e1.message ? e1.message : e1) +
+      " — TypeSafe/Jev is routed through " + OPENAI_HTTP_PROXY +
+      ". Keep the VPN HTTP proxy running and reachable, then retry."
+    );
   }
 }
 
@@ -482,11 +484,11 @@ function handleTypeSafePost(req, res) {
       res.end(JSON.stringify({
         error: {
           message: /timeout|ENOTFOUND|ECONNREFUSED|CONNECT|Bad HTTPS/i.test(msg)
-            ? "Could not reach TypeSafe (tried direct, then via " + OPENAI_HTTP_PROXY + "). " +
-              "If api.typesafe.ai is blocked, keep Shadowsocks Global Mode on and retry."
+            ? "Could not reach TypeSafe via the required VPN proxy (" + OPENAI_HTTP_PROXY + "). " +
+              "Keep Shadowsocks Global Mode / the local HTTP proxy running, then retry."
             : msg,
           upstream: TYPESAFE_URL,
-          via: "direct+fallback"
+          via: OPENAI_HTTP_PROXY
         }
       }));
     }
@@ -735,7 +737,7 @@ server.listen(PORT, "127.0.0.1", function () {
   console.log("  Open the app here (required for Google Calendar OAuth).");
   console.log("  POST /       → DeepSeek direct, then via " + OPENAI_HTTP_PROXY + " if needed");
   console.log("  POST /openai → OpenAI via " + OPENAI_HTTP_PROXY);
-  console.log("  POST /typesafe → TypeSafe Jev direct, then via " + OPENAI_HTTP_PROXY + " if needed");
+  console.log("  POST /typesafe → TypeSafe Jev always via " + OPENAI_HTTP_PROXY);
   if (PHOENIX_ENABLED) {
     initPhoenix();
   } else {
