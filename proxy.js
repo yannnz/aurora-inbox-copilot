@@ -323,20 +323,20 @@ function postJson(targetUrl, headers, body, viaProxyUrl) {
         respBuf = Buffer.concat([respBuf, c]);
       });
       tlsSock.on("end", function () {
-        var raw = respBuf.toString("utf8");
-        var sep = raw.indexOf("\r\n\r\n");
+        var crlf2 = Buffer.from("\r\n\r\n");
+        var sep = respBuf.indexOf(crlf2);
         if (sep === -1) {
           reject(new Error("Bad HTTPS response through proxy"));
           return;
         }
-        var head = raw.slice(0, sep);
-        var bodyText = raw.slice(sep + 4);
+        var head = respBuf.slice(0, sep).toString("latin1");
+        var bodyBuf = respBuf.slice(sep + crlf2.length);
         var statusMatch = head.match(/^HTTP\/1\.[01] (\d+)/);
         var status = statusMatch ? Number(statusMatch[1]) : 502;
         if (/transfer-encoding:\s*chunked/i.test(head)) {
-          bodyText = decodeChunked(bodyText);
+          bodyBuf = decodeChunkedBuffer(bodyBuf);
         }
-        resolve({ status: status, text: bodyText });
+        resolve({ status: status, text: bodyBuf.toString("utf8") });
       });
       tlsSock.on("error", reject);
     });
@@ -345,18 +345,24 @@ function postJson(targetUrl, headers, body, viaProxyUrl) {
   });
 }
 
-function decodeChunked(text) {
-  var out = "";
+function decodeChunkedBuffer(input) {
+  var crlf = Buffer.from("\r\n");
+  var chunks = [];
   var i = 0;
-  while (i < text.length) {
-    var nl = text.indexOf("\r\n", i);
+  while (i < input.length) {
+    var nl = input.indexOf(crlf, i);
     if (nl === -1) break;
-    var size = parseInt(text.slice(i, nl), 16);
+    var sizeLine = input.slice(i, nl).toString("ascii").split(";")[0].trim();
+    var size = parseInt(sizeLine, 16);
     if (!size) break;
-    out += text.slice(nl + 2, nl + 2 + size);
-    i = nl + 2 + size + 2;
+    var start = nl + crlf.length;
+    var end = start + size;
+    if (end > input.length) break;
+    chunks.push(input.slice(start, end));
+    i = end;
+    if (input.slice(i, i + crlf.length).equals(crlf)) i += crlf.length;
   }
-  return out || text;
+  return chunks.length ? Buffer.concat(chunks) : input;
 }
 
 function networkHint(err, kind) {

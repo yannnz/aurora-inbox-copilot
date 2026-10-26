@@ -11475,8 +11475,17 @@ async function callJev(em, opts) {
   }
 
   var data;
-  try { data = await resp.json(); } catch (e) {
-    return fail("<div class='error-note'>Jev answered, but the response was not readable JSON.</div>");
+  var rawJevText = "";
+  try {
+    rawJevText = await resp.text();
+    data = JSON.parse(rawJevText);
+  } catch (e) {
+    return fail(
+      "<div class='error-note'>Jev answered, but the response was not readable JSON." +
+      "<br><br><span class='muted'>Raw response preview: " +
+      escapeHtml(rawJevText.slice(0, 1000) || "(empty)") +
+      "</span></div>"
+    );
   }
   var a = (data && data.answers) || {};
   if (!a.priority || !a.needs_reply || !a.escalation) {
