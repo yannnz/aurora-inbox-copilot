@@ -6194,6 +6194,13 @@ function classifySmartEmail(em) {
       hot: true
     };
   }
+  if (/面试(邀请|变更|通知)|视频面试|interview (invitation|confirmation|schedule)|confirm whether to participate/i.test(subj + " " + body.slice(0, 1200))) {
+    return {
+      cat: "真人会议 · 需确认",
+      act: "确认面试时间是否可行，并回复或改期",
+      hot: true
+    };
+  }
  if (from.indexOf("mail8.lietou-edm.com") >= 0)
    return { cat: "今天行动 · 招聘方触达", act: "今天就回复（回复窗口最长）", hot: true };
   if (/updated invitation|invitation:|calendar.*invite/.test(subj) && !isNoreply)
@@ -6501,6 +6508,31 @@ function applySmartClassification() {
   logSmartAction("apply", (SMART_PENDING_MODE === "merge" ? "合并新分类建议" : "启用分类方案") +
     " · " + SMART_APPLIED.categories.length + " 类");
   setTopStatus("ok", "分类已启用 · 用 Triage 旁的分类下拉筛选");
+}
+
+function applyConfirmedCategoryToEmail(em, category, urgency) {
+  if (!SMART_APPLIED || !em || !category) return false;
+  var known = SMART_APPLIED.categories.some(function (c) { return c && c.name === category; });
+  if (!known) return false;
+  var changed = SMART_APPLIED.map[em.email_id] !== category || em.smart_cat !== category;
+  if (!changed) return false;
+  SMART_APPLIED.map[em.email_id] = category;
+  em.smart_cat = category;
+  var tier = normalizePriorityTier(urgency || "");
+  if (tier) {
+    SMART_APPLIED.urgency[em.email_id] = tier;
+    em.smart_urgency = tier;
+  }
+  saveSmartClassification();
+  renderSmartFilterControl();
+  return true;
+}
+
+function reconcileSmartCategoryFromResult(view) {
+  if (!view || !view.em || !view.result || !view.result.fields) return false;
+  var category = getField(view.result.fields, "Category");
+  var urgency = getField(view.result.fields, "Priority");
+  return applyConfirmedCategoryToEmail(view.em, category, urgency);
 }
 
 function renderSmartFilterControl() {
@@ -11520,6 +11552,7 @@ async function callJev(em, opts) {
   traceMeta.model = result.model;
   recordApiTrace(traceMeta, result);
   result.traceId = traceMeta.id;
+  applyConfirmedCategoryToEmail(em, result.category, result.priority);
   return result;
 }
 
@@ -12757,6 +12790,7 @@ function render() {
       read: false
     };
     restoreViewState(view);
+    reconcileSmartCategoryFromResult(view);
     updateCaseCardBadge(view); // show smart urgency chip immediately on render
     CASE_VIEWS.push(view);
     view.selectBox = card.querySelector(".mail-select");
