@@ -2715,6 +2715,122 @@ button.nav-label-item:hover { color: var(--ink); }
 .settings-card .row-actions { margin-top: 10px; }
 .settings-back { margin-top: 20px; }
 
+/* ── Triage rules → Figma 6:12244 full settings page ──────────────────── */
+.triage-rules-view {
+  margin: 0 !important;
+  padding: 0 28px 60px;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+.settings-searchbar {
+  display: flex;
+  height: 76px;
+  align-items: center;
+  justify-content: space-between;
+  width: calc(100% + 56px);
+  margin: 0 -28px;
+  padding: 0 28px;
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+}
+.settings-search-field {
+  display: flex;
+  width: 590px;
+  height: 40px;
+  align-items: center;
+  gap: 11px;
+  padding: 0 14px;
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--ink-2);
+}
+.settings-search-field svg { width:17px; height:17px; flex:none; color:var(--ink-2); }
+.settings-search-field input { flex:1; min-width:0; border:0; background:transparent; color:var(--ink); font:inherit; font-size:12px; outline:none; }
+.settings-search-field input::placeholder { color:var(--ink-2); }
+.settings-search-kbd { flex:none; font-size:10px; color:#969aa5; }
+.settings-search-filter { width:15px !important; height:15px !important; }
+.settings-utilities { display:flex; align-items:center; gap:21px; flex:none; }
+.settings-search-date { margin:0; font-size:11px; color:var(--ink-2); }
+.settings-search-divider { width:1px; height:19px; background:var(--line); }
+.settings-util-btn { display:grid; place-items:center; width:18px; height:18px; border:0; background:transparent; color:var(--ink-2); cursor:pointer; }
+.settings-util-btn svg { width:18px; height:18px; }
+.settings-profile { display:grid; place-items:center; width:31px; height:31px; border-radius:100px; background:#eeedfb; color:var(--accent); font-size:10px; font-weight:600; }
+.settings-intro { display:flex; flex-direction:column; gap:12px; margin-top:28px; }
+.settings-breadcrumb { margin: 0; font-size: 11px; letter-spacing: .07em; color: var(--ink-2); }
+.settings-heading-row { display: flex; align-items: center; gap: 20px; }
+.settings-heading-copy { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.settings-heading-copy h2 { margin: 0; font-size: 28px; line-height: normal; font-weight: 600; color: var(--ink); }
+.settings-heading-copy p { margin: 0; font-size: 13px; line-height: 1.45; color: var(--ink-2); }
+.settings-status-badge { flex: none; align-items: center; padding: 3px 7px; border-radius: 5px; background: #fbf3e5; color: #a77831; font-size: 11px; font-weight: 500; }
+.settings-status-badge.saved { background: #edf6f2; color: #39806b; }
+.triage-settings-layout { display: grid; grid-template-columns: minmax(0, 792px) minmax(0, 352px); gap: 24px; align-items: start; padding-top: 24px; }
+.settings-form-column,
+.settings-context-column { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.settings-panel-card { box-sizing:border-box; display:flex; flex-direction:column; gap:16px; background:#fff; border:1px solid var(--line); border-radius:12px; padding:19px; }
+.settings-panel-card[hidden] { display:none !important; }
+.settings-panel-heading { display: flex; flex-direction: column; gap: 4px; }
+.settings-panel-heading h3 { margin:0; font-size:17px; line-height:25px; font-weight:600; color:var(--ink); }
+.settings-panel-heading p { margin:0; font-size:12px; line-height:17px; color:var(--ink-2); }
+.setting-row { display: flex; align-items: center; gap: 24px; min-width: 0; }
+.setting-copy { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.setting-title { margin:0; font-size:13px; line-height:19px; font-weight:500; color:var(--ink); }
+.setting-desc { margin:0; font-size:12px; line-height:17px; color:var(--ink-2); }
+.pref-switch { appearance: none; position: relative; flex: none; width: 32px; height: 19px; border: 0; border-radius: 9.5px; background: #cdd0d8; cursor: pointer; transition: background .15s ease; }
+.pref-switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 13px; height: 13px; border-radius: 50%; background: #fff; transition: transform .15s ease; }
+.pref-switch:checked { background: var(--accent); }
+.pref-switch:checked::after { transform: translateX(13px); }
+.pref-check { display:flex; align-items:center; gap:9px; min-height:17px; line-height:17px; font-size:12px; color:var(--ink); }
+.pref-check input { appearance: none; width: 15px; height: 15px; margin: 0; border: 1px solid var(--accent); border-radius: 3px; background: #fff; cursor: pointer; flex: none; }
+.pref-check input:checked { background: var(--accent); }
+.pref-check input:checked::after { content: ""; display: block; width: 7px; height: 4px; margin: 3px auto 0; border-left: 1.5px solid #fff; border-bottom: 1.5px solid #fff; transform: rotate(-45deg); }
+.settings-divider { height: 1px; margin: 0; background: var(--line); }
+.settings-chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.settings-chip { padding:3px 7px; border-radius:5px; line-height:16px; font-size:11px; font-weight:500; }
+.settings-chip.accent { background: #eeedfb; color: #5752c9; }
+.settings-chip.ok { background: #edf6f2; color: #39806b; }
+.settings-chip.warn { background: #fbf3e5; color: #a77831; }
+.settings-chip.neutral { background: #f1f2f5; color: #747884; }
+.settings-inline-note { display: flex; gap: 9px; align-items: flex-start; padding: 12px; border-radius: 8px; background: #f7f6fd; color: var(--ink-2); font-size: 12px; line-height: 1.45; }
+.settings-inline-note svg { width: 15px; height: 15px; flex: none; color: var(--accent); }
+.settings-control-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.settings-field-label { display:block; margin:0 0 7px; line-height:17px; font-size:12px; font-weight:500; color:var(--ink); }
+.settings-select { box-sizing:border-box; width:100%; height:38px; padding:9px 12px; border:1px solid #cdd0d8; border-radius:8px; background:#fff; color:var(--ink); font-size:12px; }
+.settings-save-row { display: flex; align-items: center; gap: 12px; min-height: 34px; }
+.settings-save-row .btn { height:34px; padding:0 12px; border-radius:8px; font-size:12px; }
+.settings-save-row .btn.primary { background:#5752c9; border-color:#5752c9; color:#fff; }
+.settings-save-note { flex: 1; min-width: 0; margin: 0; font-size: 11px; line-height: 1.45; color: var(--ink-2); }
+.permission-row { display: flex; gap: 12px; align-items: flex-start; }
+.permission-row svg { width: 18px; height: 18px; color: var(--accent); flex: none; }
+.permission-copy { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.permission-copy strong { font-size:12px; line-height:17px; font-weight:600; color:var(--ink); }
+.permission-copy span { font-size:12px; line-height:17px; color:var(--ink-2); }
+.settings-example-badge { display:inline-flex; padding:3px 7px; border-radius:5px; background:#fbf3e5; color:#a77831; font-size:11px; line-height:16px; font-weight:500; }
+.settings-example-title { margin:0; font-size:13px; line-height:19px; font-weight:500; color:var(--ink); }
+.settings-example-meta { margin:0; font-size:12px; line-height:17px; color:var(--ink-2); }
+.settings-example-preview { display:flex; align-items:center; min-height:22px; gap:8px; font-size:12px; line-height:17px; color:var(--ink-2); }
+.settings-example-desc { min-height:51px; }
+.settings-workspace-note { min-height:48px; }
+.settings-context-note { display:flex; gap:9px; align-items:flex-start; padding:12px; border-radius:8px; background:#fbf3e5; color:var(--ink-2); font-size:12px; line-height:17px; }
+.settings-context-note svg { width: 15px; height: 15px; color: #a77831; flex: none; }
+.rules-settings-card .rules-radio { margin-right: 16px; }
+.rules-settings-card .run-mode-select,
+.rules-settings-card .rules-library-actions .field-input { width: auto; min-width: 210px; }
+.rules-settings-card .rules-draft { margin-bottom: 12px; }
+.rules-card-title { display:flex; align-items:center; gap:8px; margin:0; font-size:17px; font-weight:600; color:var(--ink); }
+.rules-card-title svg { width:16px; height:16px; color:var(--accent); }
+@media (max-width: 1180px) {
+  .triage-settings-layout { grid-template-columns: minmax(0, 1fr); }
+  .settings-context-column { display: none; }
+}
+@media (max-width: 720px) {
+  .triage-rules-view { padding: 0 16px 48px; }
+  .settings-heading-row { flex-direction: column; align-items: flex-start; }
+  .settings-control-grid { grid-template-columns: minmax(0, 1fr); }
+  .setting-row { align-items: flex-start; flex-direction: column; gap: 10px; }
+}
+
 /* ── Chat drawer keeps function, adopts tokens ───────────────────────── */
 .global-chat { border-radius: 16px; border: 1px solid var(--line); box-shadow: 0 24px 64px -24px rgba(36, 39, 51, .35); }
 .chat-launcher { background: var(--accent); }
@@ -3241,6 +3357,7 @@ body.chat-resizing { user-select: none; cursor: col-resize; }
 <main class="app-main">
 
 <script src="https://accounts.google.com/gsi/client" async defer></script>
+<link rel="icon" href="data:,">
 
 <div class="console" id="work-view" data-layout="list">
 <!-- Global sticky messenger — Intercom-style widget on every tab -->
@@ -3721,78 +3838,298 @@ body.chat-resizing { user-select: none; cursor: col-resize; }
   </div>
 </section>
 
-<section class="evals-view" id="rules-view" aria-label="Rule builder">
-  <div class="section-title-row">
-    <div class="panel-head">Rules · library &amp; interview</div>
-    <span class="info-tip">
-      <button type="button" class="info-tip-btn" aria-label="About rule builder">i</button>
-      <span class="info-tip-pop" role="tooltip">Build and save multiple rule packs. Pick which pack Work uses, or stay on Aurora demo rules. Edit any saved pack anytime. Nothing sends without human approval.</span>
-    </span>
-  </div>
-  <p class="page-sub">Build and save rule packs, then choose which one Work uses for triage decisions.</p>
-  <p class="muted" id="rules-active-banner" style="margin-top:0;"></p>
-
-  <div class="matrix-card rules-mode-card">
-    <div class="panel-head" style="margin-bottom: var(--sp-3);">Which rules does Work use?</div>
-    <div class="row-actions" style="align-items: center; flex-wrap: wrap; gap: var(--sp-3);">
-      <label class="rules-radio">
-        <input type="radio" name="rules-source" id="rules-source-aurora" value="aurora" checked>
-        Aurora demo (Ren)
-      </label>
-      <label class="rules-radio">
-        <input type="radio" name="rules-source" id="rules-source-custom" value="custom">
-        My saved pack
-      </label>
-      <label class="run-mode-label" for="rules-active-pack" style="margin:0;">Active pack</label>
-      <select class="field-input run-mode-select" id="rules-active-pack" aria-label="Active rule pack" disabled>
-        <option value="">— none saved —</option>
-      </select>
-      <span class="muted" id="rules-source-hint">Save a pack below, then select it here.</span>
+<section class="evals-view triage-rules-view" id="rules-view" aria-label="Triage settings and rule builder">
+  <header class="settings-searchbar">
+    <label class="settings-search-field" for="ts-search-input">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="ts-search-input" type="search" placeholder="Search mail, people, or tasks">
+      <span class="settings-search-kbd">⌘ K</span>
+      <svg class="settings-search-filter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M3 6h18"/><path d="M7 12h10"/><path d="M10 18h4"/></svg>
+    </label>
+    <div class="settings-utilities">
+      <p class="settings-search-date" id="ts-search-date">Friday, October 23</p>
+      <span class="settings-search-divider" aria-hidden="true"></span>
+      <button type="button" class="settings-util-btn" id="ts-help-btn" aria-label="About this workspace">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+      </button>
+      <button type="button" class="settings-util-btn" id="ts-settings-btn" aria-label="Triage settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+      <span class="settings-profile" aria-hidden="true">AL</span>
+    </div>
+  </header>
+  <div class="settings-intro">
+    <p class="settings-breadcrumb">INBOX / TRIAGE SETTINGS</p>
+    <div class="settings-heading-row">
+      <div class="settings-heading-copy">
+        <h2>Triage settings</h2>
+        <p>Choose how your agent organizes mail and when it should ask you first.</p>
+      </div>
+      <span class="settings-status-badge" id="ts-settings-status">Unsaved preferences</span>
     </div>
   </div>
 
-  <div class="matrix-card" id="rules-library-card">
-    <div class="panel-head" style="margin-bottom: var(--sp-2);">Saved rule packs</div>
-    <p class="muted" id="rules-library-empty" style="margin-top:0;">No saved packs yet. Complete the interview and Save as new pack.</p>
-    <div class="rules-library-list" id="rules-library-list" hidden></div>
-    <div class="row-actions" style="margin-top: var(--sp-3); flex-wrap: wrap; gap: var(--sp-2);">
-      <button type="button" class="btn primary" id="rules-new-btn">Create new pack</button>
-    </div>
-  </div>
+  <div class="triage-settings-layout">
+    <div class="settings-form-column">
+      <section class="settings-panel-card" aria-label="Automatic triage">
+        <div class="settings-panel-heading">
+          <h3>Automatic triage</h3>
+          <p id="ts-connected-account">Connected to alex@studioworks.co</p>
+        </div>
+        <div class="setting-row">
+          <div class="setting-copy">
+            <p class="setting-title">Triage new emails automatically</p>
+            <p class="setting-desc">Organize incoming mail as it arrives. Your inbox stays connected if this is off.</p>
+          </div>
+          <input type="checkbox" class="pref-switch" id="ts-auto-triage" checked>
+        </div>
+        <div class="settings-divider"></div>
+        <div class="setting-row">
+          <div class="setting-copy">
+            <p class="setting-title">Assign categories</p>
+            <p class="setting-desc">Use email content and conversation context to organize mail.</p>
+          </div>
+          <input type="checkbox" class="pref-switch" id="ts-assign-categories" checked>
+        </div>
+        <div class="settings-chip-row" id="ts-enabled-categories">
+          <span class="settings-chip accent">Projects</span>
+          <span class="settings-chip ok">People</span>
+          <span class="settings-chip warn">Finance</span>
+          <span class="settings-chip neutral">Updates</span>
+        </div>
+        <label class="pref-check" for="ts-keep-manual-categories">
+          <input type="checkbox" id="ts-keep-manual-categories" checked>
+          <span>Keep categories I’ve assigned manually</span>
+        </label>
+        <div class="settings-divider"></div>
+        <div class="setting-row">
+          <div class="setting-copy">
+            <p class="setting-title">Detect email priority</p>
+            <p class="setting-desc">Identify deadlines, direct requests, and time-sensitive decisions.</p>
+          </div>
+          <input type="checkbox" class="pref-switch" id="ts-detect-priority" checked>
+        </div>
+        <label class="pref-check" for="ts-never-overwrite-priority">
+          <input type="checkbox" id="ts-never-overwrite-priority" checked>
+          <span>Never overwrite a priority I’ve chosen</span>
+        </label>
+      </section>
 
-  <div class="matrix-card" id="rules-wizard-card" hidden>
-    <div class="rules-progress muted" id="rules-progress"></div>
-    <h3 class="rules-step-title" id="rules-step-title" style="margin: var(--sp-2) 0 var(--sp-3); font-size: var(--fs-2);"></h3>
-    <p class="muted" id="rules-step-help" style="margin-top:0;"></p>
-    <div id="rules-step-body"></div>
-    <div class="row-actions" style="margin-top: var(--sp-4); flex-wrap: wrap; gap: var(--sp-2);">
-      <button type="button" class="btn" id="rules-back-btn">Back</button>
-      <button type="button" class="btn primary" id="rules-next-btn">Next</button>
-      <button type="button" class="btn" id="rules-restart-btn">Start over</button>
-      <button type="button" class="btn" id="rules-cancel-edit-btn">Cancel</button>
-    </div>
-  </div>
+      <section class="settings-panel-card rules-settings-card" aria-label="Triage rules">
+        <div class="settings-panel-heading">
+          <h3 class="rules-card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></svg>
+            Triage rules
+          </h3>
+          <p>Choose the rule pack Work uses for priority, delegation, and escalation.</p>
+        </div>
+        <p class="muted" id="rules-active-banner" style="margin:0;"></p>
+        <div class="row-actions" style="align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 16px;">
+          <label class="rules-radio">
+            <input type="radio" name="rules-source" id="rules-source-aurora" value="aurora" checked>
+            Aurora demo (Ren)
+          </label>
+          <label class="rules-radio">
+            <input type="radio" name="rules-source" id="rules-source-custom" value="custom">
+            My saved pack
+          </label>
+        </div>
+        <label class="settings-field-label" for="rules-active-pack" style="margin-top:16px;">Active pack</label>
+        <select class="settings-select" id="rules-active-pack" aria-label="Active rule pack" disabled>
+          <option value="">— none saved —</option>
+        </select>
+        <p class="muted" id="rules-source-hint" style="margin:8px 0 0;">Save a pack below, then select it here.</p>
+      </section>
 
-  <div class="matrix-card" id="rules-draft-card" hidden>
-    <div class="panel-head" style="margin-bottom: var(--sp-2);">Draft rule pack</div>
-    <p class="muted" style="margin-top:0;">Edit if needed, name this pack, then Save. You can keep multiple packs and switch which one Work uses.</p>
-    <label class="field-label" for="rules-pack-name">Pack name</label>
-    <input class="field-input" type="text" id="rules-pack-name" placeholder="e.g. Alex · Northwind · v1">
-    <label class="field-label" for="rules-draft-priority">priority_rules.md</label>
-    <textarea class="field-input rules-draft" id="rules-draft-priority" rows="8"></textarea>
-    <label class="field-label" for="rules-draft-delegation">delegation_rules.md</label>
-    <textarea class="field-input rules-draft" id="rules-draft-delegation" rows="6"></textarea>
-    <label class="field-label" for="rules-draft-escalation">escalation_rules.md</label>
-    <textarea class="field-input rules-draft" id="rules-draft-escalation" rows="8"></textarea>
-    <label class="field-label" for="rules-draft-org">org_facts.md</label>
-    <textarea class="field-input rules-draft" id="rules-draft-org" rows="5"></textarea>
-    <div class="row-actions" style="margin-top: var(--sp-4); flex-wrap: wrap; gap: var(--sp-2);">
-      <button type="button" class="btn primary" id="rules-approve-btn" disabled>Save pack</button>
-      <button type="button" class="btn" id="rules-discard-btn">Discard draft</button>
-      <button type="button" class="btn" id="rules-edit-interview-btn">Edit interview answers</button>
+      <section class="settings-panel-card rules-settings-card" id="rules-library-card" aria-label="Saved rule packs">
+        <div class="settings-panel-heading">
+          <h3>Saved rule packs</h3>
+          <p>Create, edit, and switch reusable rule packs. Nothing sends without human approval.</p>
+        </div>
+        <p class="muted" id="rules-library-empty" style="margin:16px 0 0;">No saved packs yet. Complete the interview and Save as new pack.</p>
+        <div class="rules-library-list" id="rules-library-list" hidden></div>
+        <div class="row-actions rules-library-actions" style="margin-top: 16px; flex-wrap: wrap; gap: 8px;">
+          <button type="button" class="btn primary" id="rules-new-btn">Create new pack</button>
+        </div>
+      </section>
+
+      <section class="settings-panel-card rules-settings-card" id="rules-wizard-card" hidden aria-label="Rule pack interview">
+        <div class="rules-progress muted" id="rules-progress"></div>
+        <h3 class="rules-step-title" id="rules-step-title" style="margin: 12px 0;"></h3>
+        <p class="muted" id="rules-step-help" style="margin-top:0;"></p>
+        <div id="rules-step-body"></div>
+        <div class="row-actions" style="margin-top: 20px; flex-wrap: wrap; gap: 8px;">
+          <button type="button" class="btn" id="rules-back-btn">Back</button>
+          <button type="button" class="btn primary" id="rules-next-btn">Next</button>
+          <button type="button" class="btn" id="rules-restart-btn">Start over</button>
+          <button type="button" class="btn" id="rules-cancel-edit-btn">Cancel</button>
+        </div>
+      </section>
+
+      <section class="settings-panel-card rules-settings-card" id="rules-draft-card" hidden aria-label="Draft rule pack">
+        <div class="settings-panel-heading">
+          <h3>Draft rule pack</h3>
+          <p>Edit if needed, name this pack, then Save. You can keep multiple packs and switch which one Work uses.</p>
+        </div>
+        <label class="settings-field-label" for="rules-pack-name" style="margin-top:16px;">Pack name</label>
+        <input class="field-input" type="text" id="rules-pack-name" placeholder="e.g. Alex · Northwind · v1">
+        <label class="settings-field-label" for="rules-draft-priority" style="margin-top:12px;">priority_rules.md</label>
+        <textarea class="field-input rules-draft" id="rules-draft-priority" rows="8"></textarea>
+        <label class="settings-field-label" for="rules-draft-delegation">delegation_rules.md</label>
+        <textarea class="field-input rules-draft" id="rules-draft-delegation" rows="6"></textarea>
+        <label class="settings-field-label" for="rules-draft-escalation">escalation_rules.md</label>
+        <textarea class="field-input rules-draft" id="rules-draft-escalation" rows="8"></textarea>
+        <label class="settings-field-label" for="rules-draft-org">org_facts.md</label>
+        <textarea class="field-input rules-draft" id="rules-draft-org" rows="5"></textarea>
+        <div class="row-actions" style="margin-top: 16px; flex-wrap: wrap; gap: 8px;">
+          <button type="button" class="btn primary" id="rules-approve-btn" disabled>Save pack</button>
+          <button type="button" class="btn" id="rules-discard-btn">Discard draft</button>
+          <button type="button" class="btn" id="rules-edit-interview-btn">Edit interview answers</button>
+        </div>
+        <p class="muted" id="rules-approve-hint" style="margin: 12px 0 0;"></p>
+        <p class="boundary-note" style="margin: 16px 0 0;">Rules do not send mail. Work triage still needs Approve / Edit / Escalate on every case.</p>
+      </section>
+
+      <section class="settings-panel-card" aria-label="Suggested tasks">
+        <div class="settings-panel-heading">
+          <h3>Suggested tasks</h3>
+          <p>Your agent suggests next steps. You decide what becomes a task.</p>
+        </div>
+        <div class="setting-row">
+          <div class="setting-copy">
+            <p class="setting-title">Create task suggestions</p>
+            <p class="setting-desc">Extract actionable requests with a source email and due date, if provided.</p>
+          </div>
+          <input type="checkbox" class="pref-switch" id="ts-create-task-suggestions" checked>
+        </div>
+        <label class="pref-check" for="ts-require-task-review">
+          <input type="checkbox" id="ts-require-task-review" checked>
+          <span>Require my review before adding to My tasks</span>
+        </label>
+        <label class="pref-check" for="ts-due-dates-stated">
+          <input type="checkbox" id="ts-due-dates-stated" checked>
+          <span>Suggest due dates only when stated in the email</span>
+        </label>
+        <div class="settings-inline-note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+          <span>Suggestions never send replies, approve assets, or make payments. Completing a task only updates your task list.</span>
+        </div>
+      </section>
+
+      <section class="settings-panel-card" aria-label="Confidence and review">
+        <div class="settings-panel-heading">
+          <h3>Confidence &amp; review</h3>
+          <p>Let your agent act confidently and ask when something is unclear.</p>
+        </div>
+        <div class="settings-control-grid">
+          <div>
+            <label class="settings-field-label" for="ts-confidence-threshold">Auto-apply category above</label>
+            <select class="settings-select" id="ts-confidence-threshold">
+              <option value="75">75% confidence</option>
+              <option value="85" selected>85% confidence</option>
+              <option value="95">95% confidence</option>
+            </select>
+          </div>
+          <div>
+            <label class="settings-field-label" for="ts-below-threshold">Below threshold</label>
+            <select class="settings-select" id="ts-below-threshold">
+              <option value="review" selected>Flag for my review</option>
+              <option value="queue">Leave unclassified</option>
+            </select>
+          </div>
+        </div>
+        <label class="pref-check" for="ts-ask-payment-ownership">
+          <input type="checkbox" id="ts-ask-payment-ownership" checked>
+          <span>Always ask when payment ownership is unclear</span>
+        </label>
+        <label class="pref-check" for="ts-show-reasons">
+          <input type="checkbox" id="ts-show-reasons" checked>
+          <span>Show the reason behind priority and category decisions</span>
+        </label>
+      </section>
+
+      <section class="settings-panel-card" aria-label="Notifications">
+        <div class="settings-panel-heading">
+          <h3>Notifications</h3>
+        </div>
+        <div class="setting-row">
+          <div class="setting-copy">
+            <p class="setting-title">High-priority email alerts</p>
+            <p class="setting-desc">Show an in-app notification for new high-priority mail.</p>
+          </div>
+          <input type="checkbox" class="pref-switch" id="ts-high-priority-alerts" checked>
+        </div>
+        <div class="settings-divider"></div>
+        <div class="setting-row">
+          <div class="setting-copy">
+            <p class="setting-title">Review reminders</p>
+            <p class="setting-desc">Remind me about uncertain decisions at 9:00 AM on weekdays.</p>
+          </div>
+          <input type="checkbox" class="pref-switch" id="ts-review-reminders" checked>
+        </div>
+        <div class="settings-divider"></div>
+        <div class="setting-row">
+          <div class="setting-copy">
+            <p class="setting-title">Email digest</p>
+            <p class="setting-desc">Send a daily summary to alex@studioworks.co.</p>
+          </div>
+          <input type="checkbox" class="pref-switch" id="ts-email-digest">
+        </div>
+      </section>
+
+      <div class="settings-save-row">
+        <p class="settings-save-note">Changes apply to new mail after saving. Existing decisions are kept.</p>
+        <button type="button" class="btn" id="ts-cancel">Cancel</button>
+        <button type="button" class="btn primary" id="ts-save">Save preferences</button>
+      </div>
     </div>
-    <p class="muted" id="rules-approve-hint" style="margin-top: var(--sp-2);"></p>
-    <p class="boundary-note" style="margin-top: var(--sp-3);">Rules do not send mail. Work triage still needs Approve / Edit / Escalate on every case.</p>
+
+    <aside class="settings-context-column" aria-label="Settings context">
+      <section class="settings-panel-card">
+        <div class="settings-panel-heading"><h3>What your agent can do</h3></div>
+        <div class="permission-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+          <div class="permission-copy"><strong>Organize your inbox</strong><span>Apply categories and priority to new mail.</span></div>
+        </div>
+        <div class="permission-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/><path d="M13 6h8"/><path d="M13 12h8"/><path d="M13 18h8"/></svg>
+          <div class="permission-copy"><strong>Suggest a next step</strong><span>Keep suggestions separate from accepted tasks.</span></div>
+        </div>
+        <div class="permission-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+          <div class="permission-copy"><strong>Keep you in control</strong><span>Log every change and let you undo it.</span></div>
+        </div>
+        <div class="settings-divider"></div>
+        <p class="setting-desc">No messages are sent without an explicit review and send action.</p>
+      </section>
+
+      <section class="settings-panel-card">
+        <div class="settings-panel-heading">
+          <h3>Review example</h3>
+          <p id="ts-review-example-subtitle">Preview at the selected 85% threshold</p>
+        </div>
+        <span class="settings-example-badge" id="ts-review-example-badge">Needs review · 72% confidence</span>
+        <p class="settings-example-title">October invoice — Studio North</p>
+        <p class="settings-example-meta">Oliver Grant · Today, 8:05 AM</p>
+        <div class="settings-example-preview">
+          <span>Proposed category</span>
+          <span class="settings-example-badge">Finance</span>
+        </div>
+        <p class="setting-desc settings-example-desc">The invoice looks finance-related, but who owns the payment is unclear. Finance is suggested, not confirmed.</p>
+        <div class="settings-context-note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+          <span id="ts-review-example-note">72% is below 85%. This decision stays in review; no approval or payment is made.</span>
+        </div>
+      </section>
+
+      <section class="settings-panel-card">
+        <div class="settings-panel-heading"><h3>Current workspace</h3></div>
+        <p class="setting-desc" id="ts-workspace-emails">24 emails · 3 high priority</p>
+        <p class="setting-desc" id="ts-workspace-tasks">4 suggested tasks · 2 completed</p>
+        <div class="settings-divider"></div>
+        <p class="setting-desc settings-workspace-note" style="font-size:11px;">Cancel discards this form’s edits. Save confirms preferences and shows “Preferences saved” with an Undo action.</p>
+      </section>
+    </aside>
   </div>
 </section>
 
@@ -8487,7 +8824,10 @@ function setMainView(name) {
   if (name === "tasks") renderAgentPanel();
   if (name === "folder") renderGmailFolderView();
   if (name === "matrix") syncMatrixFromWorkRuns({ quiet: true });
-  if (name === "rules") renderRuleStudio();
+  if (name === "rules") {
+    renderRuleStudio();
+    syncTriageSettingsContext();
+  }
   if (name === "jobs") renderJobBoardCandidates();
 }
 
@@ -10017,6 +10357,180 @@ function renderRuleStudio() {
   }
   RULE_STUDIO.phase = "library";
   showRulePhase("library");
+}
+
+const TRIAGE_SETTINGS_STORAGE = "aurora_triage_settings_v1";
+const TRIAGE_SETTING_IDS = [
+  "ts-auto-triage",
+  "ts-assign-categories",
+  "ts-keep-manual-categories",
+  "ts-detect-priority",
+  "ts-never-overwrite-priority",
+  "ts-create-task-suggestions",
+  "ts-require-task-review",
+  "ts-due-dates-stated",
+  "ts-confidence-threshold",
+  "ts-below-threshold",
+  "ts-ask-payment-ownership",
+  "ts-show-reasons",
+  "ts-high-priority-alerts",
+  "ts-review-reminders",
+  "ts-email-digest"
+];
+const TRIAGE_SETTINGS_DEFAULTS = {
+  "ts-auto-triage": true,
+  "ts-assign-categories": true,
+  "ts-keep-manual-categories": true,
+  "ts-detect-priority": true,
+  "ts-never-overwrite-priority": true,
+  "ts-create-task-suggestions": true,
+  "ts-require-task-review": true,
+  "ts-due-dates-stated": true,
+  "ts-confidence-threshold": "85",
+  "ts-below-threshold": "review",
+  "ts-ask-payment-ownership": true,
+  "ts-show-reasons": true,
+  "ts-high-priority-alerts": true,
+  "ts-review-reminders": true,
+  "ts-email-digest": false
+};
+var TRIAGE_SETTINGS_PREFS = null;
+
+function loadTriageSettingsPrefs() {
+  try {
+    var raw = JSON.parse(localStorage.getItem(TRIAGE_SETTINGS_STORAGE) || "{}");
+    return Object.assign({}, TRIAGE_SETTINGS_DEFAULTS, raw && typeof raw === "object" ? raw : {});
+  } catch (e) {
+    return Object.assign({}, TRIAGE_SETTINGS_DEFAULTS);
+  }
+}
+
+function saveTriageSettingsPrefs() {
+  try {
+    localStorage.setItem(TRIAGE_SETTINGS_STORAGE, JSON.stringify(TRIAGE_SETTINGS_PREFS));
+  } catch (e) { /* storage unavailable; UI remains usable for this session */ }
+}
+
+function readTriageSettingsForm() {
+  var out = {};
+  TRIAGE_SETTING_IDS.forEach(function (id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    if (el.type === "checkbox") out[id] = el.checked;
+    else out[id] = el.value;
+  });
+  return out;
+}
+
+function fillTriageSettingsForm(values) {
+  TRIAGE_SETTING_IDS.forEach(function (id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    if (el.type === "checkbox") el.checked = !!values[id];
+    else el.value = String(values[id] || "");
+  });
+}
+
+function syncTriageSettingsStatus(saved) {
+  var badge = document.getElementById("ts-settings-status");
+  if (!badge) return;
+  var dirty = JSON.stringify(readTriageSettingsForm()) !== JSON.stringify(TRIAGE_SETTINGS_PREFS);
+  var showSaved = saved === true && !dirty;
+  badge.textContent = showSaved ? "Preferences saved" : "Unsaved preferences";
+  badge.classList.toggle("saved", showSaved);
+}
+
+function syncTriageSettingsExample() {
+  var threshold = (document.getElementById("ts-confidence-threshold") || {}).value || "85";
+  var subtitle = document.getElementById("ts-review-example-subtitle");
+  var badge = document.getElementById("ts-review-example-badge");
+  var note = document.getElementById("ts-review-example-note");
+  if (subtitle) subtitle.textContent = "Preview at the selected " + threshold + "% threshold";
+  if (badge) badge.textContent = "Needs review · 72% confidence";
+  if (note) note.textContent = "72% is below " + threshold + "%. This decision stays in review; no approval or payment is made.";
+}
+
+function renderTriageSettingsCategories() {
+  var wrap = document.getElementById("ts-enabled-categories");
+  if (!wrap) return;
+  var cats = confirmedJevCategories().slice(0, 4);
+  if (!cats.length) return; // Keep the exact Figma fallback markup.
+  var classes = ["accent", "ok", "warn", "neutral"];
+  wrap.innerHTML = "";
+  cats.forEach(function (cat, index) {
+    var chip = document.createElement("span");
+    chip.className = "settings-chip " + classes[index % classes.length];
+    chip.textContent = cat.name;
+    chip.title = cat.action || cat.name;
+    wrap.appendChild(chip);
+  });
+}
+
+function syncTriageSettingsContext() {
+  renderTriageSettingsCategories();
+  syncTriageSettingsExample();
+  syncTriageSettingsStatus(false);
+  var emails = getActiveEmails();
+  var high = CASE_VIEWS.filter(function (view) {
+    return tierRankOf(view) <= 1;
+  }).length;
+  var tasks = taskItems();
+  var emailLine = document.getElementById("ts-workspace-emails");
+  var taskLine = document.getElementById("ts-workspace-tasks");
+  if (emailLine) emailLine.textContent = emails.length + " emails · " + high + " high priority";
+  if (taskLine) taskLine.textContent = tasks.suggested.length + " suggested tasks · " + tasks.completed.length + " completed";
+}
+
+function initTriageSettingsUi() {
+  TRIAGE_SETTINGS_PREFS = loadTriageSettingsPrefs();
+  fillTriageSettingsForm(TRIAGE_SETTINGS_PREFS);
+  syncTriageSettingsContext();
+  syncTriageSettingsStatus(false);
+  var dateEl = document.getElementById("ts-search-date");
+  if (dateEl) {
+    dateEl.textContent = new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+  }
+  var search = document.getElementById("ts-search-input");
+  if (search) search.addEventListener("keydown", function (event) {
+    if (event.key !== "Enter") return;
+    var globalSearch = document.getElementById("inbox-search");
+    if (globalSearch) {
+      globalSearch.value = search.value;
+      globalSearch.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+    setMainView("work");
+  });
+  var help = document.getElementById("ts-help-btn");
+  if (help) help.addEventListener("click", function () {
+    setTopStatus("info", "Triage settings control future mail; existing decisions stay reversible");
+  });
+  var settingsButton = document.getElementById("ts-settings-btn");
+  if (settingsButton) settingsButton.addEventListener("click", function () { setMainView("settings"); });
+
+  TRIAGE_SETTING_IDS.forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener("change", function () {
+      syncTriageSettingsExample();
+      syncTriageSettingsStatus(false);
+    });
+  });
+
+  var cancel = document.getElementById("ts-cancel");
+  if (cancel) cancel.addEventListener("click", function () {
+    fillTriageSettingsForm(TRIAGE_SETTINGS_PREFS);
+    syncTriageSettingsContext();
+    syncTriageSettingsStatus(false);
+    setTopStatus("info", "Triage preference edits canceled");
+  });
+
+  var save = document.getElementById("ts-save");
+  if (save) save.addEventListener("click", function () {
+    TRIAGE_SETTINGS_PREFS = readTriageSettingsForm();
+    saveTriageSettingsPrefs();
+    syncTriageSettingsContext();
+    syncTriageSettingsStatus(true);
+    setTopStatus("ok", "Preferences saved");
+  });
 }
 
 function initRuleStudio() {
@@ -13818,6 +14332,7 @@ initEvalsResetButton();
 initTracesControls();
 initJobBoardControls();
 initMatrixControls();
+initTriageSettingsUi();
 initRuleStudio();
 initSessionToggle();
 initInfoTips();
@@ -13925,9 +14440,15 @@ renderEvalsTable();
     window.addEventListener("keydown", function (e) {
       if ((e.metaKey || e.ctrlKey) && String(e.key).toLowerCase() === "k") {
         e.preventDefault();
-        setMainView("work");
-        searchInput.focus();
-        searchInput.select();
+        var settingsSearch = document.getElementById("ts-search-input");
+        if (document.getElementById("rules-view").classList.contains("visible") && settingsSearch) {
+          settingsSearch.focus();
+          settingsSearch.select();
+        } else {
+          setMainView("work");
+          searchInput.focus();
+          searchInput.select();
+        }
       }
     });
   }
